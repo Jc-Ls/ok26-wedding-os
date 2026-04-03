@@ -1,65 +1,159 @@
-import Image from "next/image";
+'use client'; 
+
+import { useState, useEffect } from 'react';
 
 export default function Home() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [guestCount, setGuestCount] = useState(142);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [pin, setPin] = useState('');
+  const [errorMsg, setErrorMsg] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
+
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
+
+  const slides = [
+    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleReservation = (e) => {
+    e.preventDefault();
+    const VALID_CODE = 'LAW2026';
+
+    if (inviteCode.toUpperCase() !== VALID_CODE) {
+      setErrorMsg(true);
+      return;
+    }
+
+    setErrorMsg(false);
+    setIsAuthenticating(true);
+
+    setTimeout(() => {
+      const randomNum = Math.floor(1000 + Math.random() * 9000);
+      setPin(`OK26-${randomNum}`);
+      setIsSubmitted(true);
+      setGuestCount((prev) => prev + 1);
+      setIsAuthenticating(false);
+      
+      setTimeout(() => {
+        document.getElementById('pass-section')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }, 1200);
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <div id="carousel-container">
+        {slides.map((url, index) => (
+          <div 
+            key={index} 
+            className={`slide ${index === currentSlide ? 'active' : ''}`} 
+            style={{ backgroundImage: `url('${url}')` }}
+          ></div>
+        ))}
+      </div>
+      <div className="overlay"></div>
+
+      <nav>
+        <div className="logo">O'K26</div>
+        <div className="live-counter">
+          <span className="pulse-dot"></span>
+          <span>{guestCount}</span> &nbsp;Reservations
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </nav>
+
+      <div className="hero">
+        <div className="welcome-text">
+          The Families of<br />
+          <b>Alhaji Sulyman Olowojare & Alhaji Faruq Sarumi</b><br />
+          Invite you to celebrate the union of
         </div>
-      </main>
-    </div>
+        <div className="couple">
+          Muhammed <span className="ampersand">&</span> Kaothar
+        </div>
+      </div>
+
+      <div className="itinerary-container">
+        <div className="day-card">
+          <div className="day-header">
+            <span className="day-title">Friday, June 26</span>
+            <span className="access-badge access-public">Open Access</span>
+          </div>
+          <div className="event-row">
+            <div className="event-time">9:00 AM</div>
+            <div className="event-name">Wolimat Ceremony</div>
+            <div className="event-loc">Akala Mosque, Adeta, Ilorin</div>
+            <a href="#" className="btn-map">📍 Open in Maps</a>
+          </div>
+          <div className="event-row" style={{ marginTop: '25px' }}>
+            <div className="event-time">Immediately Following</div>
+            <div className="event-name">Nikkah Ceremony</div>
+            <div className="event-loc">Sarumi Mosq., Ode Alfa Nda, Ilorin</div>
+            <a href="#" className="btn-map">📍 Open in Maps</a>
+          </div>
+        </div>
+
+        <div className="day-card" style={{ borderLeftColor: 'var(--gold-bright)' }}>
+          <div className="day-header">
+            <span className="day-title">Saturday, June 27</span>
+            <span className="access-badge access-private">Reservation Required</span>
+          </div>
+          <div className="event-row">
+            <div className="event-time">12:00 NOON</div>
+            <div className="event-name">Reception & Dinner</div>
+            <div className="event-loc">Al-Kareem Event Hall, Opp Air-force, Oloje, Ilorin</div>
+            <a href="#" className="btn-map">📍 Open in Maps</a>
+          </div>
+        </div>
+      </div>
+
+      <div className="rsvp-container" id="pass-section">
+        {!isSubmitted ? (
+          <div id="rsvp-form-container">
+            <h2 className="rsvp-header">Secure Reservation</h2>
+            <p className="rsvp-desc">Access to the reception requires a verified reservation. Enter your details and the code from your invitation.</p>
+            
+            <form onSubmit={handleReservation}>
+              <div className="form-group">
+                <label>Full Name</label>
+                <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="e.g., John Doe" required />
+              </div>
+              <div className="form-group">
+                <label>Phone Number</label>
+                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="080..." required />
+              </div>
+              <div className="form-group">
+                <label style={{ color: '#ff6464' }}>Invitation Code</label>
+                <input type="text" className="security-input" value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="Enter code printed on card" required />
+                {errorMsg && <div id="error-msg" style={{ display: 'block', color: '#ff6464', fontSize: '0.8rem', marginTop: '5px' }}>Invalid invitation code.</div>}
+              </div>
+              <button type="submit" className="btn-submit" disabled={isAuthenticating}>
+                {isAuthenticating ? 'Verifying Data...' : 'Confirm Reservation'}
+              </button>
+            </form>
+          </div>
+        ) : (
+          <div id="success-state" style={{ display: 'block' }}>
+            <div className="success-icon">✔️</div>
+            <h2 className="rsvp-header" style={{ fontSize: '1.5rem' }}>Reservation Confirmed</h2>
+            <p className="rsvp-desc">Your information is secured in our system. Please screenshot or save your unique Reservation ID.</p>
+            <div className="pin-box">
+              <div className="pin-code">{pin}</div>
+            </div>
+            <p style={{ fontSize: '0.8rem', opacity: 0.7 }}>Present this ID at the Al-Kareem Event Hall entrance on Saturday.</p>
+          </div>
+        )}
+      </div>
+    </>
   );
 }
