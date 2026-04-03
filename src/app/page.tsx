@@ -26,7 +26,7 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleReservation = (e) => {
+  const handleReservation = (e: any) => {
     e.preventDefault();
     const VALID_CODE = 'LAW2026';
 
