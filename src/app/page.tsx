@@ -4,7 +4,10 @@ import { useState, useEffect } from 'react';
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [guestCount, setGuestCount] = useState(142);
+  const [activeViewers, setActiveViewers] = useState(12);
+  const [viewerLocation, setViewerLocation] = useState('Ilorin'); // Default
+  const [scrollY, setScrollY] = useState(0);
+  
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [pin, setPin] = useState('');
   const [errorMsg, setErrorMsg] = useState(false);
@@ -20,17 +23,40 @@ export default function Home() {
   ];
 
   useEffect(() => {
-    const timer = setInterval(() => {
+    // 1. Silent Location Fetcher (No annoying popups)
+    fetch('https://ipapi.co/json/')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.city) setViewerLocation(data.city);
+      })
+      .catch(() => console.log('Location fetch blocked, using default.'));
+
+    // 2. Parallax Scroll Listener
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // 3. Carousel Timer
+    const slideTimer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % slides.length);
     }, 5000);
-    return () => clearInterval(timer);
+
+    // 4. Live Viewers Fluctuation
+    const viewerTimer = setInterval(() => {
+      setActiveViewers((prev) => {
+        const change = Math.floor(Math.random() * 3) - 1; 
+        return prev + change > 3 ? prev + change : 4; 
+      });
+    }, 8000);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearInterval(slideTimer);
+      clearInterval(viewerTimer);
+    };
   }, []);
 
-  // Notice the 'e: any' fix we added earlier to pass the Vercel build
   const handleReservation = (e: any) => {
     e.preventDefault();
-    
-    // UPDATED INVITATION CODE
     const VALID_CODE = 'OK26';
 
     if (inviteCode.toUpperCase() !== VALID_CODE) {
@@ -45,13 +71,19 @@ export default function Home() {
       const randomNum = Math.floor(1000 + Math.random() * 9000);
       setPin(`OK26-${randomNum}`);
       setIsSubmitted(true);
-      setGuestCount((prev) => prev + 1);
       setIsAuthenticating(false);
       
       setTimeout(() => {
         document.getElementById('pass-section')?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
     }, 1200);
+  };
+
+  // Calculate Parallax Styles based on Scroll
+  const parallaxStyle = {
+    transform: `scale(${Math.max(0.6, 1 - scrollY / 1000)}) translateY(${scrollY * 0.3}px)`,
+    opacity: Math.max(0, 1 - scrollY / 500),
+    transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
   };
 
   return (
@@ -71,7 +103,7 @@ export default function Home() {
         <div className="logo">O'K26</div>
         <div className="live-counter">
           <span className="pulse-dot"></span>
-          <span>{guestCount}</span> &nbsp;Reservations
+          <span>{activeViewers}</span> &nbsp;Viewing from {viewerLocation}
         </div>
       </nav>
 
@@ -81,8 +113,9 @@ export default function Home() {
           <b>Alhaji Sulyman Olowojare & Alhaji Faruq Sarumi</b><br />
           Invite you to celebrate the union of
         </div>
-        <div className="couple">
-          Muhammed <span className="ampersand">&</span> Kaothar
+        {/* PARALLAX & SHIMMER COUPLE NAME */}
+        <div className="couple name-shimmer" style={parallaxStyle}>
+          Muhammed <span className="ampersand" style={{ color: 'var(--gold-bright)' }}>&</span> Kaothar
         </div>
       </div>
 
@@ -96,13 +129,14 @@ export default function Home() {
             <div className="event-time">9:00 AM</div>
             <div className="event-name">Wolimat Ceremony</div>
             <div className="event-loc">Akala Mosque, Adeta, Ilorin</div>
-            <a href="#" className="btn-map">📍 Open in Maps</a>
+            {/* Real Google Maps Routing URL */}
+            <a href="https://www.google.com/maps/dir/?api=1&destination=Akala+Mosque,+Adeta,+Ilorin" target="_blank" rel="noopener noreferrer" className="btn-map">📍 Open in Maps</a>
           </div>
           <div className="event-row" style={{ marginTop: '25px' }}>
             <div className="event-time">Immediately Following</div>
             <div className="event-name">Nikkah Ceremony</div>
             <div className="event-loc">Sarumi Mosq., Ode Alfa Nda, Ilorin</div>
-            <a href="#" className="btn-map">📍 Open in Maps</a>
+            <a href="https://www.google.com/maps/dir/?api=1&destination=Ode+Alfa+Nda,+Ilorin" target="_blank" rel="noopener noreferrer" className="btn-map">📍 Open in Maps</a>
           </div>
         </div>
 
@@ -115,7 +149,7 @@ export default function Home() {
             <div className="event-time">12:00 NOON</div>
             <div className="event-name">Reception & Dinner</div>
             <div className="event-loc">Al-Kareem Event Hall, Opp Air-force, Oloje, Ilorin</div>
-            <a href="#" className="btn-map">📍 Open in Maps</a>
+            <a href="https://www.google.com/maps/dir/?api=1&destination=Al-Kareem+Event+Hall,+Oloje,+Ilorin" target="_blank" rel="noopener noreferrer" className="btn-map">📍 Open in Maps</a>
           </div>
         </div>
       </div>
@@ -157,6 +191,12 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* PORTFOLIO FOOTER */}
+      <footer className="site-footer">
+        © 2026 Elegantly crafted <span className="rose-icon">🌹</span> by<br />
+        <a href="https://jclabs-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer">JARE'S CHOICE LABS</a>
+      </footer>
     </>
   );
 }
