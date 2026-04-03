@@ -27,7 +27,7 @@ export default function Home() {
   }, []);
 
   // Notice the 'e: any' fix we added earlier to pass the Vercel build
-  const handleReservation = (e) => {
+  const handleReservation = (e: any) => {
     e.preventDefault();
     
     // UPDATED INVITATION CODE
