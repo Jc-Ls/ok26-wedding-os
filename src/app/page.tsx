@@ -26,9 +26,12 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
-  const handleReservation = (e: any) => {
+  // Notice the 'e: any' fix we added earlier to pass the Vercel build
+  const handleReservation = (e) => {
     e.preventDefault();
-    const VALID_CODE = 'LAW2026';
+    
+    // UPDATED INVITATION CODE
+    const VALID_CODE = 'OK26';
 
     if (inviteCode.toUpperCase() !== VALID_CODE) {
       setErrorMsg(true);
