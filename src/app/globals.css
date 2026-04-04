@@ -4,7 +4,6 @@
   --gold-base: #D4AF37;
   --gold-bright: #E5C07B;
   --text-light: #FFF5E1;
-  /* Updated Theme Colors */
   --navy-bg: #0A142F; 
   --navy-surface: rgba(10, 20, 47, 0.85);
   --pink-accent: #F9A8D4;
@@ -18,84 +17,74 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
   overflow-x: hidden;
   background-color: var(--navy-bg);
   width: 100%;
 }
 
-/* --- THE "WOW" ANIMATIONS --- */
-.name-shimmer {
-  background: linear-gradient(to right, var(--gold-bright) 20%, #ffffff 50%, var(--gold-bright) 80%);
-  background-size: 200% auto;
-  color: transparent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  animation: shimmer 4s linear infinite;
-}
+/* --- HOME PAGE STRUCTURE --- */
+#carousel-container { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; }
+.slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: opacity 2s ease-in-out; }
+.slide.active { opacity: 0.5; } /* Darkened to let navy theme show through */
+.overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: linear-gradient(to bottom, rgba(10, 20, 47, 0.7), rgba(10, 20, 47, 0.95)); z-index: -1; }
 
-@keyframes shimmer {
-  to { background-position: 200% center; }
-}
+nav { width: 100%; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212, 175, 55, 0.2); z-index: 10; background: rgba(10, 20, 47, 0.8); backdrop-filter: blur(8px); }
+.logo { font-family: 'Cinzel', serif; font-size: 1.5rem; color: var(--gold-base); font-weight: bold; text-decoration: none; }
+.live-counter { display: flex; align-items: center; font-size: 0.85rem; color: #fff; background: rgba(249, 168, 212, 0.15); padding: 8px 15px; border-radius: 20px; border: 1px solid var(--pink-accent); }
+.pulse-dot { width: 8px; height: 8px; background-color: #4CAF50; border-radius: 50%; margin-right: 8px; box-shadow: 0 0 10px #4CAF50; animation: pulse 1.5s infinite; }
+@keyframes pulse { 0% { transform: scale(0.95); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(0.95); opacity: 0.8; } }
+
+.hero { text-align: center; padding: 40px 20px 20px; width: 100%; max-width: 800px; z-index: 10; margin: 0 auto; }
+.welcome-text { font-size: clamp(0.7rem, 2.5vw, 0.85rem); letter-spacing: 2px; text-transform: uppercase; color: var(--gold-bright); margin-bottom: 15px; line-height: 1.6; }
+.couple { font-family: 'Cormorant Garamond', serif; color: var(--gold-bright); line-height: 1.2; margin-bottom: 20px; }
+
+/* --- ITINERARY & RSVP --- */
+.itinerary-container { width: 90%; max-width: 600px; margin: 0 auto 40px auto; z-index: 10; }
+.day-card { background: rgba(255, 255, 255, 0.03); border-left: 4px solid var(--gold-base); padding: clamp(15px, 4vw, 20px); margin-bottom: 20px; border-radius: 0 8px 8px 0; backdrop-filter: blur(10px); border-top: 1px solid rgba(255,255,255,0.05); border-right: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
+.day-header { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212, 175, 55, 0.2); padding-bottom: 10px; margin-bottom: 15px; }
+.day-title { font-family: 'Cinzel', serif; font-size: clamp(1rem, 4vw, 1.2rem); color: var(--gold-bright); font-weight: bold; }
+.access-badge { font-size: 0.7rem; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; font-weight: bold; letter-spacing: 1px; white-space: nowrap; }
+.access-public { background: rgba(255,255,255,0.1); color: #ccc; }
+.access-private { background: rgba(249, 168, 212, 0.15); color: var(--pink-accent); border: 1px solid var(--pink-accent); }
+.event-row { margin-bottom: 15px; }
+.event-time { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--gold-base); margin-bottom: 3px; }
+.event-name { font-size: 1.1rem; font-weight: bold; margin: 5px 0; color: #fff; }
+.event-loc { font-size: 0.85rem; color: #ddd; margin-bottom: 10px; }
+.btn-map { display: inline-block; background: transparent; color: var(--gold-bright); border: 1px solid var(--gold-bright); padding: 6px 12px; font-size: 0.75rem; text-decoration: none; border-radius: 4px; text-transform: uppercase; letter-spacing: 1px; transition: 0.3s; }
+.btn-map:hover { background: var(--gold-bright); color: #000; }
+
+.rsvp-container { width: 90%; max-width: 500px; margin: 0 auto 60px auto; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 12px; padding: clamp(20px, 5vw, 40px) clamp(15px, 4vw, 30px); box-shadow: 0 15px 35px rgba(0,0,0,0.5); backdrop-filter: blur(15px); z-index: 10; }
+.rsvp-header { font-family: 'Cinzel', serif; font-size: clamp(1.4rem, 6vw, 1.8rem); color: var(--gold-bright); text-align: center; margin-bottom: 10px; }
+.rsvp-desc { text-align: center; font-size: 0.85rem; margin-bottom: 30px; opacity: 0.9; line-height: 1.5; color: #d1d5db; }
+.form-group { margin-bottom: 20px; }
+label { display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; color: var(--gold-base); }
+input { width: 100%; padding: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; color: white; font-family: 'Montserrat', sans-serif; font-size: 1rem; outline: none; transition: border 0.3s ease; }
+input:focus { border: 1px solid var(--gold-bright); }
+.security-input { border-color: rgba(249, 168, 212, 0.5) !important; letter-spacing: 2px; }
+.security-input:focus { border-color: var(--pink-accent) !important; }
+.btn-submit { width: 100%; background: var(--gold-base); color: #000; padding: 18px; border: none; border-radius: 8px; font-family: 'Cinzel', serif; font-weight: bold; font-size: 1.1rem; cursor: pointer; margin-top: 10px; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
+.btn-submit:active { transform: scale(0.98); }
+.btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+.pin-box { background: rgba(212, 175, 55, 0.1); border: 2px dashed var(--gold-bright); padding: 20px; margin: 20px 0; border-radius: 8px; }
+.pin-code { font-family: monospace; font-size: clamp(1.8rem, 6vw, 2.2rem); color: var(--gold-bright); letter-spacing: 2px; font-weight: bold; }
+
+/* --- MENU PAGE UTILITIES --- */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+.menu-item-card { display: flex; align-items: center; justify-content: space-between; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); cursor: pointer; transition: 0.3s ease; margin-bottom: 15px; width: 100%; }
+.menu-item-card.selected { border-color: var(--gold-base); background: rgba(212, 175, 55, 0.1); }
+.menu-item-left { display: flex; align-items: center; flex: 1; padding-right: 15px; }
+.menu-item-text { font-weight: 700; color: #fff; font-size: 0.95rem; line-height: 1.3; text-transform: uppercase; letter-spacing: 1px; word-break: break-word; }
+.menu-item-img-container { width: 70px; height: 70px; flex-shrink: 0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+.menu-item-img { width: 100%; height: 100%; object-fit: cover; }
+.radio-custom { width: 22px; height: 22px; margin-right: 12px; accent-color: var(--gold-base); flex-shrink: 0; }
+
+/* --- THE "WOW" ANIMATIONS --- */
+.name-shimmer { background: linear-gradient(to right, var(--gold-bright) 20%, #ffffff 50%, var(--gold-bright) 80%); background-size: 200% auto; color: transparent; -webkit-background-clip: text; background-clip: text; animation: shimmer 4s linear infinite; }
+@keyframes shimmer { to { background-position: 200% center; } }
 
 /* --- FOOTER --- */
-.site-footer { width: 100%; text-align: center; padding: 30px 20px 40px; font-size: 0.75rem; color: rgba(255, 245, 225, 0.5); border-top: 1px solid rgba(212, 175, 55, 0.2); background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 10; margin-top: auto; letter-spacing: 1px; }
+.site-footer { width: 100%; text-align: center; padding: 30px 20px 40px; font-size: 0.75rem; color: rgba(255, 245, 225, 0.5); border-top: 1px solid rgba(212, 175, 55, 0.2); background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(10px); z-index: 10; margin-top: auto; letter-spacing: 1px; }
 .site-footer a { color: var(--gold-bright); text-decoration: none; font-weight: bold; font-family: 'Cinzel', serif; letter-spacing: 2px; transition: opacity 0.3s; }
 .site-footer a:hover { opacity: 0.8; }
 .rose-icon { color: var(--pink-accent); font-size: 0.9rem; }
-
-/* Hide scrollbar for category tabs but allow scrolling */
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-/* --- MENU UI UTILITIES (Fixing the Mobile Layout) --- */
-.menu-item-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.1);
-  background: rgba(255,255,255,0.03);
-  cursor: pointer;
-  transition: 0.3s ease;
-  margin-bottom: 15px;
-}
-.menu-item-card.selected {
-  border-color: var(--gold-base);
-  background: rgba(212, 175, 55, 0.1);
-}
-.menu-item-left {
-  display: flex;
-  align-items: center;
-  flex: 1; /* This pushes the image to the right and takes up available space */
-  padding-right: 15px; /* Gives the text room to breathe */
-}
-.menu-item-text {
-  font-weight: 700;
-  color: #fff;
-  font-size: 0.95rem;
-  line-height: 1.3;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.menu-item-img-container {
-  width: 80px;  /* Fixed width - stops it from being too big */
-  height: 80px; /* Fixed height */
-  flex-shrink: 0; /* Prevents the image from being squished by long text */
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-}
-.menu-item-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.radio-custom {
-  width: 20px;
-  height: 20px;
-  margin-right: 15px;
-  accent-color: var(--gold-base);
-  flex-shrink: 0;
-}
