@@ -27,11 +27,36 @@ export default function MenuPage() {
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
   const [selectedDrink, setSelectedDrink] = useState<string | null>(null);
   const [includeSalad, setIncludeSalad] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // REAL DATABASE TRACKER STATE
+  const [orderId, setOrderId] = useState<string | null>(null);
+  const [orderStatus, setOrderStatus] = useState<string | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setTableNumber(params.get('table'));
   }, []);
+
+  // REAL-TIME DATABASE POLLING
+  useEffect(() => {
+    if (!orderId || orderStatus === 'DISPATCHED') return;
+
+    // Check the database every 5 seconds for an update from the Kitchen
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/orders?id=${orderId}`);
+        const data = await res.json();
+        if (data.status && data.status !== orderStatus) {
+          setOrderStatus(data.status);
+        }
+      } catch (err) {
+        console.error("Failed to fetch status");
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [orderId, orderStatus]);
 
   const categories = ['All', 'Swallows', 'Rice', 'Drinks', 'Wine'];
 
@@ -43,7 +68,36 @@ export default function MenuPage() {
     });
   }, [searchQuery, activeTab]);
 
-  const isRiceSelected = selectedMeal && MENU_ITEMS.find(i => i.id === selectedMeal)?.category === 'Rice';
+  const handlePlaceOrder = async () => {
+    setIsSubmitting(true);
+    
+    const mealName = MENU_ITEMS.find(i => i.id === selectedMeal)?.name || null;
+    const drinkName = MENU_ITEMS.find(i => i.id === selectedDrink)?.name || null;
+
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          tableNumber,
+          mealName,
+          drinkName,
+          withSalad: includeSalad
+        })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setOrderId(data.orderId);
+        setOrderStatus('SENT');
+      } else {
+        alert("Server error processing order.");
+      }
+    } catch (error) {
+      alert("Failed to send order. Please check internet connection.");
+    }
+    setIsSubmitting(false);
+  };
 
   if (tableNumber === null) {
     return (
@@ -58,7 +112,7 @@ export default function MenuPage() {
   return (
     <div style={{ width: '100vw', maxWidth: '100%', minHeight: '100vh', backgroundColor: 'var(--navy-bg)', paddingBottom: '128px', overflowX: 'hidden' }}>
       
-      {/* 1. HERO SECTION */}
+      {/* HERO SECTION */}
       <div style={{ position: 'relative', width: '100%', paddingBottom: '30px', borderBottom: '1px solid rgba(212, 175, 55, 0.2)' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(10, 20, 47, 0.95)', zIndex: 0 }}></div>
         
@@ -70,65 +124,34 @@ export default function MenuPage() {
         </nav>
 
         <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '0 20px', marginTop: '10px', width: '100%', maxWidth: '800px', margin: '0 auto' }}>
-          <p style={{ fontSize: 'clamp(0.7rem, 2.5vw, 0.85rem)', color: '#fff', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '15px' }}>
-            Welcome to the wedding ceremony of
-          </p>
-          
+          <p style={{ fontSize: 'clamp(0.7rem, 2.5vw, 0.85rem)', color: '#fff', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '15px' }}>Welcome to the wedding ceremony of</p>
           <h1 style={{ fontFamily: '"Cormorant Garamond", serif', color: 'var(--gold-bright)', lineHeight: '1.2', marginBottom: '20px', width: '100%' }}>
-            <span style={{ display: 'block', fontSize: 'clamp(2.5rem, 10vw, 3.5rem)' }}>
-              Muhammed <br className="mobile-break" style={{ display: 'none' }} />
-              <i style={{ fontSize: 'clamp(1.2rem, 5vw, 1.5rem)', color: 'var(--pink-accent)', whiteSpace: 'nowrap' }}>(Omokayode)</i>
-            </span>
+            <span style={{ display: 'block', fontSize: 'clamp(2.5rem, 10vw, 3.5rem)' }}>Muhammed <br className="mobile-break" style={{ display: 'none' }} /><i style={{ fontSize: 'clamp(1.2rem, 5vw, 1.5rem)', color: 'var(--pink-accent)' }}>(Omokayode)</i></span>
             <span style={{ fontFamily: '"Cinzel", serif', fontSize: 'clamp(1.5rem, 6vw, 2rem)', display: 'block', margin: '10px 0' }}>&</span>
-            <span style={{ display: 'block', fontSize: 'clamp(2.5rem, 10vw, 3.5rem)' }}>
-              Kaothar <br className="mobile-break" style={{ display: 'none' }} />
-              <i style={{ fontSize: 'clamp(1.2rem, 5vw, 1.5rem)', color: 'var(--pink-accent)', whiteSpace: 'nowrap' }}>(Oyindamola)</i>
-            </span>
+            <span style={{ display: 'block', fontSize: 'clamp(2.5rem, 10vw, 3.5rem)' }}>Kaothar <br className="mobile-break" style={{ display: 'none' }} /><i style={{ fontSize: 'clamp(1.2rem, 5vw, 1.5rem)', color: 'var(--pink-accent)' }}>(Oyindamola)</i></span>
           </h1>
-          
-          <p style={{ fontSize: 'clamp(0.85rem, 3vw, 0.95rem)', color: 'var(--gold-base)', maxWidth: '28rem', fontStyle: 'italic', lineHeight: '1.6' }}>
-            To serve you seamlessly, please use this digital menu to place your order directly to our kitchen. Browse the options below and choose with love and happiness.
-          </p>
+          <p style={{ fontSize: 'clamp(0.85rem, 3vw, 0.95rem)', color: 'var(--gold-base)', maxWidth: '28rem', fontStyle: 'italic', lineHeight: '1.6' }}>To serve you seamlessly, please use this digital menu to place your order directly to our kitchen.</p>
         </div>
       </div>
 
       <div style={{ width: '100%', maxWidth: '600px', margin: '0 auto', padding: '0 16px', marginTop: '24px' }}>
-        <p style={{ fontSize: '0.75rem', textAlign: 'center', fontStyle: 'italic', color: 'rgba(212, 175, 55, 0.8)', marginBottom: '24px', padding: '0 10px' }}>
-          * All meals are served with assorted premium proteins based on kitchen availability.
-        </p>
+        <p style={{ fontSize: '0.75rem', textAlign: 'center', fontStyle: 'italic', color: 'rgba(212, 175, 55, 0.8)', marginBottom: '24px', padding: '0 10px' }}>* All meals are served with assorted premium proteins based on kitchen availability.</p>
 
-        {/* 2. SEARCH BAR */}
+        {/* SEARCH BAR */}
         <div style={{ marginBottom: '24px' }}>
-          <input 
-            type="text" 
-            placeholder="Search for a meal or drink..." 
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ width: '100%', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(212, 175, 55, 0.3)', color: '#fff', padding: '14px 16px', borderRadius: '8px', outline: 'none', fontSize: '1rem' }}
-          />
+          <input type="text" placeholder="Search for a meal or drink..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ width: '100%', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(212, 175, 55, 0.3)', color: '#fff', padding: '14px 16px', borderRadius: '8px', outline: 'none', fontSize: '1rem' }} />
         </div>
 
-        {/* 3. STICKY CATEGORY TABS */}
+        {/* STICKY CATEGORY TABS */}
         <div className="no-scrollbar" style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: 'rgba(10, 20, 47, 0.95)', backdropFilter: 'blur(8px)', padding: '16px 0', marginBottom: '24px', overflowX: 'auto', whiteSpace: 'nowrap', borderBottom: '1px solid rgba(212, 175, 55, 0.2)' }}>
           <div style={{ display: 'flex', gap: '10px', padding: '0 4px' }}>
             {categories.map((cat) => (
-              <button 
-                key={cat}
-                onClick={() => setActiveTab(cat)}
-                style={{
-                  padding: '8px 18px', borderRadius: '9999px', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase', transition: 'all 0.3s', cursor: 'pointer', flexShrink: 0,
-                  backgroundColor: activeTab === cat ? 'var(--gold-base)' : 'transparent',
-                  color: activeTab === cat ? '#000' : '#9ca3af',
-                  border: activeTab === cat ? 'none' : '1px solid #4b5563'
-                }}
-              >
-                {cat}
-              </button>
+              <button key={cat} onClick={() => setActiveTab(cat)} style={{ padding: '8px 18px', borderRadius: '9999px', fontSize: '0.8rem', fontWeight: 'bold', textTransform: 'uppercase', transition: 'all 0.3s', cursor: 'pointer', flexShrink: 0, backgroundColor: activeTab === cat ? 'var(--gold-base)' : 'transparent', color: activeTab === cat ? '#000' : '#9ca3af', border: activeTab === cat ? 'none' : '1px solid #4b5563' }}>{cat}</button>
             ))}
           </div>
         </div>
 
-        {/* 4. MENU LIST */}
+        {/* MENU LIST */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
           {filteredMenu.map((item) => {
             const isMeal = item.category === 'Swallows' || item.category === 'Rice';
@@ -136,37 +159,20 @@ export default function MenuPage() {
 
             return (
               <div key={item.id}>
-                {/* Fixed Layout to guarantee radio button and text fit */}
                 <label className={`menu-item-card ${isSelected ? 'selected' : ''}`} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', borderRadius: '12px', border: `1px solid ${isSelected ? 'var(--gold-base)' : 'rgba(255,255,255,0.1)'}`, backgroundColor: isSelected ? 'rgba(212, 175, 55, 0.1)' : 'rgba(255,255,255,0.03)', cursor: 'pointer', width: '100%' }}>
-                  
                   <div style={{ display: 'flex', alignItems: 'center', flex: 1, paddingRight: '15px' }}>
-                    <input 
-                      type="radio" 
-                      name={isMeal ? "meal" : "drink"} 
-                      checked={isSelected}
-                      onChange={() => isMeal ? setSelectedMeal(item.id) : setSelectedDrink(item.id)}
-                      style={{ width: '22px', height: '22px', marginRight: '12px', flexShrink: 0, accentColor: 'var(--gold-base)' }}
-                    />
-                    <span style={{ fontWeight: 'bold', color: '#fff', fontSize: '0.9rem', lineHeight: '1.4', textTransform: 'uppercase', wordBreak: 'break-word' }}>
-                      {item.name}
-                    </span>
+                    <input type="radio" name={isMeal ? "meal" : "drink"} checked={isSelected} onChange={() => isMeal ? setSelectedMeal(item.id) : setSelectedDrink(item.id)} style={{ width: '22px', height: '22px', marginRight: '12px', flexShrink: 0, accentColor: 'var(--gold-base)' }} />
+                    <span style={{ fontWeight: 'bold', color: '#fff', fontSize: '0.9rem', lineHeight: '1.4', textTransform: 'uppercase', wordBreak: 'break-word' }}>{item.name}</span>
                   </div>
-
                   <div style={{ width: '70px', height: '70px', flexShrink: 0, borderRadius: '8px', overflow: 'hidden', boxShadow: '0 4px 10px rgba(0,0,0,0.5)' }}>
                     <img src={item.img} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                 </label>
 
-                {/* Conditional Salad Toggle for Rice */}
                 {isMeal && isSelected && item.category === 'Rice' && (
                   <div style={{ marginLeft: '45px', marginTop: '8px', padding: '12px', backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '0.85rem', color: '#d1d5db' }}>Include Coleslaw/Salad?</span>
-                    <input 
-                      type="checkbox" 
-                      checked={includeSalad} 
-                      onChange={(e) => setIncludeSalad(e.target.checked)}
-                      style={{ width: '20px', height: '20px', accentColor: 'var(--gold-base)' }}
-                    />
+                    <input type="checkbox" checked={includeSalad} onChange={(e) => setIncludeSalad(e.target.checked)} style={{ width: '20px', height: '20px', accentColor: 'var(--gold-base)' }} />
                   </div>
                 )}
               </div>
@@ -175,12 +181,63 @@ export default function MenuPage() {
         </div>
       </div>
 
-      {/* 5. FLOATING ORDER BUTTON */}
-      {(selectedMeal || selectedDrink) && (
+      {/* FLOATING ORDER BUTTON */}
+      {(selectedMeal || selectedDrink) && !orderStatus && (
         <div style={{ position: 'fixed', bottom: 0, left: 0, width: '100%', padding: '16px', backgroundColor: 'rgba(10, 20, 47, 0.95)', backdropFilter: 'blur(12px)', borderTop: '1px solid rgba(212, 175, 55, 0.3)', zIndex: 30 }}>
-          <button style={{ width: '100%', maxWidth: '600px', margin: '0 auto', display: 'block', backgroundColor: 'var(--gold-base)', color: '#000', fontWeight: 'bold', padding: '18px', borderRadius: '8px', textTransform: 'uppercase', letterSpacing: '2px', border: 'none', cursor: 'pointer', boxShadow: '0 0 20px rgba(212,175,55,0.3)', fontSize: '1rem' }}>
-            Place Your Order
+          <button onClick={handlePlaceOrder} disabled={isSubmitting} style={{ width: '100%', maxWidth: '600px', margin: '0 auto', display: 'block', backgroundColor: 'var(--gold-base)', color: '#000', fontWeight: 'bold', padding: '18px', borderRadius: '8px', textTransform: 'uppercase', letterSpacing: '2px', border: 'none', cursor: isSubmitting ? 'not-allowed' : 'pointer', boxShadow: '0 0 20px rgba(212,175,55,0.3)', fontSize: '1rem', opacity: isSubmitting ? 0.7 : 1 }}>
+            {isSubmitting ? 'Sending...' : 'Place Your Order'}
           </button>
+        </div>
+      )}
+
+      {/* REAL-TIME TRACKER MODAL */}
+      {orderStatus && (
+        <div className="tracker-overlay">
+          <div className="tracker-card">
+            <h2 style={{ fontFamily: '"Cinzel", serif', color: 'var(--gold-bright)', fontSize: '1.5rem', marginBottom: '10px' }}>Order Status</h2>
+            <p style={{ color: '#d1d5db', fontSize: '0.9rem', marginBottom: '20px' }}>
+              Your order is locked to <strong style={{ color: 'var(--gold-base)' }}>Table {tableNumber}</strong>. Please remain seated while we prepare your meal.
+            </p>
+
+            <div className="step-container">
+              <div className="step-line"></div>
+              <div className="step-line-fill" style={{ height: orderStatus === 'SENT' ? '0%' : orderStatus === 'PLATING' ? '50%' : '100%' }}></div>
+
+              {/* Step 1: Sent */}
+              <div className={`step-item ${orderStatus === 'SENT' ? 'active' : 'completed'}`}>
+                <div className="step-icon">{orderStatus === 'SENT' ? '🎫' : '✔️'}</div>
+                <div className="step-text">
+                  <h4>Ticket Sent {orderStatus === 'SENT' && <span className="pulsing-dot"></span>}</h4>
+                  <p>Kitchen has received your order</p>
+                </div>
+              </div>
+
+              {/* Step 2: Plating */}
+              <div className={`step-item ${orderStatus === 'PLATING' ? 'active' : orderStatus === 'DISPATCHED' ? 'completed' : ''}`}>
+                <div className="step-icon">{orderStatus === 'DISPATCHED' ? '✔️' : '🍳'}</div>
+                <div className="step-text">
+                  <h4>Chef is Plating {orderStatus === 'PLATING' && <span className="pulsing-dot"></span>}</h4>
+                  <p>Preparing your meal freshly</p>
+                </div>
+              </div>
+
+              {/* Step 3: Dispatched */}
+              <div className={`step-item ${orderStatus === 'DISPATCHED' ? 'active' : ''}`}>
+                <div className="step-icon">🏃‍♂️</div>
+                <div className="step-text">
+                  <h4>On the Way! {orderStatus === 'DISPATCHED' && <span className="pulsing-dot"></span>}</h4>
+                  <p>Waiter is heading to Table {tableNumber}</p>
+                </div>
+              </div>
+            </div>
+            
+            {orderStatus === 'DISPATCHED' && (
+              <button onClick={() => window.location.reload()} style={{ marginTop: '30px', padding: '10px 20px', backgroundColor: 'transparent', border: '1px solid var(--gold-base)', color: 'var(--gold-base)', borderRadius: '6px', cursor: 'pointer' }}>
+                Order Another Meal
+              </button>
+            )}
+
+          </div>
         </div>
       )}
     </div>

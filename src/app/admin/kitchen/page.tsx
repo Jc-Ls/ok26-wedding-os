@@ -1,19 +1,68 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-// Temporary Mock Data until we wire the API in the next step
-const MOCK_ORDERS = [
-  { id: '1', tableNumber: '5', mealName: 'Party Jollof Rice', drinkName: 'Coca-Cola', withSalad: true, status: 'SENT', time: 'Just now' },
-  { id: '2', tableNumber: '12', mealName: 'Amala + Gbegiri', drinkName: 'Pulpy Orange', withSalad: false, status: 'PLATING', time: '2 mins ago' },
-];
+type Order = {
+  id: string;
+  tableNumber: string;
+  mealName: string;
+  drinkName: string;
+  withSalad: boolean;
+  status: string;
+  createdAt: string;
+};
 
 export default function KitchenDashboard() {
-  const [orders, setOrders] = useState(MOCK_ORDERS);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isFetching, setIsFetching] = useState(true);
 
-  const updateStatus = (id: string, newStatus: string) => {
-    // In final step, this will hit the API to update the database
-    setOrders(orders.map(order => order.id === id ? { ...order, status: newStatus } : order));
+  // Fetch active orders from the Neon Database
+  const fetchOrders = async () => {
+    try {
+      const res = await fetch('/api/orders');
+      if (res.ok) {
+        const data = await res.json();
+        setOrders(data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch orders", err);
+    } finally {
+      setIsFetching(false);
+    }
   };
+
+  // Poll the database every 5 seconds so the Kitchen iPad auto-updates
+  useEffect(() => {
+    fetchOrders();
+    const interval = setInterval(fetchOrders, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const updateStatus = async (id: string, newStatus: string) => {
+    // 1. Optimistic Update (makes the UI feel instantly snappy)
+    setOrders(orders.map(order => order.id === id ? { ...order, status: newStatus } : order));
+    
+    // 2. Actually tell the database
+    try {
+      await fetch('/api/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: newStatus })
+      });
+    } catch (err) {
+      alert('Failed to update status. Please check your internet connection.');
+      fetchOrders(); // refresh from db if it failed
+    }
+  };
+
+  // Convert UTC database time to local readable time
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  if (isFetching) {
+    return <div style={{ minHeight: '100vh', backgroundColor: '#0A142F', color: '#D4AF37', display: 'flex', justifyContent: 'center', alignItems: 'center', fontFamily: '"Cinzel", serif', fontSize: '1.5rem' }}>Loading Kitchen Command...</div>;
+  }
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#0A142F', color: '#fff', padding: '20px', fontFamily: '"Montserrat", sans-serif' }}>
@@ -31,19 +80,21 @@ export default function KitchenDashboard() {
               
               <div>
                 <h2 style={{ fontSize: '1.5rem', color: '#D4AF37', marginBottom: '5px' }}>Table {order.tableNumber}</h2>
-                <p style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{order.mealName} {order.withSalad && <span style={{ color: '#4CAF50', fontSize: '0.8rem', marginLeft: '5px' }}>(+ Salad)</span>}</p>
-                <p style={{ color: '#d1d5db', fontSize: '0.9rem' }}>Drink: {order.drinkName}</p>
-                <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '10px' }}>⏱ {order.time}</p>
+                <p style={{ fontWeight: 'bold', fontSize: '1.1rem', color: '#fff' }}>
+                  {order.mealName} {order.withSalad && <span style={{ color: '#4CAF50', fontSize: '0.8rem', marginLeft: '5px' }}>(+ Salad)</span>}
+                </p>
+                <p style={{ color: '#d1d5db', fontSize: '0.9rem', marginTop: '4px' }}>Drink: {order.drinkName}</p>
+                <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '10px' }}>⏱ Ordered at {formatTime(order.createdAt)}</p>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', minWidth: '150px' }}>
                 {order.status === 'SENT' && (
-                  <button onClick={() => updateStatus(order.id, 'PLATING')} style={{ padding: '12px', backgroundColor: '#FFEB3B', color: '#000', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+                  <button onClick={() => updateStatus(order.id, 'PLATING')} style={{ padding: '12px', backgroundColor: '#FFEB3B', color: '#000', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', transition: '0.2s' }}>
                     👨‍🍳 Start Plating
                   </button>
                 )}
                 {order.status === 'PLATING' && (
-                  <button onClick={() => updateStatus(order.id, 'DISPATCHED')} style={{ padding: '12px', backgroundColor: '#4CAF50', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer' }}>
+                  <button onClick={() => updateStatus(order.id, 'DISPATCHED')} style={{ padding: '12px', backgroundColor: '#4CAF50', color: '#fff', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', transition: '0.2s' }}>
                     🏃‍♂️ Dispatch
                   </button>
                 )}
@@ -52,7 +103,7 @@ export default function KitchenDashboard() {
             </div>
           ))}
           {orders.filter(o => o.status !== 'DISPATCHED').length === 0 && (
-            <div style={{ textAlign: 'center', padding: '50px', color: '#888', fontStyle: 'italic' }}>No active orders right now.</div>
+            <div style={{ textAlign: 'center', padding: '50px', color: '#888', fontStyle: 'italic' }}>Kitchen is clear. Waiting for incoming orders...</div>
           )}
         </div>
       </div>
