@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useEffect } from 'react';
 
-// Mock Data for the Menu
 const MENU_ITEMS = [
   { id: 'm1', name: 'Pounded Yam + Egusi', category: 'Swallows', img: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?auto=format&fit=crop&w=200&q=80' },
   { id: 'm2', name: 'Pounded Yam + Efo-riro', category: 'Swallows', img: 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=200&q=80' },
@@ -25,12 +24,10 @@ export default function MenuPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('All');
   
-  // State for selections
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
   const [selectedDrink, setSelectedDrink] = useState<string | null>(null);
   const [includeSalad, setIncludeSalad] = useState(false);
 
-  // URL checking for Table Number
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setTableNumber(params.get('table'));
@@ -38,7 +35,6 @@ export default function MenuPage() {
 
   const categories = ['All', 'Swallows', 'Rice', 'Drinks', 'Wine'];
 
-  // Instant Search & Filter Logic
   const filteredMenu = useMemo(() => {
     return MENU_ITEMS.filter((item) => {
       const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -49,63 +45,73 @@ export default function MenuPage() {
 
   const isRiceSelected = selectedMeal && MENU_ITEMS.find(i => i.id === selectedMeal)?.category === 'Rice';
 
-  // If they somehow get here without scanning a table code
   if (tableNumber === null) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-6 text-center bg-[#111]">
-        <h1 className="text-3xl font-serif text-[#E5C07B] mb-4">Table Code Missing</h1>
-        <p className="text-gray-300">Please scan the barcode located on your table using your phone's camera to access the menu and place your order.</p>
-        <a href="/" className="mt-8 text-[#D4AF37] border border-[#D4AF37] px-6 py-2 rounded">Return Home</a>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '24px', textAlign: 'center', backgroundColor: 'var(--navy-bg)' }}>
+        <h1 style={{ fontSize: '1.875rem', fontFamily: 'serif', color: 'var(--gold-bright)', marginBottom: '16px' }}>Table Code Missing</h1>
+        <p style={{ color: '#d1d5db' }}>Please scan the barcode located on your table using your phone's camera to access the menu and place your order.</p>
+        <a href="/" style={{ marginTop: '32px', color: 'var(--gold-base)', border: '1px solid var(--gold-base)', padding: '8px 24px', borderRadius: '4px', textDecoration: 'none' }}>Return Home</a>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#111] pb-32">
-      {/* 1. HERO SECTION */}
-      <div className="relative h-[35vh] w-full bg-cover bg-center" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1000&q=80')" }}>
-        <div className="absolute inset-0 bg-black/60"></div>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--navy-bg)', paddingBottom: '128px' }}>
+      {/* 1. HERO SECTION (Navy Theme with Pink Accents) */}
+      <div style={{ position: 'relative', width: '100%', paddingBottom: '30px', borderBottom: '1px solid rgba(212, 175, 55, 0.2)' }}>
+        <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(10, 20, 47, 0.95)', zIndex: 0 }}></div>
         
-        {/* Navigation */}
-        <nav className="relative z-10 w-full p-4 flex justify-between items-center">
-          <a href="/" className="logo text-2xl" style={{ textDecoration: 'none' }}>O'K26</a>
-          <div className="live-counter">Table {tableNumber}</div>
+        <nav style={{ position: 'relative', zIndex: 10, width: '100%', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <a href="/" style={{ fontFamily: '"Cinzel", serif', fontSize: '1.5rem', color: 'var(--gold-base)', fontWeight: 'bold', textDecoration: 'none' }}>O'K26</a>
+          <div style={{ fontSize: '0.85rem', color: '#fff', background: 'rgba(249, 168, 212, 0.15)', padding: '8px 15px', borderRadius: '20px', border: '1px solid var(--pink-accent)' }}>
+            Table {tableNumber}
+          </div>
         </nav>
 
-        {/* Intro Copy */}
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-6 -mt-8">
-          <h1 className="text-3xl font-serif text-[#E5C07B] mb-2 font-bold">Reception Menu</h1>
-          <p className="text-sm text-gray-300 max-w-md">
-            Welcome! To serve you seamlessly, please use this digital menu to place your order directly to our kitchen. Browse the options below and choose with love and happiness.
+        <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', padding: '0 24px', marginTop: '10px' }}>
+          <p style={{ fontSize: '0.8rem', color: '#fff', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '10px' }}>
+            Welcome to the wedding ceremony of
+          </p>
+          <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.5rem', color: 'var(--gold-bright)', lineHeight: '1.2', marginBottom: '15px' }}>
+            Muhammed <i style={{ fontSize: '1.2rem', color: 'var(--pink-accent)' }}>(Omokayode)</i> <br/>
+            <span style={{ fontFamily: '"Cinzel", serif', fontSize: '1.5rem', margin: '0 10px' }}>&</span> <br/>
+            Kaothar <i style={{ fontSize: '1.2rem', color: 'var(--pink-accent)' }}>(Oyindamola)</i>
+          </h1>
+          <p style={{ fontSize: '0.9rem', color: 'var(--gold-base)', maxWidth: '28rem', fontStyle: 'italic', lineHeight: '1.5' }}>
+            To serve you seamlessly, please use this digital menu to place your order directly to our kitchen. Browse the options below and choose with love and happiness.
           </p>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 mt-6">
-        {/* Disclaimer */}
-        <p className="text-xs text-center italic text-[#D4AF37]/80 mb-6">
+      <div style={{ maxWidth: '42rem', margin: '0 auto', padding: '0 16px', marginTop: '24px' }}>
+        <p style={{ fontSize: '0.75rem', textAlign: 'center', fontStyle: 'italic', color: 'rgba(212, 175, 55, 0.8)', marginBottom: '24px' }}>
           * All meals are served with assorted premium proteins based on kitchen availability.
         </p>
 
         {/* 2. SEARCH BAR */}
-        <div className="mb-6">
+        <div style={{ marginBottom: '24px' }}>
           <input 
             type="text" 
             placeholder="Search for a meal or drink..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#1a1a1a] border border-[#D4AF37]/30 text-white px-4 py-3 rounded-lg focus:outline-none focus:border-[#E5C07B]"
+            style={{ width: '100%', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(212, 175, 55, 0.3)', color: '#fff', padding: '12px 16px', borderRadius: '8px', outline: 'none' }}
           />
         </div>
 
         {/* 3. STICKY CATEGORY TABS */}
-        <div className="sticky top-0 z-20 bg-[#111]/95 backdrop-blur py-4 mb-6 overflow-x-auto whitespace-nowrap border-b border-[#D4AF37]/20 no-scrollbar">
-          <div className="flex gap-3">
+        <div className="no-scrollbar" style={{ position: 'sticky', top: 0, zIndex: 20, backgroundColor: 'rgba(10, 20, 47, 0.95)', backdropFilter: 'blur(8px)', padding: '16px 0', marginBottom: '24px', overflowX: 'auto', whiteSpace: 'nowrap', borderBottom: '1px solid rgba(212, 175, 55, 0.2)' }}>
+          <div style={{ display: 'flex', gap: '12px' }}>
             {categories.map((cat) => (
               <button 
                 key={cat}
                 onClick={() => setActiveTab(cat)}
-                className={`px-5 py-2 rounded-full text-sm font-bold tracking-wider uppercase transition-all ${activeTab === cat ? 'bg-[#D4AF37] text-black' : 'bg-transparent text-gray-400 border border-gray-600'}`}
+                style={{
+                  padding: '8px 20px', borderRadius: '9999px', fontSize: '0.875rem', fontWeight: 'bold', textTransform: 'uppercase', transition: 'all 0.3s', cursor: 'pointer',
+                  backgroundColor: activeTab === cat ? 'var(--gold-base)' : 'transparent',
+                  color: activeTab === cat ? '#000' : '#9ca3af',
+                  border: activeTab === cat ? 'none' : '1px solid #4b5563'
+                }}
               >
                 {cat}
               </button>
@@ -113,43 +119,40 @@ export default function MenuPage() {
           </div>
         </div>
 
-        {/* 4. MEAL LIST (IMAGE ON RIGHT, TEXT ON LEFT) */}
-        <div className="space-y-4">
+        {/* 4. MENU LIST (FIXED RESPONSIVENESS) */}
+        <div>
           {filteredMenu.map((item) => {
             const isMeal = item.category === 'Swallows' || item.category === 'Rice';
             const isSelected = isMeal ? selectedMeal === item.id : selectedDrink === item.id;
 
             return (
               <div key={item.id}>
-                <label className={`flex items-center justify-between p-3 border rounded-xl cursor-pointer transition-all ${isSelected ? 'border-[#E5C07B] bg-[#E5C07B]/10' : 'border-gray-800 bg-[#1a1a1a]/50'}`}>
-                  
-                  <div className="flex items-center gap-4 flex-1">
-                    {/* Radio Button */}
+                {/* Fixed Layout using custom CSS from globals.css */}
+                <label className={`menu-item-card ${isSelected ? 'selected' : ''}`}>
+                  <div className="menu-item-left">
                     <input 
                       type="radio" 
                       name={isMeal ? "meal" : "drink"} 
                       checked={isSelected}
                       onChange={() => isMeal ? setSelectedMeal(item.id) : setSelectedDrink(item.id)}
-                      className="w-5 h-5 accent-[#D4AF37]"
+                      className="radio-custom"
                     />
-                    <span className="font-bold text-gray-200">{item.name}</span>
+                    <span className="menu-item-text">{item.name}</span>
                   </div>
-
-                  {/* Food Image */}
-                  <div className="w-16 h-16 rounded-lg bg-gray-800 overflow-hidden ml-4 shrink-0 shadow-lg">
-                    <img src={item.img} alt={item.name} className="w-full h-full object-cover" />
+                  <div className="menu-item-img-container">
+                    <img src={item.img} alt={item.name} className="menu-item-img" />
                   </div>
                 </label>
 
                 {/* Conditional Salad Toggle for Rice */}
                 {isMeal && isSelected && item.category === 'Rice' && (
-                  <div className="ml-12 mt-2 p-3 bg-black/40 rounded-lg border border-gray-800 flex items-center justify-between">
-                    <span className="text-sm text-gray-300">Include Coleslaw/Salad?</span>
+                  <div style={{ marginLeft: '48px', marginTop: '-5px', marginBottom: '15px', padding: '12px', backgroundColor: 'rgba(0,0,0,0.4)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '0.875rem', color: '#d1d5db' }}>Include Coleslaw/Salad?</span>
                     <input 
                       type="checkbox" 
                       checked={includeSalad} 
                       onChange={(e) => setIncludeSalad(e.target.checked)}
-                      className="w-5 h-5 accent-[#D4AF37]"
+                      style={{ width: '20px', height: '20px', accentColor: 'var(--gold-base)' }}
                     />
                   </div>
                 )}
@@ -161,9 +164,9 @@ export default function MenuPage() {
 
       {/* 5. FLOATING ORDER BUTTON */}
       {(selectedMeal || selectedDrink) && (
-        <div className="fixed bottom-0 left-0 w-full p-4 bg-[#111]/90 backdrop-blur-md border-t border-[#D4AF37]/30 z-30">
-          <button className="w-full max-w-2xl mx-auto block bg-[#D4AF37] text-black font-bold py-4 rounded-lg shadow-[0_0_20px_rgba(212,175,55,0.3)] uppercase tracking-widest transition-transform active:scale-95">
-            Proceed with Order
+        <div style={{ position: 'fixed', bottom: 0, left: 0, width: '100%', padding: '16px', backgroundColor: 'rgba(10, 20, 47, 0.95)', backdropFilter: 'blur(12px)', borderTop: '1px solid rgba(212, 175, 55, 0.3)', zIndex: 30 }}>
+          <button style={{ width: '100%', maxWidth: '42rem', margin: '0 auto', display: 'block', backgroundColor: 'var(--gold-base)', color: '#000', fontWeight: 'bold', padding: '16px', borderRadius: '8px', textTransform: 'uppercase', letterSpacing: '2px', border: 'none', cursor: 'pointer', boxShadow: '0 0 20px rgba(212,175,55,0.3)' }}>
+            Place Your Order
           </button>
         </div>
       )}
