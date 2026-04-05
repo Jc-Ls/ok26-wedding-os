@@ -21,9 +21,12 @@ model Guest {
 model Order {
   id          String   @id @default(cuid())
   tableNumber String
+  guestName   String?  // NEW: Guest's Name
+  guestPhone  String?  // NEW: Guest's Phone (Optional)
   mealName    String?
   drinkName   String?
   withSalad   Boolean  @default(false)
   status      String   @default("SENT") // States: SENT, PLATING, DISPATCHED
   createdAt   DateTime @default(now())
 }
+

@@ -25,7 +25,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Database error' }, { status: 500 });
   }
 }
-
 // POST: Guest submits a new order from the Menu
 export async function POST(request: Request) {
   try {
@@ -33,12 +32,20 @@ export async function POST(request: Request) {
     const newOrder = await prisma.order.create({
       data: {
         tableNumber: body.tableNumber,
+        guestName: body.guestName,   // <-- Added this
+        guestPhone: body.guestPhone, // <-- Added this
         mealName: body.mealName,
         drinkName: body.drinkName,
         withSalad: body.withSalad,
         status: 'SENT',
       },
     });
+    return NextResponse.json({ success: true, orderId: newOrder.id });
+  } catch (error) {
+    return NextResponse.json({ success: false, error: 'Failed to create order' }, { status: 500 });
+  }
+}
+
     return NextResponse.json({ success: true, orderId: newOrder.id });
   } catch (error) {
     return NextResponse.json({ success: false, error: 'Failed to create order' }, { status: 500 });
