@@ -1,32 +1,26 @@
 generator client {
   provider = "prisma-client-js"
 }
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
-// SECURITY GATE: Stores the RSVPs
 model Guest {
   id            String   @id @default(cuid())
   fullName      String
   phone         String
-  reservationId String   @unique // The unique OK26-XXXX pin
-  hasEntered    Boolean  @default(false) // Bouncer toggles this when they arrive
+  reservationId String   @unique
+  hasEntered    Boolean  @default(false)
   createdAt     DateTime @default(now())
 }
-
-// KITCHEN: Stores the Food Orders
 model Order {
   id          String   @id @default(cuid())
   tableNumber String
-  guestName   String?  // NEW: Guest's Name
-  guestPhone  String?  // NEW: Guest's Phone (Optional)
+  guestName   String?
+  guestPhone  String?
   mealName    String?
   drinkName   String?
   withSalad   Boolean  @default(false)
-  status      String   @default("SENT") // States: SENT, PLATING, DISPATCHED
+  status      String   @default("SENT")
   createdAt   DateTime @default(now())
 }
-
