@@ -38,13 +38,26 @@ export default function MenuPage() {
   const galleryImages = ['/images/hero1.jpg', '/images/hero2.jpg', '/images/hero3.jpg'];
   const [currentHero, setCurrentHero] = useState(0);
 
+  // 1. INITIAL LOAD & LOCAL STORAGE CHECK
   useEffect(() => {
     setTableNumber(new URLSearchParams(window.location.search).get('table'));
-    const timer = setTimeout(() => setShowSplash(false), 1500);
+    const savedOrderId = localStorage.getItem('ok26_orderId');
+    const savedStep = localStorage.getItem('ok26_step');
+    
+    if (savedOrderId && savedStep) {
+      setOrderId(savedOrderId);
+      setWizardStep(parseInt(savedStep));
+      setShowSplash(false); // Skip splash if returning
+    } else {
+      const timer = setTimeout(() => setShowSplash(false), 1500);
+      return () => clearTimeout(timer);
+    }
+    
     const heroTimer = setInterval(() => setCurrentHero(prev => (prev + 1) % heroImages.length), 4000);
-    return () => { clearTimeout(timer); clearInterval(heroTimer); };
+    return () => clearInterval(heroTimer);
   }, []);
 
+  // 2. LIVE POLLING
   useEffect(() => {
     if (showSplash) return;
     const fetchUpdates = async () => {
@@ -63,6 +76,7 @@ export default function MenuPage() {
         if (orderId && orderStatus !== 'DELIVERED') {
           const myOrder = orders.find((o: any) => o.id === orderId);
           if (myOrder && myOrder.status !== orderStatus) setOrderStatus(myOrder.status);
+          if (myOrder && myOrder.status === 'CANCELLED') handleReset(); // Auto reset if kitchen cancels
         }
       } catch (err) {}
     };
@@ -88,6 +102,7 @@ export default function MenuPage() {
     setTimeout(() => setWizardStep(3), 400);
   };
 
+  // 3. PLACE ORDER & SAVE TO MEMORY
   const handleConfirmOrder = async () => {
     if (!guestName.trim()) return alert("Please enter your name!");
     setIsSubmitting(true);
@@ -97,16 +112,38 @@ export default function MenuPage() {
         body: JSON.stringify({ tableNumber, guestName, mealName: MENU_ITEMS.find(i => i.id === selectedMeal)?.name || 'None', drinkName: MENU_ITEMS.find(i => i.id === selectedDrink)?.name || 'None', withSalad: includeSalad })
       });
       const data = await res.json();
-      if (data.success) { setOrderId(data.orderId); setOrderStatus('SENT'); setWizardStep(4); }
+      if (data.success) { 
+        setOrderId(data.orderId); 
+        setOrderStatus('SENT'); 
+        setWizardStep(4);
+        localStorage.setItem('ok26_orderId', data.orderId);
+        localStorage.setItem('ok26_step', '4');
+      }
     } catch (e) {}
     setIsSubmitting(false);
+  };
+
+  // 4. CANCEL ORDER
+  const handleCancelOrder = async () => {
+    if (!confirm("Are you sure you want to cancel this order?")) return;
+    try {
+      await fetch('/api/orders', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: orderId, status: 'CANCELLED' }) });
+      handleReset();
+    } catch (e) { alert("Failed to cancel."); }
   };
 
   const handleMarkDelivered = async () => {
     try {
       await fetch('/api/orders', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: orderId, status: 'DELIVERED' }) });
-      setOrderStatus('DELIVERED'); setWizardStep(5);
+      setOrderStatus('DELIVERED'); 
+      setWizardStep(5);
+      localStorage.setItem('ok26_step', '5');
     } catch (e) {}
+  };
+
+  const handleReset = () => {
+    setWizardStep(1); setSelectedMeal(null); setSelectedDrink(null); setOrderId(null); setOrderStatus(null);
+    localStorage.removeItem('ok26_orderId'); localStorage.removeItem('ok26_step');
   };
 
   const callConcierge = async (type: string) => {
@@ -142,9 +179,12 @@ export default function MenuPage() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Montserrat:wght@400;600&display=swap');
         @keyframes slowScroll { 0% { transform: translateX(100vw); } 100% { transform: translateX(-150%); } }
+        @keyframes kenBurns { 0% { transform: scale(1) translateX(0); } 100% { transform: scale(1.15) translateX(-5px); } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .lux-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 12px; overflow: hidden; transition: all 0.3s ease; cursor: pointer; }
         .lux-card.selected { border-color: #D4AF37; background: rgba(212, 175, 55, 0.15); box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2); }
+        .lux-img { width: 90px; height: 90px; overflow: hidden; border-radius: 8px; flex-shrink: 0; }
+        .lux-img img { width: 100%; height: 100%; object-fit: cover; animation: kenBurns 15s infinite alternate ease-in-out; }
         .hide-scroll::-webkit-scrollbar { display: none; }
       `}</style>
 
@@ -181,13 +221,14 @@ export default function MenuPage() {
           </div>
         )}
 
-        {/* --- STEP 1: FOOD --- */}
+        {/* --- STEP 1: FOOD (Images Restored!) --- */}
         {wizardStep === 1 && (
           <div style={{ animation: 'slideUp 0.5s', display: 'flex', flexDirection: 'column', gap: '15px' }}>
             {MENU_ITEMS.filter(i => i.category === 'Swallows' || i.category === 'Rice').map((item) => (
               <div key={item.id} onClick={() => handleMealSelect(item)} className={`lux-card ${selectedMeal === item.id ? 'selected' : ''}`} style={{ display: 'flex', alignItems: 'center', padding: '12px' }}>
                 <div style={{ margin: '0 15px', width: '20px', height: '20px', borderRadius: '50%', border: `2px solid ${selectedMeal === item.id ? '#D4AF37' : 'rgba(255,255,255,0.3)'}`, backgroundColor: selectedMeal === item.id ? '#D4AF37' : 'transparent' }}></div>
                 <div style={{ flex: 1 }}><span style={{ fontWeight: '600', fontSize: '1rem' }}>{item.name}</span></div>
+                <div className="lux-img"><img src={item.img} alt={item.name} /></div>
               </div>
             ))}
           </div>
@@ -207,7 +248,7 @@ export default function MenuPage() {
           </div>
         )}
 
-        {/* --- STEP 2: DRINK --- */}
+        {/* --- STEP 2: DRINK (Images Restored!) --- */}
         {wizardStep === 2 && (
           <div style={{ animation: 'slideUp 0.5s' }}>
             <h3 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#D4AF37', fontSize: '1.8rem', marginBottom: '20px', textAlign: 'center' }}>Select a Drink</h3>
@@ -220,6 +261,7 @@ export default function MenuPage() {
                 <div key={item.id} onClick={() => handleDrinkSelect(item.id)} className={`lux-card ${selectedDrink === item.id ? 'selected' : ''}`} style={{ display: 'flex', alignItems: 'center', padding: '12px' }}>
                   <div style={{ margin: '0 15px', width: '20px', height: '20px', borderRadius: '50%', border: `2px solid ${selectedDrink === item.id ? '#D4AF37' : 'rgba(255,255,255,0.3)'}`, backgroundColor: selectedDrink === item.id ? '#D4AF37' : 'transparent' }}></div>
                   <div style={{ flex: 1 }}><span style={{ fontWeight: '600' }}>{item.name}</span></div>
+                  <div className="lux-img"><img src={item.img} alt={item.name} /></div>
                 </div>
               ))}
             </div>
@@ -240,7 +282,7 @@ export default function MenuPage() {
           </div>
         )}
 
-        {/* --- STEP 4: TRACKING & GALLERY --- */}
+        {/* --- STEP 4: TRACKING & CANCEL BUTTON --- */}
         {wizardStep === 4 && (
           <div style={{ animation: 'slideUp 0.5s', textAlign: 'center', padding: '20px 0' }}>
             <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#D4AF37', fontSize: '2.2rem', marginBottom: '30px' }}>Tracking Order</h2>
@@ -267,10 +309,17 @@ export default function MenuPage() {
                 </div>
               </div>
             )}
+
+            {/* THE CANCEL BUTTON (Only visible before plating starts) */}
+            {orderStatus === 'SENT' && (
+              <button onClick={handleCancelOrder} style={{ marginTop: '30px', padding: '10px', backgroundColor: 'transparent', color: '#ef4444', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '6px', fontSize: '0.85rem' }}>
+                Cancel Order
+              </button>
+            )}
           </div>
         )}
 
-        {/* --- STEP 5: SUCCESS & ROYAL REGISTRY --- */}
+        {/* --- STEP 5: SUCCESS --- */}
         {wizardStep === 5 && (
           <div style={{ animation: 'slideUp 0.6s', textAlign: 'center', paddingTop: '20px' }}>
             <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '3.5rem', color: '#D4AF37', margin: '0 0 10px 0' }}>O'K26</h1>
@@ -294,21 +343,17 @@ export default function MenuPage() {
                     <p style={{ color: '#D4AF37', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase' }}>— {guestName} (Table {tableNumber})</p>
                   </div>
                 </div>
-                
-                {/* DIRECT WHATSAPP SHARE BUTTON */}
                 <button onClick={shareToWhatsApp} style={{ width: '100%', padding: '15px', backgroundColor: '#25D366', color: '#fff', fontWeight: 'bold', borderRadius: '8px', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontSize: '1rem', marginBottom: '10px' }}>
                   💬 Share Text to WhatsApp
                 </button>
-                <p style={{ color: '#aaa', fontSize: '0.75rem' }}>(Or screenshot the card above to share the image!)</p>
               </div>
             )}
 
-            <button onClick={() => { setWizardStep(1); setSelectedMeal(null); setSelectedDrink(null); setOrderId(null); setOrderStatus(null); }} style={{ padding: '15px 30px', backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '8px' }}>Order Something Else</button>
+            <button onClick={handleReset} style={{ padding: '15px 30px', backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '8px' }}>Order Something Else</button>
           </div>
         )}
       </div>
 
-      {/* --- DEVELOPER FOOTER (Fixed Positioning) --- */}
       <div style={{ marginTop: 'auto', padding: '30px 20px 20px', width: '100%', textAlign: 'center', zIndex: 10 }}>
         <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem', letterSpacing: '1px', textTransform: 'uppercase', margin: 0 }}>
           Seamlessly Engineered by <br/><span style={{ color: '#D4AF37', fontWeight: 'bold' }}>Jare's Choice Labs</span>
@@ -326,7 +371,7 @@ export default function MenuPage() {
                 <p style={{ color: '#ccc', marginBottom: '25px', fontSize: '0.9rem' }}>Silent service. What can we bring to Table {tableNumber}?</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <button onClick={() => callConcierge('BOTTLED WATER')} style={{ padding: '15px', backgroundColor: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid #D4AF37', borderRadius: '8px' }}>🧊 Bottled Water</button>
-                  <button onClick={() => callConcierge('FRESH CUTLERY')} style={{ padding: '15px', backgroundColor: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid #D4AF37', borderRadius: '8px' }}>🍽️ Fresh Cutlery / Napkins</button>
+                  <button onClick={() => callConcierge('SERVIETTE / TISSUE')} style={{ padding: '15px', backgroundColor: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid #D4AF37', borderRadius: '8px' }}>🧻 Serviette / Tissue Paper</button>
                   <button onClick={() => callConcierge('CLEAR TABLE')} style={{ padding: '15px', backgroundColor: 'rgba(255,255,255,0.05)', color: '#fff', border: '1px solid #D4AF37', borderRadius: '8px' }}>🧹 Clear My Table</button>
                 </div>
                 <button onClick={() => setShowConcierge(false)} style={{ marginTop: '20px', padding: '10px', backgroundColor: 'transparent', color: '#aaa', border: 'none' }}>Cancel</button>
