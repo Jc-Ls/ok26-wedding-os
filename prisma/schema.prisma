@@ -24,3 +24,11 @@ model Order {
   status      String   @default("SENT")
   createdAt   DateTime @default(now())
 }
+model ConciergeRequest {
+  id          String   @id @default(cuid())
+  tableNumber String
+  guestName   String
+  requestType String   // e.g., "WATER", "CUTLERY", "CLEAR_TABLE"
+  status      String   @default("PENDING")
+  createdAt   DateTime @default(now())
+}
