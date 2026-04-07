@@ -2,9 +2,16 @@
 import { useState, useEffect } from 'react';
 
 const MENU_ITEMS = [
-  { id: 'm1', name: 'Pounded Yam + Egusi', category: 'Swallows', img: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?auto=format&fit=crop&w=300&q=80' },
-  { id: 'r1', name: 'Party Jollof Rice', category: 'Rice', img: 'https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=300&q=80' },
-  { id: 'd1', name: 'Chilled Coca-Cola', category: 'Drinks', img: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?auto=format&fit=crop&w=300&q=80' }
+  { id: 'm1', name: 'Pounded Yam + Egusi', category: 'Swallows', img: '/images/hero1.jpg' },
+  { id: 'm2', name: 'Pounded Yam + Efo-riro', category: 'Swallows', img: '/images/hero2.jpg' },
+  { id: 'm3', name: 'Amala + Ewedu', category: 'Swallows', img: '/images/hero3.jpg' },
+  { id: 'r1', name: 'Party Jollof Rice', category: 'Rice', img: '/images/hero1.jpg' },
+  { id: 'r2', name: 'Fried Rice + Chicken', category: 'Rice', img: '/images/hero2.jpg' },
+  { id: 'd1', name: 'Chilled Coca-Cola', category: 'Drinks', img: '/images/hero3.jpg' },
+  { id: 'd2', name: 'Pepsi', category: 'Drinks', img: '/images/hero1.jpg' },
+  { id: 'd3', name: '7Up', category: 'Drinks', img: '/images/hero2.jpg' },
+  { id: 'd4', name: 'Bigi Apple / Cola', category: 'Drinks', img: '/images/hero3.jpg' },
+  { id: 'w1', name: 'Premium Red Wine', category: 'Wine', img: '/images/hero1.jpg' }
 ];
 
 export default function MenuPage() {
@@ -23,7 +30,6 @@ export default function MenuPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [recentActivity, setRecentActivity] = useState<string[]>(["✨ Welcome to O'K26!"]);
 
-  // VIP CONCIERGE & SOUVENIR STATES
   const [showConcierge, setShowConcierge] = useState(false);
   const [blessingText, setBlessingText] = useState('');
   const [showSouvenir, setShowSouvenir] = useState(false);
@@ -103,7 +109,6 @@ export default function MenuPage() {
     } catch (e) {}
   };
 
-  // VIP CONCIERGE CALL
   const callConcierge = async (type: string) => {
     try {
       await fetch('/api/concierge', {
@@ -113,6 +118,12 @@ export default function MenuPage() {
       alert(`VIP Request sent! Our waiter is bringing ${type.toLowerCase()} to Table ${tableNumber}.`);
       setShowConcierge(false);
     } catch (e) { alert("Failed to connect to concierge."); }
+  };
+
+  const shareToWhatsApp = () => {
+    const text = `Celebrating the wedding of Olowojare & Kaothar! ✨🥂\n\n"${blessingText || 'Wishing you endless joy and love!'}"\n\n— ${guestName}\n\nExperience seamless event tech by Jare's Choice Labs: https://your-portfolio-link.com`;
+    const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
   };
 
   if (showSplash) {
@@ -127,7 +138,7 @@ export default function MenuPage() {
   if (!tableNumber) return <div style={{ backgroundColor: '#4A0E1B', minHeight: '100vh', color: '#D4AF37', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Missing Table Code.</div>;
 
   return (
-    <div style={{ backgroundColor: '#4A0E1B', minHeight: '100vh', color: '#fff', paddingBottom: '100px', overflowX: 'hidden', fontFamily: '"Montserrat", sans-serif' }}>
+    <div style={{ backgroundColor: '#4A0E1B', minHeight: '100vh', display: 'flex', flexDirection: 'column', color: '#fff', overflowX: 'hidden', fontFamily: '"Montserrat", sans-serif' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Montserrat:wght@400;600&display=swap');
         @keyframes slowScroll { 0% { transform: translateX(100vw); } 100% { transform: translateX(-150%); } }
@@ -156,7 +167,7 @@ export default function MenuPage() {
         </div>
       )}
 
-      <div style={{ padding: '24px 20px', maxWidth: '600px', margin: '0 auto', marginTop: wizardStep < 4 ? '-60px' : '0', position: 'relative', zIndex: 10 }}>
+      <div style={{ padding: '24px 20px', maxWidth: '600px', margin: '0 auto', marginTop: wizardStep < 4 ? '-60px' : '0', position: 'relative', zIndex: 10, flex: 1, width: '100%' }}>
         
         {wizardStep < 4 && (
           <div style={{ textAlign: 'center', marginBottom: '30px', animation: 'slideUp 0.6s' }}>
@@ -165,7 +176,7 @@ export default function MenuPage() {
               Welcome to the Wedding Reception of<br/><span style={{ color: '#D4AF37', fontSize: '2.4rem' }}>Olowojare & Kaothar</span>
             </h1>
             <p style={{ fontSize: '0.85rem', color: '#e5e7eb', lineHeight: '1.6', opacity: 0.9 }}>
-              Experience seamless dining. Simply select your meal below, and our waiters will deliver it to your table within 5 minutes—no waving, no waiting.
+              Experience seamless dining. Simply select your meal below, and our waiters will deliver it to your table within 5 minutes.
             </p>
           </div>
         )}
@@ -205,13 +216,14 @@ export default function MenuPage() {
                 <div style={{ margin: '0 15px', width: '20px', height: '20px', borderRadius: '50%', border: '2px solid rgba(255,255,255,0.3)' }}></div>
                 <span style={{ fontWeight: '600' }}>Just Food, No Drink</span>
               </div>
-              {MENU_ITEMS.filter(i => i.category === 'Drinks').map((item) => (
+              {MENU_ITEMS.filter(i => i.category === 'Drinks' || i.category === 'Wine').map((item) => (
                 <div key={item.id} onClick={() => handleDrinkSelect(item.id)} className={`lux-card ${selectedDrink === item.id ? 'selected' : ''}`} style={{ display: 'flex', alignItems: 'center', padding: '12px' }}>
                   <div style={{ margin: '0 15px', width: '20px', height: '20px', borderRadius: '50%', border: `2px solid ${selectedDrink === item.id ? '#D4AF37' : 'rgba(255,255,255,0.3)'}`, backgroundColor: selectedDrink === item.id ? '#D4AF37' : 'transparent' }}></div>
                   <div style={{ flex: 1 }}><span style={{ fontWeight: '600' }}>{item.name}</span></div>
                 </div>
               ))}
             </div>
+            <button onClick={() => setWizardStep(1)} style={{ width: '100%', padding: '15px', marginTop: '20px', backgroundColor: 'transparent', color: '#fff', border: 'none' }}>← Back to Meals</button>
           </div>
         )}
 
@@ -224,10 +236,11 @@ export default function MenuPage() {
             <button onClick={handleConfirmOrder} disabled={isSubmitting} style={{ width: '100%', padding: '18px', backgroundColor: '#D4AF37', color: '#4A0E1B', fontWeight: 'bold', fontSize: '1.1rem', borderRadius: '8px', border: 'none', textTransform: 'uppercase' }}>
               {isSubmitting ? 'Sending to Kitchen...' : 'Place Order'}
             </button>
+            <button onClick={() => setWizardStep(2)} style={{ width: '100%', padding: '15px', marginTop: '15px', backgroundColor: 'transparent', color: '#fff', border: 'none' }}>← Go Back</button>
           </div>
         )}
 
-        {/* --- STEP 4: TRACKING & PRE-WEDDING GALLERY --- */}
+        {/* --- STEP 4: TRACKING & GALLERY --- */}
         {wizardStep === 4 && (
           <div style={{ animation: 'slideUp 0.5s', textAlign: 'center', padding: '20px 0' }}>
             <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#D4AF37', fontSize: '2.2rem', marginBottom: '30px' }}>Tracking Order</h2>
@@ -264,17 +277,16 @@ export default function MenuPage() {
             <h2 style={{ fontFamily: '"Montserrat", sans-serif', color: '#fff', fontSize: '1.5rem', marginBottom: '10px' }}>Order Delivered!</h2>
             <p style={{ color: '#e5e7eb', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '30px' }}>Enjoy your meal, {guestName}. Thank you for celebrating with us.</p>
             
-            {/* SOUVENIR GENERATOR */}
             {!showSouvenir ? (
               <div style={{ backgroundColor: 'rgba(255,255,255,0.05)', padding: '25px', borderRadius: '12px', border: '1px solid rgba(212,175,55,0.3)', marginBottom: '30px' }}>
                 <h3 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#D4AF37', fontSize: '1.5rem', marginBottom: '10px' }}>The Royal Registry</h3>
-                <p style={{ fontSize: '0.85rem', color: '#ccc', marginBottom: '15px' }}>Leave a digital blessing for the couple and get your personalized WhatsApp Souvenir.</p>
+                <p style={{ fontSize: '0.85rem', color: '#ccc', marginBottom: '15px' }}>Leave a digital blessing for the couple.</p>
                 <textarea value={blessingText} onChange={(e) => setBlessingText(e.target.value)} placeholder="Wishing you a happy married life..." style={{ width: '100%', padding: '15px', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.2)', color: '#fff', outline: 'none', height: '80px', marginBottom: '15px' }} />
                 <button onClick={() => setShowSouvenir(true)} style={{ width: '100%', padding: '15px', backgroundColor: '#D4AF37', color: '#4A0E1B', fontWeight: 'bold', borderRadius: '8px', border: 'none' }}>Generate Digital Souvenir</button>
               </div>
             ) : (
               <div style={{ animation: 'slideUp 0.5s', marginBottom: '30px' }}>
-                <div style={{ position: 'relative', width: '100%', padding: '30px', borderRadius: '12px', backgroundImage: 'url(/images/hero1.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', border: '2px solid #D4AF37', boxShadow: '0 10px 30px rgba(0,0,0,0.5)' }}>
+                <div style={{ position: 'relative', width: '100%', padding: '30px', borderRadius: '12px', backgroundImage: 'url(/images/hero1.jpg)', backgroundSize: 'cover', backgroundPosition: 'center', border: '2px solid #D4AF37', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', marginBottom: '15px' }}>
                   <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(74,14,27,0.85)', borderRadius: '10px' }}></div>
                   <div style={{ position: 'relative', zIndex: 10, textAlign: 'center' }}>
                     <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#D4AF37', fontSize: '2rem', margin: '0 0 10px 0' }}>O'K26</h2>
@@ -282,21 +294,31 @@ export default function MenuPage() {
                     <p style={{ color: '#D4AF37', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase' }}>— {guestName} (Table {tableNumber})</p>
                   </div>
                 </div>
-                <p style={{ color: '#aaa', fontSize: '0.8rem', marginTop: '15px' }}>📸 Take a screenshot to share on your WhatsApp Status!</p>
+                
+                {/* DIRECT WHATSAPP SHARE BUTTON */}
+                <button onClick={shareToWhatsApp} style={{ width: '100%', padding: '15px', backgroundColor: '#25D366', color: '#fff', fontWeight: 'bold', borderRadius: '8px', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontSize: '1rem', marginBottom: '10px' }}>
+                  💬 Share Text to WhatsApp
+                </button>
+                <p style={{ color: '#aaa', fontSize: '0.75rem' }}>(Or screenshot the card above to share the image!)</p>
               </div>
             )}
 
             <button onClick={() => { setWizardStep(1); setSelectedMeal(null); setSelectedDrink(null); setOrderId(null); setOrderStatus(null); }} style={{ padding: '15px 30px', backgroundColor: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '8px' }}>Order Something Else</button>
           </div>
         )}
-
       </div>
 
-      {/* --- VIP CONCIERGE BELL (Only visible in Step 5 after delivery) --- */}
+      {/* --- DEVELOPER FOOTER (Fixed Positioning) --- */}
+      <div style={{ marginTop: 'auto', padding: '30px 20px 20px', width: '100%', textAlign: 'center', zIndex: 10 }}>
+        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem', letterSpacing: '1px', textTransform: 'uppercase', margin: 0 }}>
+          Seamlessly Engineered by <br/><span style={{ color: '#D4AF37', fontWeight: 'bold' }}>Jare's Choice Labs</span>
+        </p>
+      </div>
+
+      {/* --- VIP CONCIERGE BELL --- */}
       {wizardStep === 5 && (
         <>
           <button onClick={() => setShowConcierge(true)} style={{ position: 'fixed', bottom: '80px', right: '20px', width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#D4AF37', color: '#4A0E1B', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', border: 'none', boxShadow: '0 5px 20px rgba(212,175,55,0.5)', zIndex: 50, animation: 'pulse 2s infinite' }}>🔔</button>
-          
           {showConcierge && (
             <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
               <div style={{ backgroundColor: '#4A0E1B', border: '1px solid #D4AF37', borderRadius: '12px', padding: '30px', width: '100%', maxWidth: '400px', textAlign: 'center', animation: 'slideUp 0.3s' }}>
@@ -313,14 +335,6 @@ export default function MenuPage() {
           )}
         </>
       )}
-
-      {/* --- DEVELOPER FOOTER --- */}
-      <div style={{ position: 'absolute', bottom: '20px', width: '100%', textAlign: 'center', zIndex: 10 }}>
-        <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.7rem', letterSpacing: '1px', textTransform: 'uppercase' }}>
-          Seamlessly Engineered by <br/><span style={{ color: '#D4AF37', fontWeight: 'bold' }}>Jare's Choice Labs</span>
-        </p>
-      </div>
-
     </div>
   );
 }
