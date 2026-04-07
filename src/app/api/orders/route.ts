@@ -19,10 +19,9 @@ export async function POST(request: Request) {
     data: {
       tableNumber: body.tableNumber,
       guestName: body.guestName,
-      guestPhone: body.guestPhone,
       mealName: body.mealName,
       drinkName: body.drinkName,
-      withSalad: body.withSalad,
+      withSalad: body.withSalad || false,
       status: 'SENT',
     },
   });
@@ -31,9 +30,32 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   const body = await request.json();
+  const dataToUpdate: any = {};
+  if (body.status) dataToUpdate.status = body.status;
+  if (body.tableNumber) dataToUpdate.tableNumber = body.tableNumber;
+  if (body.guestName) dataToUpdate.guestName = body.guestName;
+
   const updatedOrder = await prisma.order.update({
     where: { id: body.id },
-    data: { status: body.status },
+    data: dataToUpdate,
   });
   return NextResponse.json({ success: true, order: updatedOrder });
+}
+
+export async function DELETE(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+  const wipeAll = searchParams.get('wipeAll');
+
+  if (wipeAll === 'true') {
+    await prisma.order.deleteMany({});
+    return NextResponse.json({ success: true, message: 'Database Wiped' });
+  }
+
+  if (id) {
+    await prisma.order.delete({ where: { id } });
+    return NextResponse.json({ success: true });
+  }
+
+  return NextResponse.json({ success: false }, { status: 400 });
 }
