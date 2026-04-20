@@ -1,226 +1,171 @@
-'use client'; 
-
+'use client';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
-export default function Home() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [activeViewers, setActiveViewers] = useState(12);
-  const [viewerLocation, setViewerLocation] = useState('Ilorin');
-  const [scrollY, setScrollY] = useState(0);
-  
-  // RSVP State
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [pin, setPin] = useState('');
-  const [errorMsg, setErrorMsg] = useState(false);
-  const [isAuthenticating, setIsAuthenticating] = useState(false);
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [inviteCode, setInviteCode] = useState('');
+export default function HomePage() {
+  const router = useRouter();
+  const [isMounted, setIsMounted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  const [showModal, setShowModal] = useState(false);
+  const [tableInput, setTableInput] = useState('');
 
-  // Scanner Modal State
-  const [showScannerModal, setShowScannerModal] = useState(false);
-
-  const slides = [
-    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
+  const RSVP_NUMBERS = [
+    '+234 800 000 0001', '+234 800 000 0002', '+234 800 000 0003',
+    '+234 800 000 0004', '+234 800 000 0005', '+234 800 000 0006'
   ];
 
   useEffect(() => {
-    fetch('https://ipapi.co/json/')
-      .then((res) => res.json())
-      .then((data) => { if (data.city) setViewerLocation(data.city); })
-      .catch(() => console.log('Location fetch blocked, using default.'));
+    setIsMounted(true);
+    // Countdown targets the start of the first event (Thursday Night)
+    const targetDate = new Date('2026-06-25T21:00:00').getTime();
 
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    const interval = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = targetDate - now;
 
-    const slideTimer = setInterval(() => setCurrentSlide((prev) => (prev + 1) % slides.length), 5000);
-    const viewerTimer = setInterval(() => {
-      setActiveViewers((prev) => {
-        const change = Math.floor(Math.random() * 3) - 1; 
-        return prev + change > 3 ? prev + change : 4; 
-      });
-    }, 8000);
+      if (distance < 0) {
+        clearInterval(interval);
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      } else {
+        setTimeLeft({
+          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((distance % (1000 * 60)) / 1000)
+        });
+      }
+    }, 1000);
 
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      clearInterval(slideTimer);
-      clearInterval(viewerTimer);
-    };
+    return () => clearInterval(interval);
   }, []);
 
-  const handleReservation = (e: any) => {
+  const handleEnterPortal = (e: React.FormEvent) => {
     e.preventDefault();
-    const VALID_CODE = 'OK26';
-
-    if (inviteCode.toUpperCase() !== VALID_CODE) {
-      setErrorMsg(true);
-      return;
-    }
-
-    setErrorMsg(false);
-    setIsAuthenticating(true);
-
-    setTimeout(() => {
-      const randomNum = Math.floor(1000 + Math.random() * 9000);
-      setPin(`OK26-${randomNum}`);
-      setIsSubmitted(true);
-      setIsAuthenticating(false);
-      
-      setTimeout(() => document.getElementById('pass-section')?.scrollIntoView({ behavior: 'smooth' }), 100);
-    }, 1200);
+    if (!tableInput.trim()) return alert("Please enter a valid Table Number.");
+    router.push(`/menu?table=${tableInput.trim()}`);
   };
 
-  const parallaxStyle = {
-    transform: `scale(${Math.max(0.6, 1 - scrollY / 1000)}) translateY(${scrollY * 0.3}px)`,
-    opacity: Math.max(0, 1 - scrollY / 500),
-    transition: 'transform 0.1s ease-out, opacity 0.1s ease-out'
-  };
+  if (!isMounted) return <div style={{ backgroundColor: '#4A0E1B', minHeight: '100vh' }} />;
 
   return (
-    <>
-      {/* Background Carousel */}
-      <div id="carousel-container">
-        {slides.map((url, index) => (
-          <div key={index} className={`slide ${index === currentSlide ? 'active' : ''}`} style={{ backgroundImage: `url('${url}')` }}></div>
-        ))}
-      </div>
-      <div className="overlay"></div>
+    <div style={{ backgroundColor: '#050505', minHeight: '100vh', color: '#fff', overflowX: 'hidden', fontFamily: '"Montserrat", sans-serif' }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Montserrat:wght@300;400;600&display=swap');
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulseGlow { 0% { box-shadow: 0 0 10px rgba(212,175,55,0.2); } 50% { box-shadow: 0 0 25px rgba(212,175,55,0.6); } 100% { box-shadow: 0 0 10px rgba(212,175,55,0.2); } }
+        .lux-btn { transition: all 0.3s ease; cursor: pointer; text-decoration: none; display: inline-block; }
+        .lux-btn:active { transform: scale(0.95); }
+        .itinerary-card { position: relative; padding-bottom: 50px; }
+        .itinerary-card:last-child { padding-bottom: 0; }
+        .nav-link { color: #D4AF37; font-size: 0.8rem; text-decoration: underline; margin-top: 10px; display: inline-block; letter-spacing: 1px; }
+      `}</style>
 
-      <nav>
-        <a href="/" className="logo">O'K26</a>
-        <div className="live-counter">
-          <span className="pulse-dot"></span>
-          <span>{activeViewers}</span> &nbsp;Viewing from {viewerLocation}
+      {/* --- HERO SECTION --- */}
+      <section style={{ position: 'relative', width: '100%', minHeight: '80vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundImage: 'url(/images/hero1.jpg)', backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(74,14,27,0.3) 0%, rgba(5,5,5,1) 100%)' }} />
+        <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '20px', animation: 'fadeIn 2s ease-out' }}>
+          <h2 style={{ fontSize: '0.8rem', letterSpacing: '5px', textTransform: 'uppercase', color: '#D4AF37', marginBottom: '20px' }}>Kwara 2026</h2>
+          <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '5.5rem', color: '#D4AF37', margin: 0, lineHeight: 0.8 }}>O<span style={{ fontSize: '2.5rem', color: '#fff', verticalAlign: 'middle', margin: '0 10px' }}>&</span>K</h1>
+          <h3 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.2rem', color: '#fff', fontStyle: 'italic', marginTop: '10px' }}>Olowojare & Kaothar</h3>
         </div>
-      </nav>
+      </section>
 
-      <div className="hero">
-        <div className="welcome-text">
-          The Families of<br />
-          <b>Alhaji Sulyman Olowojare & Alhaji Faruq Sarumi</b><br />
-          Invite you to celebrate the union of
-        </div>
-        
-        {/* PARALLAX COUPLE NAMES (Updated Formatting) */}
-        <div className="couple name-shimmer" style={parallaxStyle}>
-           <span style={{ display: 'block', fontSize: 'clamp(2.5rem, 10vw, 3.5rem)' }}>
-              Muhammed <br style={{ display: 'none' }} className="mobile-break" />
-              <i style={{ fontSize: 'clamp(1.2rem, 5vw, 1.5rem)', color: 'var(--pink-accent)' }}>(Omokayode)</i>
-            </span>
-            <span style={{ fontFamily: '"Cinzel", serif', fontSize: 'clamp(1.5rem, 6vw, 2rem)', display: 'block', margin: '10px 0' }}>&</span>
-            <span style={{ display: 'block', fontSize: 'clamp(2.5rem, 10vw, 3.5rem)' }}>
-              Kaothar <br style={{ display: 'none' }} className="mobile-break" />
-              <i style={{ fontSize: 'clamp(1.2rem, 5vw, 1.5rem)', color: 'var(--pink-accent)' }}>(Oyindamola)</i>
-            </span>
-        </div>
-
-        {/* RECEPTION MENU BUTTON */}
-        <button 
-          onClick={() => setShowScannerModal(true)}
-          style={{ marginTop: '10px', backgroundColor: 'transparent', border: '1px solid var(--gold-base)', color: 'var(--gold-bright)', padding: '12px 24px', borderRadius: '30px', fontFamily: '"Cinzel", serif', fontSize: '0.9rem', letterSpacing: '1px', cursor: 'pointer', textTransform: 'uppercase', backdropFilter: 'blur(5px)' }}
-        >
-          🍽️ Open Reception Menu
-        </button>
-      </div>
-
-      {/* ITINERARY */}
-      <div className="itinerary-container">
-        <div className="day-card">
-          <div className="day-header">
-            <span className="day-title">Friday, June 26</span>
-            <span className="access-badge access-public">Open Access</span>
-          </div>
-          <div className="event-row">
-            <div className="event-time">9:00 AM</div>
-            <div className="event-name">Wolimat Ceremony</div>
-            <div className="event-loc">Akala Mosque, Adeta, Ilorin</div>
-            <a href="https://www.google.com/maps/dir/?api=1&destination=Akala+Mosque,+Adeta,+Ilorin" target="_blank" rel="noopener noreferrer" className="btn-map">📍 Open in Maps</a>
-          </div>
-          <div className="event-row" style={{ marginTop: '25px' }}>
-            <div className="event-time">Immediately Following</div>
-            <div className="event-name">Nikkah Ceremony</div>
-            <div className="event-loc">Sarumi Mosq., Ode Alfa Nda, Ilorin</div>
-            <a href="https://www.google.com/maps/dir/?api=1&destination=Ode+Alfa+Nda,+Ilorin" target="_blank" rel="noopener noreferrer" className="btn-map">📍 Open in Maps</a>
-          </div>
-        </div>
-
-        <div className="day-card" style={{ borderLeftColor: 'var(--pink-accent)' }}>
-          <div className="day-header">
-            <span className="day-title">Saturday, June 27</span>
-            <span className="access-badge access-private">Reservation Required</span>
-          </div>
-          <div className="event-row">
-            <div className="event-time">12:00 NOON</div>
-            <div className="event-name">Reception & Dinner</div>
-            <div className="event-loc">Al-Kareem Event Hall, Opp Air-force, Oloje, Ilorin</div>
-            <a href="https://www.google.com/maps/dir/?api=1&destination=Al-Kareem+Event+Hall,+Oloje,+Ilorin" target="_blank" rel="noopener noreferrer" className="btn-map">📍 Open in Maps</a>
-          </div>
-        </div>
-      </div>
-
-      {/* RSVP FORM */}
-      <div className="rsvp-container" id="pass-section">
-        {!isSubmitted ? (
-          <div id="rsvp-form-container">
-            <h2 className="rsvp-header">Secure Reservation</h2>
-            <p className="rsvp-desc">Access to the reception requires a verified reservation. Enter your details and the code from your invitation.</p>
-            
-            <form onSubmit={handleReservation}>
-              <div className="form-group">
-                <label>Full Name</label>
-                <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="e.g., John Doe" required />
-              </div>
-              <div className="form-group">
-                <label>Phone Number</label>
-                <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="080..." required />
-              </div>
-              <div className="form-group">
-                <label style={{ color: 'var(--pink-accent)' }}>Invitation Code</label>
-                <input type="text" className="security-input" value={inviteCode} onChange={(e) => setInviteCode(e.target.value)} placeholder="Enter code printed on card" required />
-                {errorMsg && <div style={{ display: 'block', color: 'var(--pink-accent)', fontSize: '0.8rem', marginTop: '5px' }}>Invalid invitation code.</div>}
-              </div>
-              <button type="submit" className="btn-submit" disabled={isAuthenticating}>
-                {isAuthenticating ? 'Verifying Data...' : 'Confirm Reservation'}
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div id="success-state" style={{ display: 'block', textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '10px' }}>✔️</div>
-            <h2 className="rsvp-header" style={{ fontSize: '1.5rem' }}>Reservation Confirmed</h2>
-            <p className="rsvp-desc">Your information is secured in our system. Please screenshot or save your unique Reservation ID.</p>
-            <div className="pin-box">
-              <div className="pin-code">{pin}</div>
+      {/* --- COUNTDOWN --- */}
+      <section style={{ padding: '0 20px', marginTop: '-50px', position: 'relative', zIndex: 20 }}>
+        <div style={{ maxWidth: '600px', margin: '0 auto', backgroundColor: 'rgba(74,14,27,0.95)', backdropFilter: 'blur(10px)', border: '1px solid rgba(212,175,55,0.4)', borderRadius: '15px', padding: '25px', display: 'flex', justifyContent: 'space-around', boxShadow: '0 20px 40px rgba(0,0,0,0.6)' }}>
+          {[ 
+            { label: 'DAYS', value: timeLeft.days }, 
+            { label: 'HOURS', value: timeLeft.hours }, 
+            { label: 'MINS', value: timeLeft.minutes }, 
+            { label: 'SECS', value: timeLeft.seconds } 
+          ].map((item, idx) => (
+            <div key={idx} style={{ textAlign: 'center' }}>
+              <div style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.5rem', color: '#D4AF37' }}>{item.value}</div>
+              <div style={{ fontSize: '0.6rem', color: '#aaa', letterSpacing: '1px' }}>{item.label}</div>
             </div>
-            <p style={{ fontSize: '0.8rem', color: '#d1d5db' }}>Present this ID at the Al-Kareem Event Hall entrance on Saturday.</p>
+          ))}
+        </div>
+      </section>
+
+      {/* --- 3-DAY ITINERARY --- */}
+      <section style={{ padding: '80px 24px', maxWidth: '600px', margin: '0 auto' }}>
+        <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.8rem', color: '#D4AF37', textAlign: 'center', marginBottom: '50px' }}>The Royal Itinerary</h2>
+        
+        <div style={{ position: 'relative', paddingLeft: '35px', borderLeft: '1px solid rgba(212,175,55,0.2)' }}>
+          
+          {/* DAY 1 */}
+          <div className="itinerary-card">
+            <div style={{ position: 'absolute', left: '-42px', top: '5px', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#D4AF37', boxShadow: '0 0 15px #D4AF37' }} />
+            <h5 style={{ color: '#D4AF37', fontSize: '0.75rem', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '5px' }}>Thursday 25 June</h5>
+            <h4 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.8rem', color: '#fff', margin: 0 }}>Wolimah-eve / Sisa</h4>
+            <p style={{ color: '#bbb', fontSize: '0.9rem', margin: '10px 0' }}>Venue: Olowojare Comp Adeta, Ilorin<br/>Time: 9:00 PM — 11:00 PM</p>
+            <a href="https://maps.google.com/?q=Adeta+Ilorin+Nigeria" target="_blank" className="nav-link">NAVIGATE TO VENUE →</a>
           </div>
-        )}
-      </div>
 
-      <footer className="site-footer">
-        © 2026 Elegantly crafted <span className="rose-icon">🌹</span> by<br />
-        <a href="https://jclabs-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer">JARE'S CHOICE LABS</a>
-      </footer>
+          {/* DAY 2 */}
+          <div className="itinerary-card">
+            <div style={{ position: 'absolute', left: '-42px', top: '5px', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#D4AF37' }} />
+            <h5 style={{ color: '#D4AF37', fontSize: '0.75rem', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '5px' }}>Friday 26 June</h5>
+            <h4 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.8rem', color: '#fff', margin: 0 }}>Walimatul-qur'an & Nikkah</h4>
+            <p style={{ color: '#bbb', fontSize: '0.9rem', margin: '10px 0' }}>Venue: Sarumi Mosque, Ode Alfa Nda, Ilorin</p>
+            <a href="https://maps.google.com/?q=Sarumi+Mosque+Ilorin" target="_blank" className="nav-link">NAVIGATE TO VENUE →</a>
+          </div>
 
-      {/* SCANNER MODAL */}
-      {showScannerModal && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ backgroundColor: 'var(--navy-bg)', border: '1px solid var(--gold-base)', borderRadius: '16px', padding: '30px 20px', maxWidth: '400px', width: '100%', textAlign: 'center', boxShadow: '0 20px 40px rgba(0,0,0,0.8)' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '15px' }}>📷</div>
-            <h2 style={{ fontFamily: '"Cinzel", serif', color: 'var(--gold-bright)', fontSize: '1.4rem', marginBottom: '15px' }}>Scan Your Table</h2>
-            <p style={{ color: '#d1d5db', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '25px' }}>
-              To order your meal, simply open your phone's normal camera and point it at the barcode on your table! No app required.
-            </p>
-            <button 
-              onClick={() => setShowScannerModal(false)}
-              style={{ backgroundColor: 'var(--gold-base)', color: '#000', border: 'none', padding: '14px 30px', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', width: '100%', textTransform: 'uppercase', letterSpacing: '1px' }}
-            >
-              Understood
-            </button>
+          {/* DAY 3 */}
+          <div className="itinerary-card">
+            <div style={{ position: 'absolute', left: '-42px', top: '5px', width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#D4AF37' }} />
+            <h5 style={{ color: '#D4AF37', fontSize: '0.75rem', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '5px' }}>Saturday 27 June</h5>
+            <h4 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.8rem', color: '#fff', margin: 0 }}>The Grand Reception</h4>
+            <p style={{ color: '#bbb', fontSize: '0.9rem', margin: '10px 0' }}>Venue: Ilorin, Kwara State<br/>(Portal strictly for reception guests)</p>
+            <a href="https://maps.google.com/?q=Ilorin+Kwara+State" target="_blank" className="nav-link">NAVIGATE TO VENUE →</a>
+          </div>
+
+        </div>
+      </section>
+
+      {/* --- RSVP SECTION --- */}
+      <section style={{ padding: '40px 20px 80px', maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
+        <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.5rem', color: '#D4AF37', marginBottom: '30px' }}>RSVP & Enquiries</h2>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+          {RSVP_NUMBERS.map((num, i) => (
+            <a key={i} href={`tel:${num}`} style={{ padding: '15px', backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(212,175,55,0.2)', borderRadius: '10px', color: '#fff', textDecoration: 'none', fontSize: '0.85rem', letterSpacing: '1px' }}>
+              {num}
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* --- RECEPTION PORTAL --- */}
+      <section style={{ padding: '60px 24px', backgroundColor: '#4A0E1B', textAlign: 'center', borderTop: '2px solid #D4AF37' }}>
+        <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.5rem', color: '#D4AF37', marginBottom: '15px' }}>Reception Portal</h2>
+        <p style={{ color: '#eee', fontSize: '0.9rem', maxWidth: '400px', margin: '0 auto 35px' }}>Exclusively for guests at the Grand Reception. Enter your table code to access VIP dining.</p>
+        <button onClick={() => setShowModal(true)} className="lux-btn" style={{ padding: '20px 50px', backgroundColor: '#D4AF37', color: '#4A0E1B', fontWeight: 'bold', fontSize: '1.1rem', borderRadius: '8px', border: 'none', textTransform: 'uppercase', animation: 'pulseGlow 3s infinite' }}>
+          Enter Portal
+        </button>
+      </section>
+
+      {/* --- MODAL --- */}
+      {showModal && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div style={{ backgroundColor: '#111', border: '1px solid #D4AF37', borderRadius: '15px', padding: '40px 30px', width: '100%', maxWidth: '400px', textAlign: 'center', animation: 'slideUp 0.4s ease-out' }}>
+            <h3 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#D4AF37', fontSize: '2.2rem', marginBottom: '10px' }}>Welcome</h3>
+            <p style={{ color: '#888', fontSize: '0.9rem', marginBottom: '30px' }}>Please enter the Table Number found on your invitation or table card.</p>
+            <form onSubmit={handleEnterPortal}>
+              <input type="number" value={tableInput} onChange={(e) => setTableInput(e.target.value)} placeholder="0" style={{ width: '100%', padding: '20px', fontSize: '2rem', textAlign: 'center', borderRadius: '8px', border: '1px solid rgba(212,175,55,0.5)', backgroundColor: '#000', color: '#fff', marginBottom: '20px', outline: 'none' }} autoFocus />
+              <button type="submit" className="lux-btn" style={{ width: '100%', padding: '18px', backgroundColor: '#D4AF37', color: '#000', fontWeight: 'bold', borderRadius: '8px', border: 'none', textTransform: 'uppercase' }}>Access Menu</button>
+            </form>
+            <button onClick={() => setShowModal(false)} style={{ marginTop: '20px', color: '#666', background: 'none', border: 'none', fontSize: '0.9rem', cursor: 'pointer' }}>Close</button>
           </div>
         </div>
       )}
-    </>
+
+      {/* --- FOOTER --- */}
+      <footer style={{ padding: '40px 20px', textAlign: 'center', borderTop: '1px solid #1a1a1a' }}>
+        <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.7rem', letterSpacing: '2px', textTransform: 'uppercase' }}>
+          Seamlessly Engineered by<br/><span style={{ color: '#D4AF37', fontWeight: 'bold' }}>Jare's Choice Labs</span>
+        </p>
+      </footer>
+    </div>
   );
 }
