@@ -32,3 +32,11 @@ model ConciergeRequest {
   status      String   @default("PENDING")
   createdAt   DateTime @default(now())
 }
+model Reservation {
+  id        String   @id @default(cuid())
+  ticketId  String   @unique
+  name      String
+  email     String?  // The ? makes it optional in the database
+  phone     String?
+  createdAt DateTime @default(now())
+}
