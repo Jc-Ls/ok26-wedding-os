@@ -108,8 +108,15 @@ export default function ReservePage() {
             </div>
 
             <p style={{ color: '#aaa', fontSize: '0.9rem', lineHeight: '1.6', fontWeight: '300' }}>
-              Your reservation is secured in our system.<br/>
-              {form.email ? "A confirmation has been sent to your email." : "Please screenshot this pass for the entrance."}
+              Your reservation is secured in our system.<br/><br/>
+              {form.email ? (
+                <>
+                  A confirmation has been sent to your email.<br/>
+                  <span style={{ fontSize: '0.8rem', fontStyle: 'italic', color: '#E5D08F' }}>
+                    (Please check your spam/junk folder if you do not see it within 2 minutes).
+                  </span>
+                </>
+              ) : "Please screenshot this pass for the entrance."}
             </p>
           </div>
         ) : (

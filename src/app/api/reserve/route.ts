@@ -42,8 +42,10 @@ export async function POST(request: Request) {
 
       const mailOptions = {
         from: `"The Olowojaré Gala" <${process.env.EMAIL_USER}>`,
+        replyTo: process.env.EMAIL_USER, // Crucial for spam filters
         to: email,
         subject: "VIP Access Granted: The Olowojaré Gala",
+        text: `Access Granted, ${name}. Your VIP reservation is confirmed. Your Ticket ID is ${ticketId}. Please present this at the entrance. We look forward to celebrating with you.`, // Plain text fallback
         html: `
           <div style="font-family: sans-serif; text-align: center; color: #0A2318; padding: 20px;">
             <h1 style="color: #C7A951;">O'K26</h1>
