@@ -15,9 +15,9 @@ export default function HomePage() {
   ];
   const [currentHero, setCurrentHero] = useState(0);
 
-  // Auto-fade Splash Screen after 8 seconds
+  // Auto-fade Splash Screen after 1 Minute (60000ms) to give ample reading time
   useEffect(() => {
-    const splashTimer = setTimeout(() => setShowSplash(false), 8000);
+    const splashTimer = setTimeout(() => setShowSplash(false), 60000);
     return () => clearTimeout(splashTimer);
   }, []);
 
@@ -51,8 +51,9 @@ export default function HomePage() {
         <style>{`@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap');`}</style>
         
         <div style={{ animation: 'fadeInDown 1.5s ease-out' }}>
-          <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '3.5rem', color: '#E5D08F', letterSpacing: '6px', margin: '0 0 20px 0', fontWeight: '400' }}>
-            THE OLOWOJARÉ'S
+          {/* FIXED: Broken into two lines for perfect mobile fitting, with adjusted line-height */}
+          <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(1.8rem, 8vw, 3.5rem)', color: '#E5D08F', letterSpacing: '6px', margin: '0 0 20px 0', fontWeight: '400', lineHeight: '1.3' }}>
+            THE <br/> OLOWOJARE'S
           </h1>
           <div style={{ height: '1px', width: '60px', background: '#E5D08F', margin: '0 auto 30px' }}></div>
         </div>
@@ -62,6 +63,7 @@ export default function HomePage() {
           Thank you for gracing us with your time and love. Please proceed to secure your VIP Reservation.
         </p>
 
+        {/* KEPT YOUR ORIGINAL BUTTON */}
         <button onClick={() => setShowSplash(false)} style={{ marginTop: '50px', padding: '15px 35px', background: 'transparent', border: '1px solid #E5D08F', color: '#E5D08F', borderRadius: '30px', textTransform: 'uppercase', letterSpacing: '2px', fontSize: '0.8rem', cursor: 'pointer', fontFamily: '"Montserrat", sans-serif', animation: 'fadeIn 2s ease-out 2s both' }}>
           Enter The Gala
         </button>
@@ -138,8 +140,8 @@ export default function HomePage() {
           <p style={{ fontFamily: '"Montserrat", sans-serif', fontSize: '0.8rem', letterSpacing: '6px', color: '#E5D08F', textTransform: 'uppercase', marginBottom: '15px' }}>
             You are cordially invited to
           </p>
-          <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '4rem', color: '#FDFBF7', margin: '0 0 10px 0', fontWeight: '400', lineHeight: '1.1' }}>
-            The Olowojaré <br/><span style={{ color: '#E5D08F', fontStyle: 'italic' }}>Gala</span>
+          <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(2.5rem, 12vw, 4rem)', color: '#FDFBF7', margin: '0 0 10px 0', fontWeight: '400', lineHeight: '1.1' }}>
+            The Olowojare <br/><span style={{ color: '#E5D08F', fontStyle: 'italic', fontSize: 'clamp(2rem, 10vw, 4rem)' }}>Gala</span>
           </h1>
           <div style={{ height: '1px', width: '80px', background: 'rgba(229, 208, 143, 0.5)', margin: '20px auto' }}></div>
           <p style={{ fontFamily: '"Montserrat", sans-serif', fontSize: '1rem', letterSpacing: '4px', color: '#FDFBF7', textTransform: 'uppercase' }}>

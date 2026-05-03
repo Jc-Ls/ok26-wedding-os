@@ -6,16 +6,21 @@ export default function ReservePage() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', passcode: '' });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [ticketId, setTicketId] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus('submitting');
+    setErrorMessage(''); // Clear old errors
+    
+    // Trim accidental spaces from the passcode
+    const cleanPasscode = form.passcode.trim();
     
     try {
       const res = await fetch('/api/reserve', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+        body: JSON.stringify({ ...form, passcode: cleanPasscode })
       });
       
       const data = await res.json();
@@ -25,9 +30,12 @@ export default function ReservePage() {
         setStatus('success');
       } else {
         setStatus('error');
+        // Capture the specific error from our new backend!
+        setErrorMessage(data.error || 'Authentication failed.'); 
       }
     } catch (err) {
       setStatus('error');
+      setErrorMessage('Network error. Please try again.');
     }
   };
 
@@ -133,7 +141,11 @@ export default function ReservePage() {
               
               <div style={{ position: 'relative' }}>
                 <input type="password" placeholder="Enter VIP Passcode" required className="input-emerald" value={form.passcode} onChange={e => setForm({...form, passcode: e.target.value})} style={{ borderColor: status === 'error' ? '#ff4444' : '' }} />
-                {status === 'error' && <p style={{ position: 'absolute', bottom: '-20px', left: '5px', color: '#ff4444', fontSize: '0.75rem', letterSpacing: '1px' }}>Invalid Passcode. Please try again.</p>}
+                {status === 'error' && (
+                  <p style={{ position: 'absolute', bottom: '-22px', left: '5px', color: '#ff4444', fontSize: '0.75rem', letterSpacing: '1px' }}>
+                    {errorMessage}
+                  </p>
+                )}
               </div>
 
               <button type="submit" disabled={status === 'submitting'} className="btn-champagne" style={{ marginTop: '30px', opacity: status === 'submitting' ? 0.7 : 1 }}>

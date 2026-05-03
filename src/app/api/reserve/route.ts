@@ -9,15 +9,33 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { name, email, phone, passcode } = body;
 
-    // 1. Verify Passcode
-    if (passcode !== "OK26-VIP") {
-      return NextResponse.json({ success: false, error: "Invalid passcode" }, { status: 401 });
+    // 1. Verify Single-Use Passcode from Neon DB
+    const validPass = await prisma.vipPass.findUnique({
+      where: { code: passcode }
+    });
+
+    if (!validPass) {
+      return NextResponse.json({ success: false, error: "Invalid VIP Code" }, { status: 401 });
     }
 
-    // 2. Generate Unique Ticket ID
+    if (validPass.isUsed) {
+      return NextResponse.json({ success: false, error: "Code already claimed" }, { status: 401 });
+    }
+
+    // 2. Burn the Code (Mark as used so it cannot be shared)
+    await prisma.vipPass.update({
+      where: { id: validPass.id },
+      data: { 
+        isUsed: true, 
+        usedBy: name,
+        usedAt: new Date()
+      }
+    });
+
+    // 3. Generate Unique Ticket ID
     const ticketId = `OK26-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    // 3. Save to Neon Database
+    // 4. Save Reservation to Neon Database
     await prisma.reservation.create({
       data: {
         ticketId,
@@ -27,7 +45,7 @@ export async function POST(request: Request) {
       }
     });
 
-    // 4. Nodemailer (Only fires if email was provided)
+    // 5. Nodemailer (Only fires if email was provided)
     if (email) {
       const transporter = nodemailer.createTransport({
         service: 'gmail',
@@ -61,7 +79,7 @@ export async function POST(request: Request) {
       await transporter.sendMail(mailOptions);
     }
 
-    // 5. Send Success Response back to UI
+    // 6. Send Success Response back to UI
     return NextResponse.json({ success: true, ticketId });
     
   } catch (error) {
