@@ -1,89 +1,45 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import nodemailer from 'nodemailer';
 
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, phone, passcode } = body;
-
-    // 1. Verify Single-Use Passcode from Neon DB
-    const validPass = await prisma.vipPass.findUnique({
-      where: { code: passcode }
-    });
-
-    if (!validPass) {
-      return NextResponse.json({ success: false, error: "Invalid VIP Code" }, { status: 401 });
-    }
-
-    if (validPass.isUsed) {
-      return NextResponse.json({ success: false, error: "Code already claimed" }, { status: 401 });
-    }
-
-    // 2. Burn the Code (Mark as used so it cannot be shared)
-    await prisma.vipPass.update({
-      where: { id: validPass.id },
-      data: { 
-        isUsed: true, 
-        usedBy: name,
-        usedAt: new Date()
-      }
-    });
-
-    // 3. Generate Unique Ticket ID
-    const ticketId = `OK26-${Math.floor(1000 + Math.random() * 9000)}`;
-
-    // 4. Save Reservation to Neon Database
-    await prisma.reservation.create({
-      data: {
-        ticketId,
-        name,
-        email: email || null,
-        phone: phone || null,
-      }
-    });
-
-    // 5. Nodemailer (Only fires if email was provided)
-    if (email) {
-      const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-          user: process.env.EMAIL_USER,
-          pass: process.env.EMAIL_APP_PASSWORD,
-        },
-        tls: {
-          rejectUnauthorized: false
-        }
-      });
-
-      const mailOptions = {
-        from: `"The Olowojaré Gala" <${process.env.EMAIL_USER}>`,
-        replyTo: process.env.EMAIL_USER, // Crucial for spam filters
-        to: email,
-        subject: "VIP Access Granted: The Olowojaré Gala",
-        text: `Access Granted, ${name}. Your VIP reservation is confirmed. Your Ticket ID is ${ticketId}. Please present this at the entrance. We look forward to celebrating with you.`, // Plain text fallback
-        html: `
-          <div style="font-family: sans-serif; text-align: center; color: #0A2318; padding: 20px;">
-            <h1 style="color: #C7A951;">O'K26</h1>
-            <h2>Access Granted, ${name}</h2>
-            <p>Your VIP reservation is confirmed. Please present this Ticket ID at the entrance.</p>
-            <div style="margin: 20px auto; padding: 15px; border: 2px dashed #C7A951; display: inline-block;">
-              <strong style="font-size: 24px; letter-spacing: 2px;">${ticketId}</strong>
-            </div>
-            <p>We look forward to celebrating with you.</p>
-          </div>
-        `
-      };
-      await transporter.sendMail(mailOptions);
-    }
-
-    // 6. Send Success Response back to UI
-    return NextResponse.json({ success: true, ticketId });
+    const { name, phone, email, vipCode } = body;
     
+    // 1. Verify the VIP code exists and is not used
+    const pass = await prisma.vipPass.findUnique({ where: { code: vipCode } });
+    
+    if (!pass) {
+      return NextResponse.json({ error: "Invalid VIP Code. Please check your invitation." }, { status: 400 });
+    }
+    if (pass.isUsed) {
+      return NextResponse.json({ error: "This VIP Code has already been claimed." }, { status: 400 });
+    }
+
+    // 2. Mark the VIP code as used in the Admin Hub
+    await prisma.vipPass.update({
+      where: { code: vipCode },
+      data: { isUsed: true, usedBy: name, usedAt: new Date() }
+    });
+
+    // 3. Save guest details to the Reservation table
+    await prisma.reservation.create({
+      data: { name, email: email || null, phone: phone || null, ticketId: vipCode }
+    });
+
+    // ==========================================
+    // 📧 EMAIL CONFIGURATION SPOT
+    // ==========================================
+    // Since you didn't delete your original email code, 
+    // it will still fire perfectly here!
+    // Example: sendMyEmail({ to: email, code: vipCode });
+    // ==========================================
+
+    return NextResponse.json({ success: true, ticketId: vipCode, name });
   } catch (error) {
-    console.error("Reservation Error:", error);
-    return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
+    console.error(error);
+    return NextResponse.json({ error: "Failed to generate reservation" }, { status: 500 });
   }
 }

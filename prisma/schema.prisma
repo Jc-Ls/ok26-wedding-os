@@ -18,10 +18,12 @@ model Order {
   tableNumber String
   guestName   String?
   guestPhone  String?
+  ticketId    String?  // <-- NEW OPTIONAL FIELD
   mealName    String?
   drinkName   String?
   withSalad   Boolean  @default(false)
   status      String   @default("SENT")
+  deliveredBy String?
   createdAt   DateTime @default(now())
 }
 model ConciergeRequest {
@@ -51,8 +53,8 @@ model VipPass {
 model MenuItem {
   id          String   @id @default(cuid())
   name        String
-  category    String   // "MEAL" or "DRINK"
-  imageUrl    String?  // Cloudinary URL
+  category    String   
+  imageUrl    String?  
   isAvailable Boolean  @default(true)
   createdAt   DateTime @default(now())
 }
