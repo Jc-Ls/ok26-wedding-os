@@ -28,7 +28,7 @@ model ConciergeRequest {
   id          String   @id @default(cuid())
   tableNumber String
   guestName   String
-  requestType String   // e.g., "WATER", "CUTLERY", "CLEAR_TABLE"
+  requestType String
   status      String   @default("PENDING")
   createdAt   DateTime @default(now())
 }
@@ -36,7 +36,7 @@ model Reservation {
   id        String   @id @default(cuid())
   ticketId  String   @unique
   name      String
-  email     String?  // The ? makes it optional in the database
+  email     String?
   phone     String?
   createdAt DateTime @default(now())
 }
@@ -44,7 +44,15 @@ model VipPass {
   id        String   @id @default(cuid())
   code      String   @unique
   isUsed    Boolean  @default(false)
-  usedBy    String?  // Tracks which guest claimed this specific code
+  usedBy    String?
   usedAt    DateTime?
   createdAt DateTime @default(now())
+}
+model MenuItem {
+  id          String   @id @default(cuid())
+  name        String
+  category    String   // "MEAL" or "DRINK"
+  imageUrl    String?  // Cloudinary URL
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
 }
