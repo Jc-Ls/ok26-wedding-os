@@ -1,46 +1,49 @@
+import { neon } from '@neondatabase/serverless';
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const orders = await prisma.order.findMany({ orderBy: { createdAt: 'desc' } });
+    const sql = neon(process.env.DATABASE_URL!);
+    const orders = await sql`SELECT * FROM "Order" ORDER BY "createdAt" DESC`;
     return NextResponse.json(orders);
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch orders" }, { status: 500 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const body = await request.json();
-    const order = await prisma.order.create({
-      data: {
-        tableNumber: body.tableNumber,
-        guestName: body.guestName,
-        mealName: body.mealName,
-        drinkName: body.drinkName,
-        withSalad: body.withSalad || false,
-      }
-    });
-    return NextResponse.json(order);
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to place order" }, { status: 500 });
-  }
-}
+    const sql = neon(process.env.DATABASE_URL!);
+    const body = await req.json();
+    
+    // 🔥 AUTO-FIX: Silently add missing columns before placing the order!
+    await sql`ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "souvenirNudge" BOOLEAN DEFAULT false;`;
+    await sql`ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "nudgeCount" INTEGER DEFAULT 0;`;
+    await sql`ALTER TABLE "Order" ADD COLUMN IF NOT EXISTS "deliveredBy" TEXT;`;
 
-export async function PATCH(request: Request) {
-  try {
-    const body = await request.json();
-    const updated = await prisma.order.update({
-      where: { id: body.id },
-      data: { 
-        status: body.status,
-        deliveredBy: body.deliveredBy // Captures the waiter's name
-      }
-    });
-    return NextResponse.json(updated);
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to update order" }, { status: 500 });
+    const id = `OK26-${Math.floor(1000 + Math.random() * 9000)}`;
+    
+    const order = await sql`
+      INSERT INTO "Order" (
+        id, "tableNumber", "guestName", "ticketId", "mealName", "drinkName", "withSalad", "souvenirNudge", "status", "createdAt"
+      )
+      VALUES (
+        ${id}, 
+        ${body.tableNumber || 'VIP'}, 
+        ${body.guestName || 'VIP Guest'}, 
+        ${body.ticketId || null}, 
+        ${body.mealName || null}, 
+        ${body.drinkName || null}, 
+        ${body.withSalad ? true : false}, 
+        ${body.souvenirNudge ? true : false}, 
+        'Pending', 
+        NOW()
+      )
+      RETURNING *;
+    `;
+    return NextResponse.json(order[0]);
+  } catch (err: any) {
+    console.error("ORDER POST ERROR:", err.message);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

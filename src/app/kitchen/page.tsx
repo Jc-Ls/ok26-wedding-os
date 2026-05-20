@@ -1,149 +1,86 @@
 'use client';
 import { useState, useEffect } from 'react';
 
-type Order = { id: string; tableNumber: string; guestName: string; mealName: string; drinkName: string; withSalad: boolean; status: string; createdAt: string; };
-type VIPRequest = { id: string; tableNumber: string; guestName: string; requestType: string; status: string; createdAt: string; };
-
 export default function KitchenDashboard() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [pinInput, setPinInput] = useState('');
-  
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [vipRequests, setVipRequests] = useState<VIPRequest[]>([]);
-  
-  // 1. GHOST LOCK CHECK
-  useEffect(() => {
-    const savedAuth = localStorage.getItem('ok26_kitchen_auth');
-    if (savedAuth === 'true') setIsAuthenticated(true);
-  }, []);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [waiterName, setWaiterName] = useState('');
+  const [pin, setPin] = useState('');
+  const [isSecurelyLoggedIn, setIsSecurelyLoggedIn] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (pinInput === '5273') {
-      setIsAuthenticated(true);
-      localStorage.setItem('ok26_kitchen_auth', 'true');
-    } else {
-      alert('Incorrect Kitchen PIN');
-      setPinInput('');
-    }
-  };
-
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('ok26_kitchen_auth');
-  };
-
-  // 2. LIVE DATA POLLING
-  const fetchData = async () => {
+  const fetchOrders = async () => {
     try {
-      const [ordersRes, vipRes] = await Promise.all([ fetch('/api/orders'), fetch('/api/concierge') ]);
-      const [ordersData, vipData] = await Promise.all([ ordersRes.json(), vipRes.json() ]);
-      setOrders(ordersData);
-      setVipRequests(vipData);
-    } catch (err) { console.error("Data fetch error"); }
+      const res = await fetch('/api/kitchen');
+      if (res.ok) {
+        const data = await res.json();
+        setOrders(Array.isArray(data) ? data : []);
+      }
+    } catch(err) { console.error("Data fetch error", err); }
   };
 
   useEffect(() => {
-    if (!isAuthenticated) return;
-    fetchData();
-    const interval = setInterval(fetchData, 5000); // Poll every 5 seconds
-    return () => clearInterval(interval);
-  }, [isAuthenticated]);
+    if (isSecurelyLoggedIn) {
+      fetchOrders();
+      const interval = setInterval(fetchOrders, 3000);
+      return () => clearInterval(interval);
+    }
+  }, [isSecurelyLoggedIn]);
 
-  // 3. OPTIMISTIC UI UPDATES (Super Fast)
-  const updateOrderStatus = async (id: string, newStatus: string) => {
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
-    try { await fetch('/api/orders', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status: newStatus }) }); } 
-    catch (e) { fetchData(); /* revert on fail */ }
+  const updateStatus = async (id: string, status: string) => {
+    await fetch('/api/kitchen', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status, waiterName })
+    });
+    fetchOrders(); 
   };
 
-  const handleVIPRequest = async (id: string) => {
-    setVipRequests(prev => prev.filter(req => req.id !== id));
-    try { await fetch('/api/concierge', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status: 'HANDLED' }) }); } 
-    catch (e) { fetchData(); }
+  const handleLogin = () => {
+    if (!waiterName) return alert("Please enter your name.");
+    if (pin !== '5273') return alert("Access Denied: Invalid Master PIN.");
+    setIsSecurelyLoggedIn(true);
   };
 
-  // --- LOCK SCREEN UI ---
-  if (!isAuthenticated) {
+  if (!isSecurelyLoggedIn) {
     return (
-      <div style={{ backgroundColor: '#000', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#D4AF37', fontFamily: '"Montserrat", sans-serif' }}>
-        <form onSubmit={handleLogin} style={{ backgroundColor: '#111', padding: '40px', borderRadius: '12px', border: '1px solid #D4AF37', textAlign: 'center', width: '90%', maxWidth: '400px' }}>
-          <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.5rem', marginBottom: '10px' }}>Kitchen Access</h2>
-          <p style={{ color: '#888', marginBottom: '30px' }}>Authorized Staff Only</p>
-          <input type="password" value={pinInput} onChange={e => setPinInput(e.target.value)} placeholder="Enter 4-Digit PIN" maxLength={4} style={{ width: '100%', padding: '15px', fontSize: '1.5rem', textAlign: 'center', letterSpacing: '10px', borderRadius: '8px', border: '1px solid #D4AF37', backgroundColor: '#000', color: '#fff', marginBottom: '20px' }} />
-          <button type="submit" style={{ width: '100%', padding: '15px', backgroundColor: '#D4AF37', color: '#000', fontWeight: 'bold', fontSize: '1.2rem', borderRadius: '8px', border: 'none' }}>Unlock Dashboard</button>
-        </form>
+      <div style={{ backgroundColor: '#050505', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Montserrat", sans-serif' }}>
+        <div style={{ backgroundColor: '#111', padding: '40px', borderRadius: '16px', border: '1px solid #ef4444', textAlign: 'center', width: '90%', maxWidth: '400px', boxShadow: '0 0 20px rgba(239, 68, 68, 0.2)' }}>
+          <span style={{ fontSize: '3rem', display: 'block', marginBottom: '10px' }}>🔒</span>
+          <h2 style={{ color: '#ef4444', margin: '0 0 20px 0' }}>Kitchen Secure Login</h2>
+          <input type="text" placeholder="Enter Waiter/Chef Name" value={waiterName} onChange={(e) => setWaiterName(e.target.value)} style={{ width: '100%', padding: '15px', backgroundColor: '#000', border: '1px solid #333', color: '#fff', borderRadius: '8px', marginBottom: '15px', outline: 'none', textAlign: 'center' }} />
+          <input type="password" placeholder="Master PIN (5273)" value={pin} onChange={(e) => setPin(e.target.value)} style={{ width: '100%', padding: '15px', backgroundColor: '#000', border: '1px solid #333', color: '#fff', borderRadius: '8px', marginBottom: '25px', outline: 'none', textAlign: 'center', letterSpacing: '4px' }} />
+          <button onClick={handleLogin} style={{ width: '100%', padding: '15px', backgroundColor: '#ef4444', color: '#fff', fontWeight: 'bold', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>Unlock Dashboard</button>
+        </div>
       </div>
     );
   }
 
-  // --- DASHBOARD UI ---
   return (
-    <div style={{ backgroundColor: '#050505', minHeight: '100vh', color: '#fff', padding: '20px', fontFamily: '"Montserrat", sans-serif' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(212, 175, 55, 0.3)', paddingBottom: '20px', marginBottom: '20px' }}>
-        <h1 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#D4AF37', margin: 0 }}>O'K26 Kitchen Engine</h1>
-        <button onClick={handleLogout} style={{ padding: '8px 15px', backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', borderRadius: '6px' }}>Lock Terminal</button>
+    <div style={{ padding: '20px', fontFamily: '"Montserrat", sans-serif', backgroundColor: '#050505', color: '#FDFBF7', minHeight: '100vh' }}>
+      <header style={{ borderBottom: '1px solid rgba(212, 175, 55, 0.3)', paddingBottom: '20px', marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <h1 style={{ color: '#D4AF37', margin: 0, fontFamily: '"Cormorant Garamond", serif' }}>Kitchen Engine</h1>
+          <p style={{ color: '#aaa', fontSize: '0.9rem', margin: '5px 0 0 0' }}>Logged in as: <strong style={{ color: '#fff' }}>{waiterName}</strong></p>
+        </div>
+        <button onClick={() => { setIsSecurelyLoggedIn(false); setPin(''); }} style={{ padding: '10px 15px', backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', borderRadius: '6px' }}>Logout</button>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px' }}>
-        
-        {/* COLUMN 1: LIVE GRILL (SENT & PLATING) */}
-        <div style={{ backgroundColor: '#111', borderRadius: '12px', border: '1px solid #333', padding: '20px', minHeight: '80vh' }}>
-          <h2 style={{ color: '#D4AF37', borderBottom: '1px solid #333', paddingBottom: '10px', marginBottom: '15px' }}>🔥 Live Orders ({orders.filter(o => o.status === 'SENT' || o.status === 'PLATING').length})</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            {orders.filter(o => o.status === 'SENT' || o.status === 'PLATING').map(order => (
-              <div key={order.id} style={{ backgroundColor: '#000', borderLeft: `4px solid ${order.status === 'SENT' ? '#ef4444' : '#f59e0b'}`, padding: '15px', borderRadius: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-                  <span style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#D4AF37' }}>Table {order.tableNumber}</span>
-                  <span style={{ color: '#aaa', fontSize: '0.8rem' }}>{new Date(order.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                </div>
-                <p style={{ color: '#fff', fontSize: '1.1rem', fontWeight: '600', margin: '0 0 5px 0' }}>{order.mealName} {order.withSalad && <span style={{color: '#10b981'}}>(+ Salad)</span>}</p>
-                <p style={{ color: '#888', margin: '0 0 10px 0' }}>Drink: {order.drinkName}</p>
-                <p style={{ color: '#aaa', fontSize: '0.85rem', fontStyle: 'italic', marginBottom: '15px' }}>Guest: {order.guestName}</p>
-                
-                {order.status === 'SENT' ? (
-                  <button onClick={() => updateOrderStatus(order.id, 'PLATING')} style={{ width: '100%', padding: '12px', backgroundColor: '#f59e0b', color: '#000', fontWeight: 'bold', border: 'none', borderRadius: '6px' }}>Start Plating</button>
-                ) : (
-                  <button onClick={() => updateOrderStatus(order.id, 'DISPATCHED')} style={{ width: '100%', padding: '12px', backgroundColor: '#10b981', color: '#000', fontWeight: 'bold', border: 'none', borderRadius: '6px' }}>Dispatch Waiter</button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+        {orders.length === 0 ? <p style={{ color: '#aaa' }}>No active orders in the queue.</p> : orders.map((o) => (
+          <div key={o.id} style={{ backgroundColor: '#111', border: o.status === 'Pending' ? '1px solid #ef4444' : o.status === 'Ready' ? '1px solid #D4AF37' : '1px solid #333', padding: '20px', borderRadius: '12px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+              <h2 style={{ margin: 0, color: '#D4AF37' }}>Table {o.tableNumber}</h2>
+              <span style={{ backgroundColor: 'rgba(255,255,255,0.1)', padding: '5px 10px', borderRadius: '4px', fontSize: '0.8rem' }}>{o.status}</span>
+            </div>
+            <p style={{ margin: '0 0 5px 0', fontSize: '1.1rem' }}><strong>{o.guestName}</strong></p>
+            <p style={{ margin: '0 0 5px 0', color: '#aaa' }}>🍽️ {o.mealName} {o.withSalad ? '(+ Salad)' : ''}</p>
+            <p style={{ margin: '0 0 15px 0', color: '#aaa' }}>🍹 {o.drinkName}</p>
 
-        {/* COLUMN 2: VIP CONCIERGE */}
-        <div style={{ backgroundColor: '#111', borderRadius: '12px', border: '1px solid #333', padding: '20px', minHeight: '80vh' }}>
-          <h2 style={{ color: '#60a5fa', borderBottom: '1px solid #333', paddingBottom: '10px', marginBottom: '15px' }}>🔔 VIP Requests ({vipRequests.length})</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            {vipRequests.length === 0 && <p style={{ color: '#555', textAlign: 'center', marginTop: '20px' }}>No active VIP requests.</p>}
-            {vipRequests.map(req => (
-              <div key={req.id} style={{ backgroundColor: '#000', borderLeft: '4px solid #60a5fa', padding: '15px', borderRadius: '8px' }}>
-                <h3 style={{ color: '#60a5fa', margin: '0 0 10px 0', fontSize: '1.3rem' }}>Table {req.tableNumber}</h3>
-                <p style={{ color: '#fff', fontWeight: 'bold', fontSize: '1.1rem', margin: '0 0 5px 0' }}>{req.requestType}</p>
-                <p style={{ color: '#aaa', fontSize: '0.85rem', marginBottom: '15px' }}>Requested by: {req.guestName}</p>
-                <button onClick={() => handleVIPRequest(req.id)} style={{ width: '100%', padding: '12px', backgroundColor: 'transparent', color: '#60a5fa', border: '1px solid #60a5fa', borderRadius: '6px', fontWeight: 'bold' }}>Mark as Handled</button>
-              </div>
-            ))}
+            {o.status === 'Pending' && <button onClick={() => updateStatus(o.id, 'Preparing')} style={{ width: '100%', padding: '12px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Accept & Start Cooking</button>}
+            {o.status === 'Preparing' && <button onClick={() => updateStatus(o.id, 'Ready')} style={{ width: '100%', padding: '12px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Mark as Ready</button>}
+            {o.status === 'Ready' && <button onClick={() => updateStatus(o.id, 'On the Way')} style={{ width: '100%', padding: '12px', backgroundColor: '#D4AF37', color: '#000', fontWeight: 'bold', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Claim & Deliver</button>}
+            {o.status === 'On the Way' && <p style={{ textAlign: 'center', color: '#10b981', margin: '10px 0 0 0', fontSize: '0.9rem' }}>En route by {o.deliveredBy}</p>}
           </div>
-        </div>
-
-        {/* COLUMN 3: PENDING DELIVERIES (Override) */}
-        <div style={{ backgroundColor: '#111', borderRadius: '12px', border: '1px solid #333', padding: '20px', minHeight: '80vh' }}>
-          <h2 style={{ color: '#10b981', borderBottom: '1px solid #333', paddingBottom: '10px', marginBottom: '15px' }}>🏃‍♂️ Pending Deliveries</h2>
-          <p style={{ color: '#555', fontSize: '0.85rem', marginBottom: '15px' }}>Orders with waiters. Use Force Complete if guest forgets to confirm.</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-            {orders.filter(o => o.status === 'DISPATCHED').map(order => (
-              <div key={order.id} style={{ backgroundColor: '#000', border: '1px solid #10b981', padding: '15px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <span style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#fff', display: 'block' }}>Table {order.tableNumber}</span>
-                  <span style={{ color: '#aaa', fontSize: '0.85rem' }}>{order.guestName}</span>
-                </div>
-                <button onClick={() => updateOrderStatus(order.id, 'DELIVERED')} style={{ padding: '10px 15px', backgroundColor: '#10b981', color: '#000', border: 'none', borderRadius: '6px', fontWeight: 'bold' }}>Force Complete</button>
-              </div>
-            ))}
-          </div>
-        </div>
-
+        ))}
       </div>
     </div>
   );

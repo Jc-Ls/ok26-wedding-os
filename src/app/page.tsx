@@ -23,10 +23,7 @@ export default function HomePage() {
   const enterGala = () => {
     setStep(1);
     setShowArabic(true);
-    setTimeout(() => {
-      setShowArabic(false);
-      setShowEnglishTitles(true);
-    }, 4500);
+    setTimeout(() => { setShowArabic(false); setShowEnglishTitles(true); }, 4500);
   };
 
   return (
@@ -53,7 +50,7 @@ export default function HomePage() {
         
         {step === 0 && (
           <div className="booklet-page" style={{ maxWidth: '600px' }}>
-            <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.5rem', color: '#E5D08F', letterSpacing: '4px', textTransform: 'uppercase', margin: '0 0 20px 0' }}>The Olowojare's</h1>
+            <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.5rem', color: '#E5D08F', letterSpacing: '4px', textTransform: 'uppercase', margin: '0 0 20px 0' }}>The M'K26 Gala</h1>
             <span style={{ fontSize: '2rem', display: 'block', marginBottom: '20px' }}>✨</span>
             <p style={{ fontFamily: '"Montserrat", sans-serif', fontSize: '1rem', lineHeight: '2', letterSpacing: '2px', color: '#FDFBF7', marginBottom: '40px' }}>
               It brings us immeasurable joy to welcome you to the celebration of our love. Your presence is the greatest gift.
@@ -64,11 +61,11 @@ export default function HomePage() {
 
         {step === 1 && (
           <div style={{ width: '100%' }}>
-            {showArabic && <div className="arabic-pop">محمد الأول <br/> و <br/> كوثر</div>}
+            {showArabic && <div className="arabic-pop">محمد <br/> و <br/> كوثر</div>}
             {showEnglishTitles && (
               <div className="english-titles">
-                <p style={{ fontFamily: '"Montserrat", sans-serif', fontSize: '0.8rem', letterSpacing: '6px', color: '#E5D08F', textTransform: 'uppercase', marginBottom: '15px' }}>The Olowojare Gala</p>
-                <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(2.5rem, 10vw, 4rem)', color: '#FDFBF7', margin: '0 0 20px 0', fontWeight: '400' }}>Muhammedul'Awwal <br/><span style={{ color: '#E5D08F', fontStyle: 'italic', fontSize: 'clamp(1.5rem, 8vw, 3rem)' }}>&</span> Kaothar</h1>
+                <p style={{ fontFamily: '"Montserrat", sans-serif', fontSize: '0.8rem', letterSpacing: '6px', color: '#E5D08F', textTransform: 'uppercase', marginBottom: '15px' }}>The M'K26 Gala</p>
+                <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: 'clamp(2.5rem, 10vw, 4rem)', color: '#FDFBF7', margin: '0 0 20px 0', fontWeight: '400' }}>Muhammed <br/><span style={{ color: '#E5D08F', fontStyle: 'italic', fontSize: 'clamp(1.5rem, 8vw, 3rem)' }}>&</span> Kaothar</h1>
                 <div style={{ height: '1px', width: '60px', background: 'rgba(229, 208, 143, 0.5)', margin: '30px auto' }}></div>
                 <button onClick={() => setStep(2)} className="btn-minimal">Read More</button>
               </div>
@@ -79,9 +76,21 @@ export default function HomePage() {
         {step === 2 && (
           <div className="booklet-page">
             <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.2rem', color: '#E5D08F', marginBottom: '40px', fontWeight: '400', fontStyle: 'italic' }}>The Honorees</h2>
-            <div style={{ marginBottom: '35px' }}><p style={{ fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', color: 'rgba(253,251,247,0.5)', marginBottom: '8px' }}>The Host</p><h3 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.8rem', color: '#FDFBF7', margin: 0, fontWeight: '400' }}>Engr. Hammed Olowojare</h3></div>
-            <div style={{ marginBottom: '35px' }}><p style={{ fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', color: '#E5D08F', marginBottom: '8px' }}>Guest of Honour</p><h3 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.8rem', color: '#FDFBF7', margin: 0, fontWeight: '400' }}>Alh. Hakeem Olademeji Lawal</h3></div>
-            <div style={{ marginBottom: '40px' }}><p style={{ fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', color: 'rgba(253,251,247,0.5)', marginBottom: '8px' }}>Special Invited Guest</p><h3 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.6rem', color: '#FDFBF7', margin: '0 0 5px 0', fontWeight: '400' }}>Alh. M. Salman</h3><p style={{ fontSize: '0.8rem', color: '#aaa', margin: 0, fontStyle: 'italic' }}>(Executive Secretary, APC)</p></div>
+            
+            <div style={{ marginBottom: '30px' }}><p style={{ fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', color: 'rgba(253,251,247,0.5)', marginBottom: '8px' }}>The Host</p><h3 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.8rem', color: '#FDFBF7', margin: 0, fontWeight: '400' }}>Engr. Hammed Olowojare</h3></div>
+            
+            <div style={{ marginBottom: '30px' }}><p style={{ fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', color: '#E5D08F', marginBottom: '8px' }}>Mother of the Day</p><h3 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.8rem', color: '#FDFBF7', margin: 0, fontWeight: '400' }}>[Insert Mother's Name]</h3></div>
+            
+            <div style={{ marginBottom: '30px' }}><p style={{ fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', color: 'rgba(253,251,247,0.5)', marginBottom: '8px' }}>Guest of Honour</p><h3 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.8rem', color: '#FDFBF7', margin: 0, fontWeight: '400' }}>Alh. Hakeem Olademeji Lawal</h3></div>
+            
+            <div style={{ marginBottom: '40px', padding: '20px', backgroundColor: 'rgba(229, 208, 143, 0.05)', borderRadius: '12px', border: '1px solid rgba(229, 208, 143, 0.2)' }}>
+              <p style={{ fontSize: '0.65rem', letterSpacing: '4px', textTransform: 'uppercase', color: '#E5D08F', marginBottom: '15px' }}>Special Invited Guests</p>
+              <h3 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.4rem', color: '#FDFBF7', margin: '0 0 10px 0', fontWeight: '400' }}>Alh. M. Salman <span style={{ fontSize: '0.8rem', color: '#aaa', fontStyle: 'italic' }}>(Exec. Sec, APC)</span></h3>
+              <h3 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.4rem', color: '#FDFBF7', margin: '0 0 10px 0', fontWeight: '400' }}>[Insert Special Guest 2]</h3>
+              <h3 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.4rem', color: '#FDFBF7', margin: '0 0 10px 0', fontWeight: '400' }}>[Insert Special Guest 3]</h3>
+              <h3 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.4rem', color: '#FDFBF7', margin: 0, fontWeight: '400' }}>[Insert Special Guest 4]</h3>
+            </div>
+
             <button onClick={() => setStep(3)} className="btn-minimal">View Itinerary</button>
           </div>
         )}
@@ -93,10 +102,7 @@ export default function HomePage() {
             <div style={{ marginBottom: '25px', paddingBottom: '20px', borderBottom: '1px solid rgba(229, 208, 143, 0.2)' }}><p style={{ color: '#E5D08F', fontSize: '0.75rem', letterSpacing: '3px', textTransform: 'uppercase', margin: '0 0 5px 0' }}>Friday</p><h4 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.5rem', color: '#FDFBF7', margin: 0, fontWeight: '400' }}>Nikkah Ceremony</h4></div>
             <div style={{ marginBottom: '40px' }}><p style={{ color: '#E5D08F', fontSize: '0.75rem', letterSpacing: '3px', textTransform: 'uppercase', margin: '0 0 5px 0' }}>Saturday</p><h4 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '1.5rem', color: '#FDFBF7', margin: 0, fontWeight: '400' }}>The Royal Reception</h4></div>
             <p style={{ fontFamily: '"Cormorant Garamond", serif', color: '#FDFBF7', fontSize: '1.4rem', fontStyle: 'italic', lineHeight: '1.6', marginBottom: '40px' }}>"May Allah bless for you, and may He bless on you, and combine both of you in good."</p>
-            <Link href="/reserve" className="btn-champagne" style={{ display: 'block', width: '100%', marginBottom: '40px' }}>Secure VIP Pass</Link>
-            <footer style={{ paddingTop: '20px', borderTop: '1px solid rgba(229, 208, 143, 0.1)' }}>
-              <p style={{ color: 'rgba(253,251,247,0.4)', fontSize: '0.65rem', letterSpacing: '2px', textTransform: 'uppercase', margin: 0, lineHeight: '1.8' }}>Seamlessly engineered and designed by <br/> principal architects <br/><a href="https://your-portfolio.vercel.app" target="_blank" rel="noopener noreferrer" style={{ color: '#E5D08F', fontWeight: '600', textDecoration: 'none', display: 'inline-block', marginTop: '5px', letterSpacing: '1px' }}>JCLs • (Jare's Choice Labs)</a></p>
-            </footer>
+            <Link href="/reserve" className="btn-champagne" style={{ display: 'block', width: '100%', marginBottom: '40px', textDecoration: 'none' }}>Secure VIP Pass</Link>
           </div>
         )}
       </div>

@@ -1,166 +1,370 @@
 'use client';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
+import confetti from 'canvas-confetti';
 
 type MenuItem = { id: string; name: string; category: string; imageUrl: string; isAvailable: boolean; };
 
+const fallbackMenu: MenuItem[] = [
+  { id: '1', name: 'Royal Jollof Rice & Spicy Beef', category: 'MEAL', imageUrl: 'https://images.unsplash.com/photo-1662481028751-bb3d5eb9231f?q=80&w=200&auto=format&fit=crop', isAvailable: true },
+  { id: '2', name: 'Amala, Ewedu & Assorted Meat', category: 'MEAL', imageUrl: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?q=80&w=200&auto=format&fit=crop', isAvailable: true },
+  { id: '4', name: 'Chilled Zobo Drink', category: 'DRINK', imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=200&auto=format&fit=crop', isAvailable: true },
+  { id: '5', name: 'Fresh Palm Wine', category: 'DRINK', imageUrl: 'https://images.unsplash.com/photo-1595981267035-7b04d84b4f1c?q=80&w=200&auto=format&fit=crop', isAvailable: true },
+];
+
 function MenuContent() {
   const searchParams = useSearchParams();
-  const tableNumber = searchParams.get('table') || 'Unknown';
+  const tableNumber = searchParams.get('table') || 'VIP';
   
-  const [showSplash, setShowSplash] = useState(true);
-  const [form, setForm] = useState({ guestName: '', ticketId: '', mealName: '', drinkName: '', withSalad: false });
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [step, setStep] = useState(0); 
+  const [form, setForm] = useState({ guestName: '', ticketId: '', mealName: '', drinkName: '', withSalad: false, souvenirNudge: false });
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loadingMenu, setLoadingMenu] = useState(true);
+  
+  // REAL ENGINE STATE
+  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+  const [trackingStatus, setTrackingStatus] = useState('Pending');
+  const [blessing, setBlessing] = useState('');
+  const [selfieUrl, setSelfieUrl] = useState('');
+  
+  // 🪄 FOMO RIBBON STATE
+  const [activities, setActivities] = useState<string[]>([]);
 
+  const throwbackImages = [
+    'https://res.cloudinary.com/din74ljlu/image/upload/v1779078967/SAVE_20260518_242717_kylnnd.jpg',
+    'https://res.cloudinary.com/din74ljlu/image/upload/v1779079235/SAVE_20260518_242642_vyqfjk.jpg',
+    'https://res.cloudinary.com/din74ljlu/image/upload/v1779080144/SAVE_20260518_242650_wgqxex.jpg'
+  ];
+
+  // MEMORY RESTORE
   useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 3000);
-    return () => clearTimeout(timer);
+    const savedOrderId = localStorage.getItem('mk26_active_order');
+    if (savedOrderId) {
+      setActiveOrderId(savedOrderId);
+      setStep(5);
+    } else if (step === 0) {
+      const timer = setTimeout(() => setStep(1), 3500); 
+      return () => clearTimeout(timer);
+    }
   }, []);
 
+  // LIVE DATABASE POLLING (Tracking & Ribbon)
+  useEffect(() => {
+    // 1. Fetch Ribbon Activities
+    const fetchActivities = async () => {
+      try {
+        const res = await fetch('/api/activities');
+        if (res.ok) setActivities(await res.json());
+      } catch(e) {}
+    };
+    
+    fetchActivities(); // initial fetch
+    const activityInterval = setInterval(fetchActivities, 2500); // Check every 2.5s
+
+    // 2. Fetch Active Order Status (If ordering)
+    let orderInterval: NodeJS.Timeout;
+    if (activeOrderId && step === 5) {
+      orderInterval = setInterval(async () => {
+        try {
+          const res = await fetch(`/api/orders/${activeOrderId}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.status) {
+              if (data.status === 'On the Way' && trackingStatus !== 'On the Way') {
+                if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+              }
+              setTrackingStatus(data.status);
+            }
+          }
+        } catch (error) {}
+      }, 3000);
+    }
+
+    return () => {
+      clearInterval(activityInterval);
+      if (orderInterval) clearInterval(orderInterval);
+    };
+  }, [activeOrderId, step, trackingStatus]);
+
+  // FETCH MENU
   useEffect(() => {
     fetch('/api/menu').then(res => res.json()).then(data => {
-      if(Array.isArray(data)) { setMenuItems(data.filter((item: MenuItem) => item.isAvailable)); }
+      if (Array.isArray(data) && data.length > 0) setMenuItems(data.filter((item: MenuItem) => item.isAvailable));
+      else setMenuItems(fallbackMenu);
       setLoadingMenu(false);
-    }).catch(() => setLoadingMenu(false));
+    }).catch(() => { setMenuItems(fallbackMenu); setLoadingMenu(false); });
   }, []);
 
-  const submitOrder = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.guestName || !form.mealName) return alert("Please enter your name and select a meal.");
-    setStatus('submitting');
-    try {
-      await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, tableNumber }) });
-      setStatus('success');
-    } catch (err) { setStatus('idle'); }
+  const handleFoodSelection = (mealName: string) => {
+    setForm({ ...form, mealName });
+    if (/rice|jollof|fried/i.test(mealName)) setStep(2); else setStep(3);
   };
 
-  const shareCard = async () => {
+  const submitRoyalOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.guestName) return alert("Please enter your name.");
+    
+    try {
+      const res = await fetch('/api/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, tableNumber }) });
+      const data = await res.json();
+      if (data.id) {
+        localStorage.setItem('mk26_active_order', data.id);
+        setActiveOrderId(data.id);
+        setTrackingStatus('Pending');
+        setStep(5);
+      }
+    } catch (err) { alert("Failed to connect to Kitchen. Please try again."); }
+  };
+
+  const cancelOrder = async () => {
+    if (confirm("Are you sure you want to cancel this order?")) {
+      if (activeOrderId) await fetch(`/api/orders/${activeOrderId}`, { method: 'DELETE' });
+      localStorage.removeItem('mk26_active_order');
+      setActiveOrderId(null);
+      setForm({ ...form, mealName: '', drinkName: '' });
+      setStep(1);
+    }
+  };
+
+  const confirmDelivery = async () => {
+    if (activeOrderId) await fetch(`/api/orders/${activeOrderId}`, { method: 'PATCH' });
+    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#D4AF37', '#10b981', '#FFFFFF'] });
+    setStep(6);
+  };
+
+  const handleSelfieCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) setSelfieUrl(URL.createObjectURL(e.target.files[0]));
+  };
+
+  const shareToWhatsApp = async () => {
     try {
       const html2canvas = (await import('html2canvas')).default;
-      const cardElement = document.getElementById('blessing-card');
+      const cardElement = document.getElementById('viral-card');
       if (!cardElement) return;
-
       const canvas = await html2canvas(cardElement, { scale: 2, backgroundColor: '#06140F', useCORS: true });
-
       canvas.toBlob(async (blob) => {
         if (!blob) return;
-        const file = new File([blob], 'MK26_Gala_Blessing.png', { type: 'image/png' });
+        const file = new File([blob], 'MK26_Gala.png', { type: 'image/png' });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({ files: [file], title: 'M\'K26 Gala', text: 'Celebrating Muhammed & Kaothar! ✨' });
         } else {
-          const link = document.createElement('a'); link.download = 'MK26_Gala_Blessing.png'; link.href = URL.createObjectURL(blob); link.click();
+          const link = document.createElement('a'); link.download = 'MK26_Gala.png'; link.href = URL.createObjectURL(blob); link.click();
         }
       });
-    } catch (error) {
-      alert("Oops! Failed to generate your shareable card. Please try again.");
-    }
+    } catch (error) { alert("Failed to generate your shareable card. Please try again."); }
+  };
+
+  const resetFlow = () => {
+    localStorage.removeItem('mk26_active_order');
+    setActiveOrderId(null);
+    setForm({ guestName: '', ticketId: '', mealName: '', drinkName: '', withSalad: false, souvenirNudge: false });
+    setBlessing(''); setSelfieUrl(''); setStep(1);
   };
 
   const meals = menuItems.filter(i => i.category === 'MEAL');
   const drinks = menuItems.filter(i => i.category === 'DRINK');
 
-  if (showSplash) {
+  if (step === 0) {
     return (
       <div style={{ backgroundColor: '#06140F', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
-          .mk-splash { font-family: '"Cormorant Garamond", serif'; color: #E5D08F; font-size: 5rem; letter-spacing: 6px; animation: pulseFade 3s ease-in-out forwards; }
-          @keyframes pulseFade { 0% { opacity: 0; transform: scale(0.9); filter: blur(5px); } 30% { opacity: 1; transform: scale(1); filter: blur(0px); } 80% { opacity: 1; transform: scale(1.05); filter: blur(0px); } 100% { opacity: 0; transform: scale(1.1); filter: blur(5px); } }
-        `}</style>
-        <h1 className="mk-splash">M'K26</h1>
+        <h1 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '5rem', letterSpacing: '6px', animation: 'pulseFade 3s ease-in-out forwards' }}>M'K26</h1>
+        <style>{`@keyframes pulseFade { 0% { opacity: 0; transform: scale(0.9); filter: blur(5px); } 30% { opacity: 1; transform: scale(1); filter: blur(0px); } 80% { opacity: 1; transform: scale(1.05); filter: blur(0px); } 100% { opacity: 0; transform: scale(1.1); filter: blur(5px); } }`}</style>
       </div>
     );
   }
 
   return (
-    <div style={{ backgroundImage: 'linear-gradient(to bottom, rgba(6,20,15,0.7), rgba(6,20,15,0.98)), url("https://res.cloudinary.com/din74ljlu/image/upload/v1779080657/SAVE_20260518_242659_ftuf3e.jpg")', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed', minHeight: '100vh', padding: '20px', fontFamily: '"Montserrat", sans-serif', color: '#FDFBF7' }}>
+    <div style={{ backgroundColor: '#06140F', backgroundImage: 'linear-gradient(to bottom, rgba(6,20,15,0.4), rgba(6,20,15,0.95)), url("https://res.cloudinary.com/din74ljlu/image/upload/v1779080657/SAVE_20260518_242659_ftuf3e.jpg")', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed', minHeight: '100vh', fontFamily: '"Montserrat", sans-serif', color: '#FDFBF7', overflowX: 'hidden' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
-        .glass-panel { background: rgba(10, 35, 24, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(229, 208, 143, 0.2); border-radius: 16px; padding: 30px 20px; max-width: 500px; margin: 0 auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: fadeIn 1s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .input-emerald { width: 100%; padding: 16px; margin-bottom: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(229, 208, 143, 0.5); border-radius: 8px; color: #FDFBF7; font-family: "Montserrat", sans-serif; font-size: 1.1rem; outline: none; text-align: center; }
-        .input-emerald::placeholder { color: rgba(253, 251, 247, 0.4); font-weight: 300; }
-        .btn-champagne { width: 100%; padding: 20px; background: linear-gradient(145deg, #E5D08F, #C7A951); color: #06140F; font-weight: 600; border: none; border-radius: 8px; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; cursor: pointer; transition: transform 0.2s; }
-        .btn-champagne:active { transform: scale(0.98); }
         
-        /* NEW GRID STYLES */
-        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
-        .grid-card { border: 1px solid rgba(229, 208, 143, 0.2); border-radius: 12px; padding: 15px 10px; cursor: pointer; transition: 0.3s; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .grid-card.selected { border-color: #E5D08F; background: rgba(229, 208, 143, 0.15); box-shadow: inset 0 0 15px rgba(229, 208, 143, 0.1); transform: scale(0.98); }
-        .food-image { width: 70px; height: 70px; border-radius: 50%; background-size: cover; background-position: center; border: 2px solid rgba(229, 208, 143, 0.3); margin-bottom: 10px; }
-        .drink-image { width: 50px; height: 50px; border-radius: 50%; background-size: cover; background-position: center; border: 2px solid rgba(229, 208, 143, 0.3); margin-bottom: 10px; }
+        /* 🪄 PREMIUM FOMO RIBBON */
+        .ticker-wrap { width: 100%; overflow: hidden; background: rgba(10, 35, 24, 0.85); border-bottom: 1px solid rgba(229, 208, 143, 0.4); padding: 10px 0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .ticker-move { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; }
+        @keyframes ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
+        .ticker-item { color: #E5D08F; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-right: 50px; font-weight: 500; }
+
+        .glass-panel { background: rgba(10, 35, 24, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(229, 208, 143, 0.3); border-radius: 20px; padding: 30px 20px; max-width: 500px; margin: 0 auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: floatUp 0.5s ease-out forwards; }
+        @keyframes floatUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .premium-card { display: flex; align-items: center; background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.3)); border: 1px solid rgba(229, 208, 143, 0.2); border-radius: 16px; padding: 15px; margin-bottom: 15px; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
+        .premium-card:active { transform: scale(0.96); border-color: #E5D08F; background: rgba(229, 208, 143, 0.15); }
+        .card-img { width: 85px; height: 85px; border-radius: 12px; background-size: cover; background-position: center; border: 2px solid rgba(229, 208, 143, 0.4); flex-shrink: 0; }
+        .glow-badge { position: absolute; top: -1px; right: -1px; background: linear-gradient(90deg, #D4AF37, #FDFBF7); color: #000; font-size: 0.65rem; font-weight: bold; padding: 5px 12px; border-bottom-left-radius: 12px; border-top-right-radius: 16px; box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
+        
+        .input-emerald { width: 100%; padding: 16px; margin-bottom: 15px; background: rgba(0,0,0,0.5); border: 1px solid rgba(229, 208, 143, 0.4); border-radius: 8px; color: #FDFBF7; font-family: "Montserrat", sans-serif; font-size: 1rem; outline: none; transition: 0.3s; }
+        .btn-champagne { width: 100%; padding: 18px; background: linear-gradient(145deg, #E5D08F, #C7A951); color: #06140F; font-weight: 600; border: none; border-radius: 8px; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; cursor: pointer; }
+        .btn-outline { width: 100%; padding: 18px; background: rgba(0,0,0,0.5); color: #E5D08F; border: 1px solid #E5D08F; border-radius: 8px; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; cursor: pointer; display: block; text-align: center; }
+        
+        .carousel-container { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .carousel-container::-webkit-scrollbar { display: none; }
+        .carousel-img { width: 220px; height: 280px; flex-shrink: 0; border-radius: 12px; background-size: cover; background-position: center; scroll-snap-align: center; border: 2px solid rgba(229, 208, 143, 0.3); }
       `}</style>
       
-      <div style={{ textAlign: 'center', marginBottom: '30px', paddingTop: '20px' }}>
-        <h1 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '2.5rem', margin: '5px 0' }}>Table {tableNumber}</h1>
-        <div style={{ height: '1px', width: '40px', background: '#E5D08F', margin: '15px auto' }}></div>
-      </div>
+      {/* THE LIVE ACTIVITY RIBBON */}
+      {activities.length > 0 && (
+        <div className="ticker-wrap">
+          <div className="ticker-move">
+            {activities.map((act, i) => (
+              <span key={i} className="ticker-item">{act} &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp;</span>
+            ))}
+          </div>
+        </div>
+      )}
       
-      <div className="glass-panel">
-        {status === 'success' ? (
-          <div>
-            <div id="blessing-card" style={{ padding: '40px 20px', background: '#06140F', border: '2px solid #E5D08F', borderRadius: '16px', margin: '10px 0 30px 0', position: 'relative', overflow: 'hidden', textAlign: 'center' }}>
-              <div style={{ position: 'absolute', inset: 0, opacity: 0.15, backgroundImage: 'url("https://res.cloudinary.com/din74ljlu/image/upload/v1779080657/SAVE_20260518_242659_ftuf3e.jpg")', backgroundSize: 'cover', backgroundPosition: 'center' }} />
-              <div style={{ position: 'relative', zIndex: 10 }}>
-                <span style={{ fontSize: '2.5rem', display: 'block', marginBottom: '15px' }}>✨</span>
-                <p style={{ color: '#E5D08F', fontFamily: '"Montserrat", sans-serif', fontSize: '0.8rem', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '10px' }}>VIP Guest</p>
-                <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#FDFBF7', fontSize: '2.2rem', margin: '0 0 5px 0', fontWeight: '400' }}>{form.guestName}</h2>
-                {form.ticketId && <p style={{ color: '#10b981', fontFamily: 'monospace', fontSize: '0.9rem', margin: '0 0 20px 0', letterSpacing: '2px' }}>{form.ticketId}</p>}
-                
-                <p style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '1.4rem', fontStyle: 'italic', lineHeight: '1.6', marginBottom: '30px', padding: '0 10px', marginTop: form.ticketId ? '0' : '20px' }}>
-                  "May Allah bless for you, and may He bless on you, and combine both of you in good."
+      <div style={{ padding: '20px' }}>
+        {step > 0 && step < 6 && (
+          <div style={{ textAlign: 'center', marginBottom: '20px', paddingTop: '10px' }}>
+            <p style={{ color: '#E5D08F', letterSpacing: '4px', fontSize: '0.75rem', textTransform: 'uppercase', margin: '0 0 5px 0' }}>The M'K26 Gala</p>
+            <h1 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#FDFBF7', fontSize: '2.2rem', margin: 0 }}>Table {tableNumber}</h1>
+          </div>
+        )}
+        
+        <div className="glass-panel">
+          
+          {step === 1 && (
+            <div>
+              <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '1.8rem', margin: '0 0 20px 0', textAlign: 'center' }}>The Royal Main Course</h2>
+              {loadingMenu ? <p style={{ textAlign: 'center', color: '#E5D08F' }}>Curating Menu...</p> : meals.map(meal => (
+                <div key={meal.id} className="premium-card" onClick={() => handleFoodSelection(meal.name)}>
+                  <div className="card-img" style={{ backgroundImage: `url(${meal.imageUrl || 'https://via.placeholder.com/100'})` }} />
+                  <div style={{ marginLeft: '18px' }}>
+                    <h4 style={{ margin: '0 0 5px 0', color: '#FDFBF7', fontSize: '1.1rem', fontWeight: '500' }}>{meal.name}</h4>
+                    <p style={{ margin: 0, color: '#E5D08F', fontSize: '0.75rem', textTransform: 'uppercase' }}>Tap to Select</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {step === 2 && (
+            <div style={{ textAlign: 'center', padding: '20px 0' }}>
+              <span style={{ fontSize: '4rem', display: 'block', marginBottom: '15px' }}>🥗</span>
+              <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '2rem', margin: '0 0 15px 0' }}>Add a Side?</h2>
+              <p style={{ color: '#FDFBF7', fontSize: '1.1rem', marginBottom: '35px', lineHeight: '1.5' }}>Would you like to add Coleslaw or Side Salad to your Rice dish?</p>
+              <button onClick={() => { setForm({...form, withSalad: true}); setStep(3); }} className="btn-champagne" style={{ marginBottom: '15px' }}>Yes, Add Salad</button>
+              <button onClick={() => { setForm({...form, withSalad: false}); setStep(3); }} className="btn-outline">No, Thank You</button>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div>
+              <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '1.8rem', margin: '0 0 20px 0', textAlign: 'center' }}>Royal Beverages</h2>
+              {drinks.map(drink => {
+                const isRecommended = drink.name.toLowerCase().includes('zobo');
+                return (
+                  <div key={drink.id} className="premium-card" onClick={() => { setForm({...form, drinkName: drink.name}); setStep(4); }}>
+                    {isRecommended && <div className="glow-badge">✨ Chef's Pairing</div>}
+                    <div className="card-img" style={{ backgroundImage: `url(${drink.imageUrl || 'https://via.placeholder.com/100'})` }} />
+                    <div style={{ marginLeft: '18px' }}>
+                      <h4 style={{ margin: '0 0 5px 0', color: '#FDFBF7', fontSize: '1.1rem', fontWeight: '500' }}>{drink.name}</h4>
+                      <p style={{ margin: 0, color: '#E5D08F', fontSize: '0.75rem', textTransform: 'uppercase' }}>Tap to Select</p>
+                    </div>
+                  </div>
+                );
+              })}
+              <button onClick={() => setStep(1)} style={{ background: 'none', border: 'none', color: '#aaa', width: '100%', padding: '15px', marginTop: '10px', textDecoration: 'underline' }}>← Restart Selection</button>
+            </div>
+          )}
+
+          {step === 4 && (
+            <div>
+              <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '2rem', margin: '0 0 5px 0', textAlign: 'center' }}>Final Details</h2>
+              <p style={{ textAlign: 'center', color: '#aaa', fontSize: '0.85rem', marginBottom: '30px' }}>So our Royal Waiters can address you properly.</p>
+              <form onSubmit={submitRoyalOrder}>
+                <input type="text" placeholder="Your Full Name *" className="input-emerald" value={form.guestName} onChange={e => setForm({...form, guestName: e.target.value})} required />
+                <input type="text" placeholder="Ticket ID / VIP Code (Optional)" className="input-emerald" value={form.ticketId} onChange={e => setForm({...form, ticketId: e.target.value})} />
+                <label style={{ display: 'flex', alignItems: 'center', gap: '15px', padding: '20px', background: 'rgba(229, 208, 143, 0.1)', borderRadius: '12px', border: '1px solid rgba(229, 208, 143, 0.4)', marginBottom: '30px' }}>
+                  <input type="checkbox" checked={form.souvenirNudge} onChange={e => setForm({...form, souvenirNudge: e.target.checked})} style={{ width: '25px', height: '25px', accentColor: '#D4AF37' }} />
+                  <span style={{ color: '#FDFBF7', fontSize: '0.9rem', lineHeight: '1.4' }}>Request event souvenir/gift package with this delivery?</span>
+                </label>
+                <button type="submit" className="btn-champagne">Place Royal Order</button>
+              </form>
+            </div>
+          )}
+
+          {step === 5 && (
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ background: 'rgba(0,0,0,0.6)', padding: '25px', borderRadius: '16px', marginBottom: '25px', border: '1px solid rgba(229, 208, 143, 0.3)' }}>
+                <p style={{ color: '#E5D08F', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '3px', margin: '0 0 10px 0' }}>Order Status</p>
+                <h2 style={{ color: trackingStatus === 'On the Way' ? '#10b981' : '#E5D08F', margin: '0 0 10px 0', fontSize: '2.2rem', fontFamily: '"Cormorant Garamond", serif', transition: 'color 0.5s' }}>{trackingStatus}</h2>
+                <p style={{ color: '#FDFBF7', fontSize: '0.9rem', margin: 0 }}>
+                  {trackingStatus === 'SENT' || trackingStatus === 'Pending' ? "Your order is in the kitchen queue." : ""}
+                  {trackingStatus === 'Preparing' ? "The Chef is prioritizing your meal." : ""}
+                  {trackingStatus === 'Ready' ? "Awaiting a Royal Waiter to claim your tray." : ""}
+                  {trackingStatus === 'On the Way' ? "Look up! Your food is approaching. ✨" : ""}
                 </p>
-                <div style={{ borderTop: '1px solid rgba(229, 208, 143, 0.3)', paddingTop: '20px' }}>
-                  <p style={{ color: '#aaa', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '3px', margin: 0 }}>M'K26 Gala</p>
-                  <p style={{ color: '#E5D08F', fontSize: '0.9rem', margin: '5px 0 0 0' }}>Muhammed & Kaothar</p>
+              </div>
+
+              {(trackingStatus === 'SENT' || trackingStatus === 'Pending') && (
+                <button onClick={cancelOrder} style={{ width: '100%', padding: '15px', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: '1px solid #ef4444', borderRadius: '8px', marginBottom: '20px' }}>Cancel Order</button>
+              )}
+
+              <button onClick={() => alert("🛎️ VIP Bell Rung! The Kitchen has been notified.")} className="btn-outline" style={{ marginBottom: '40px' }}><span style={{ fontSize: '1.3rem', marginRight: '8px' }}>🛎️</span> Ring VIP Service Bell</button>
+
+              <div style={{ textAlign: 'left', borderTop: '1px solid rgba(229, 208, 143, 0.2)', paddingTop: '30px', marginBottom: '40px' }}>
+                <h3 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#FDFBF7', fontSize: '1.8rem', margin: '0 0 20px 0', fontStyle: 'italic' }}>The Moment Before Wedding...</h3>
+                <div className="carousel-container">
+                  {throwbackImages.map((src, i) => <div key={i} className="carousel-img" style={{ backgroundImage: `url(${src})` }} />)}
                 </div>
               </div>
-            </div>
-            <p style={{ textAlign: 'center', color: '#aaa', fontSize: '0.9rem', marginBottom: '20px' }}>Your selection has been sent to the Royal Kitchen. Waiters will serve you shortly.</p>
-            <button onClick={shareCard} className="btn-champagne" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '1.2rem' }}>📸</span> Share to Status
-            </button>
-          </div>
-        ) : loadingMenu ? (
-          <p style={{ textAlign: 'center', color: '#E5D08F' }}>Fetching today's selections...</p>
-        ) : (
-          <form onSubmit={submitOrder}>
-            {/* GRID LAYOUT FOR FOOD */}
-            <p style={{ fontSize: '0.85rem', color: '#E5D08F', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '15px', textAlign: 'center' }}>1. Culinary Selection</p>
-            <div className="menu-grid">
-              {meals.map(meal => (
-                <div key={meal.id} className={`grid-card ${form.mealName === meal.name ? 'selected' : ''}`} onClick={() => setForm({...form, mealName: meal.name})}>
-                  {meal.imageUrl ? <div className="food-image" style={{ backgroundImage: `url(${meal.imageUrl})` }} /> : <div className="food-image" style={{ backgroundColor: '#222' }} />}
-                  <h4 style={{ margin: 0, color: form.mealName === meal.name ? '#E5D08F' : '#fff', fontWeight: '500', fontSize: '1rem' }}>{meal.name}</h4>
-                </div>
-              ))}
-            </div>
 
-            {/* GRID LAYOUT FOR DRINKS */}
-            <p style={{ fontSize: '0.85rem', color: '#E5D08F', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '15px', textAlign: 'center' }}>2. Beverage</p>
-            <div className="menu-grid">
-              {drinks.map(drink => (
-                <div key={drink.id} className={`grid-card ${form.drinkName === drink.name ? 'selected' : ''}`} onClick={() => setForm({...form, drinkName: drink.name})}>
-                  {drink.imageUrl ? <div className="drink-image" style={{ backgroundImage: `url(${drink.imageUrl})` }} /> : <div className="drink-image" style={{ backgroundColor: '#222' }} />}
-                  <h4 style={{ margin: 0, color: form.drinkName === drink.name ? '#E5D08F' : '#fff', fontWeight: '500', fontSize: '0.9rem' }}>{drink.name}</h4>
-                </div>
-              ))}
+              {trackingStatus === 'On the Way' && (
+                <button onClick={confirmDelivery} className="btn-champagne" style={{ animation: 'floatUp 0.5s ease-out' }}>I Received My Order ✓</button>
+     )}
             </div>
+          )}
 
-            {/* GUEST SIGNATURE & TICKET ID */}
-            <div style={{ borderTop: '1px solid rgba(229, 208, 143, 0.2)', paddingTop: '25px', marginTop: '10px' }}>
-              <p style={{ fontSize: '0.85rem', color: '#E5D08F', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '15px', textAlign: 'center' }}>3. Guest Details</p>
+          {step === 6 && (
+            <div style={{ textAlign: 'center' }}>
+              <span style={{ fontSize: '3rem', display: 'block', marginBottom: '10px' }}>🎉</span>
+              <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#10b981', fontSize: '2rem', margin: '0 0 25px 0' }}>Enjoy Your Meal!</h2>
               
-              <input type="text" placeholder="Full Name *" className="input-emerald" value={form.guestName} onChange={e => setForm({...form, guestName: e.target.value})} required />
-              
-              <input type="text" placeholder="Ticket ID (Optional)" className="input-emerald" value={form.ticketId} onChange={e => setForm({...form, ticketId: e.target.value.toUpperCase()})} style={{ letterSpacing: '2px' }} />
+              <div style={{ background: 'rgba(255,255,255,0.05)', padding: '25px', borderRadius: '16px', border: '1px solid rgba(229, 208, 143, 0.3)', marginBottom: '30px' }}>
+                <h3 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '1.5rem', margin: '0 0 15px 0' }}>The Blessing Vault</h3>
+                <p style={{ color: '#aaa', fontSize: '0.85rem', marginBottom: '20px' }}>Leave a heartfelt wish for Muhammed & Kaothar. It will be saved forever.</p>
+                
+                <textarea placeholder="Write your prayer or wish here..." value={blessing} onChange={e => setBlessing(e.target.value)} className="input-emerald" style={{ minHeight: '100px', resize: 'none' }}></textarea>
+                
+                {!selfieUrl ? (
+                  <label className="btn-outline" style={{ cursor: 'pointer', marginBottom: '15px' }}>
+                    📸 Snap a Quick Selfie
+                    <input type="file" accept="image/*" capture="user" onChange={handleSelfieCapture} style={{ display: 'none' }} />
+                  </label>
+                ) : (
+                  <div style={{ width: '100px', height: '100px', margin: '0 auto 20px', borderRadius: '50%', backgroundImage: `url(${selfieUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', border: '3px solid #E5D08F' }} />
+                )}
+              </div>
+
+              {blessing && (
+                <button onClick={shareToWhatsApp} className="btn-champagne" style={{ background: '#25D366', color: '#fff', marginBottom: '30px' }}>
+                  Share Blessing to WhatsApp 💚
+                </button>
+              )}
+
+              <button onClick={resetFlow} style={{ background: 'none', border: 'none', color: '#E5D08F', textDecoration: 'underline', padding: '15px', cursor: 'pointer' }}>
+                Order for someone else? (Start Over)
+              </button>
+
+              <div style={{ position: 'absolute', left: '-9999px' }}>
+                <div id="viral-card" style={{ width: '400px', padding: '40px', background: '#06140F', border: '4px solid #E5D08F', textAlign: 'center', position: 'relative' }}>
+                  <div style={{ position: 'absolute', inset: 0, opacity: 0.15, backgroundImage: 'url("https://res.cloudinary.com/din74ljlu/image/upload/v1779080657/SAVE_20260518_242659_ftuf3e.jpg")', backgroundSize: 'cover' }} />
+                  <div style={{ position: 'relative', zIndex: 10 }}>
+                    <p style={{ color: '#E5D08F', fontFamily: '"Montserrat", sans-serif', fontSize: '1rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '20px' }}>VIP Blessing</p>
+                    {selfieUrl && <div style={{ width: '120px', height: '120px', margin: '0 auto 20px', borderRadius: '50%', backgroundImage: `url(${selfieUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', border: '4px solid #E5D08F' }} />}
+                    <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#FDFBF7', fontSize: '2.5rem', margin: '0 0 20px 0' }}>{form.guestName || "VIP Guest"}</h2>
+                    <p style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '1.8rem', fontStyle: 'italic', lineHeight: '1.5', padding: '0 20px' }}>"{blessing}"</p>
+                    <div style={{ borderTop: '2px solid rgba(229, 208, 143, 0.4)', marginTop: '30px', paddingTop: '20px' }}>
+                      <p style={{ color: '#aaa', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '3px', margin: 0 }}>The M'K26 Gala</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
-            
-            <button type="submit" disabled={status === 'submitting'} className="btn-champagne">{status === 'submitting' ? 'Sending to Kitchen...' : 'Place Order'}</button>
-          </form>
-        )}
+          )}
+
+        </div>
       </div>
     </div>
   );
