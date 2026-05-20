@@ -1,6 +1,6 @@
 'use client';
-import { useState, useEffect, Suspense, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import confetti from 'canvas-confetti';
 
 type MenuItem = { id: string; name: string; category: string; imageUrl: string; isAvailable: boolean; };
@@ -8,12 +8,12 @@ type MenuItem = { id: string; name: string; category: string; imageUrl: string; 
 const fallbackMenu: MenuItem[] = [
   { id: '1', name: 'Royal Jollof Rice & Spicy Beef', category: 'MEAL', imageUrl: 'https://images.unsplash.com/photo-1662481028751-bb3d5eb9231f?q=80&w=200&auto=format&fit=crop', isAvailable: true },
   { id: '2', name: 'Amala, Ewedu & Assorted Meat', category: 'MEAL', imageUrl: 'https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?q=80&w=200&auto=format&fit=crop', isAvailable: true },
-  { id: '4', name: 'Chilled Zobo Drink', category: 'DRINK', imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=200&auto=format&fit=crop', isAvailable: true },
-  { id: '5', name: 'Fresh Palm Wine', category: 'DRINK', imageUrl: 'https://images.unsplash.com/photo-1595981267035-7b04d84b4f1c?q=80&w=200&auto=format&fit=crop', isAvailable: true },
+  { id: '4', name: 'Chilled Zobo Drink', category: 'DRINK', imageUrl: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=200&auto=format&fit=crop', isAvailable: true }
 ];
 
 function MenuContent() {
   const searchParams = useSearchParams();
+  const router = useRouter(); // 🔥 FAST ROUTER INJECTED
   const tableNumber = searchParams.get('table') || 'VIP';
   
   const [step, setStep] = useState(0); 
@@ -21,13 +21,10 @@ function MenuContent() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loadingMenu, setLoadingMenu] = useState(true);
   
-  // REAL ENGINE STATE
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
   const [trackingStatus, setTrackingStatus] = useState('Pending');
   const [blessing, setBlessing] = useState('');
   const [selfieUrl, setSelfieUrl] = useState('');
-  
-  // 🪄 FOMO RIBBON STATE
   const [activities, setActivities] = useState<string[]>([]);
 
   const throwbackImages = [
@@ -36,21 +33,28 @@ function MenuContent() {
     'https://res.cloudinary.com/din74ljlu/image/upload/v1779080144/SAVE_20260518_242650_wgqxex.jpg'
   ];
 
-  // MEMORY RESTORE
+  // 🔥 MEMORY RESTORE (Now checks if order was already completed!)
   useEffect(() => {
     const savedOrderId = localStorage.getItem('mk26_active_order');
     if (savedOrderId) {
       setActiveOrderId(savedOrderId);
-      setStep(5);
+      // Quickly ask the DB if this order was already completed
+      fetch(`/api/orders/${savedOrderId}`).then(res => res.json()).then(data => {
+        if (data && data.status === 'Completed') {
+          setStep(6); // Jump straight back to Blessing Vault!
+        } else {
+          setStep(5);
+          setTrackingStatus(data?.status || 'Pending');
+        }
+      }).catch(() => setStep(5));
     } else if (step === 0) {
       const timer = setTimeout(() => setStep(1), 3500); 
       return () => clearTimeout(timer);
     }
   }, []);
 
-  // LIVE DATABASE POLLING (Tracking & Ribbon)
+  // LIVE DATABASE POLLING
   useEffect(() => {
-    // 1. Fetch Ribbon Activities
     const fetchActivities = async () => {
       try {
         const res = await fetch('/api/activities');
@@ -58,10 +62,9 @@ function MenuContent() {
       } catch(e) {}
     };
     
-    fetchActivities(); // initial fetch
-    const activityInterval = setInterval(fetchActivities, 2500); // Check every 2.5s
+    fetchActivities();
+    const activityInterval = setInterval(fetchActivities, 2500);
 
-    // 2. Fetch Active Order Status (If ordering)
     let orderInterval: NodeJS.Timeout;
     if (activeOrderId && step === 5) {
       orderInterval = setInterval(async () => {
@@ -86,7 +89,6 @@ function MenuContent() {
     };
   }, [activeOrderId, step, trackingStatus]);
 
-  // FETCH MENU
   useEffect(() => {
     fetch('/api/menu').then(res => res.json()).then(data => {
       if (Array.isArray(data) && data.length > 0) setMenuItems(data.filter((item: MenuItem) => item.isAvailable));
@@ -151,7 +153,7 @@ function MenuContent() {
           const link = document.createElement('a'); link.download = 'MK26_Gala.png'; link.href = URL.createObjectURL(blob); link.click();
         }
       });
-    } catch (error) { alert("Failed to generate your shareable card. Please try again."); }
+    } catch (error) { alert("Failed to generate your shareable card."); }
   };
 
   const resetFlow = () => {
@@ -159,6 +161,12 @@ function MenuContent() {
     setActiveOrderId(null);
     setForm({ guestName: '', ticketId: '', mealName: '', drinkName: '', withSalad: false, souvenirNudge: false });
     setBlessing(''); setSelfieUrl(''); setStep(1);
+  };
+
+  // 🔥 FAST NAVIGATION TO HOME
+  const goHome = () => {
+    localStorage.removeItem('mk26_active_order');
+    router.push('/'); 
   };
 
   const meals = menuItems.filter(i => i.category === 'MEAL');
@@ -177,37 +185,28 @@ function MenuContent() {
     <div style={{ backgroundColor: '#06140F', backgroundImage: 'linear-gradient(to bottom, rgba(6,20,15,0.4), rgba(6,20,15,0.95)), url("https://res.cloudinary.com/din74ljlu/image/upload/v1779080657/SAVE_20260518_242659_ftuf3e.jpg")', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed', minHeight: '100vh', fontFamily: '"Montserrat", sans-serif', color: '#FDFBF7', overflowX: 'hidden' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
-        
-        /* 🪄 PREMIUM FOMO RIBBON */
         .ticker-wrap { width: 100%; overflow: hidden; background: rgba(10, 35, 24, 0.85); border-bottom: 1px solid rgba(229, 208, 143, 0.4); padding: 10px 0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .ticker-move { display: inline-block; white-space: nowrap; animation: ticker 25s linear infinite; }
         @keyframes ticker { 0% { transform: translateX(100vw); } 100% { transform: translateX(-100%); } }
         .ticker-item { color: #E5D08F; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-right: 50px; font-weight: 500; }
-
         .glass-panel { background: rgba(10, 35, 24, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(229, 208, 143, 0.3); border-radius: 20px; padding: 30px 20px; max-width: 500px; margin: 0 auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5); animation: floatUp 0.5s ease-out forwards; }
         @keyframes floatUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        
         .premium-card { display: flex; align-items: center; background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(0,0,0,0.3)); border: 1px solid rgba(229, 208, 143, 0.2); border-radius: 16px; padding: 15px; margin-bottom: 15px; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
         .premium-card:active { transform: scale(0.96); border-color: #E5D08F; background: rgba(229, 208, 143, 0.15); }
         .card-img { width: 85px; height: 85px; border-radius: 12px; background-size: cover; background-position: center; border: 2px solid rgba(229, 208, 143, 0.4); flex-shrink: 0; }
         .glow-badge { position: absolute; top: -1px; right: -1px; background: linear-gradient(90deg, #D4AF37, #FDFBF7); color: #000; font-size: 0.65rem; font-weight: bold; padding: 5px 12px; border-bottom-left-radius: 12px; border-top-right-radius: 16px; box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
-        
         .input-emerald { width: 100%; padding: 16px; margin-bottom: 15px; background: rgba(0,0,0,0.5); border: 1px solid rgba(229, 208, 143, 0.4); border-radius: 8px; color: #FDFBF7; font-family: "Montserrat", sans-serif; font-size: 1rem; outline: none; transition: 0.3s; }
         .btn-champagne { width: 100%; padding: 18px; background: linear-gradient(145deg, #E5D08F, #C7A951); color: #06140F; font-weight: 600; border: none; border-radius: 8px; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; cursor: pointer; }
         .btn-outline { width: 100%; padding: 18px; background: rgba(0,0,0,0.5); color: #E5D08F; border: 1px solid #E5D08F; border-radius: 8px; text-transform: uppercase; letter-spacing: 2px; font-size: 0.9rem; cursor: pointer; display: block; text-align: center; }
-        
         .carousel-container { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; scroll-snap-type: x mandatory; scrollbar-width: none; }
         .carousel-container::-webkit-scrollbar { display: none; }
         .carousel-img { width: 220px; height: 280px; flex-shrink: 0; border-radius: 12px; background-size: cover; background-position: center; scroll-snap-align: center; border: 2px solid rgba(229, 208, 143, 0.3); }
       `}</style>
       
-      {/* THE LIVE ACTIVITY RIBBON */}
       {activities.length > 0 && (
         <div className="ticker-wrap">
           <div className="ticker-move">
-            {activities.map((act, i) => (
-              <span key={i} className="ticker-item">{act} &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp;</span>
-            ))}
+            {activities.map((act, i) => <span key={i} className="ticker-item">{act} &nbsp;&nbsp;&nbsp; ✦ &nbsp;&nbsp;&nbsp;</span>)}
           </div>
         </div>
       )}
@@ -311,7 +310,7 @@ function MenuContent() {
 
               {trackingStatus === 'On the Way' && (
                 <button onClick={confirmDelivery} className="btn-champagne" style={{ animation: 'floatUp 0.5s ease-out' }}>I Received My Order ✓</button>
-     )}
+              )}
             </div>
           )}
 
@@ -328,8 +327,9 @@ function MenuContent() {
                 
                 {!selfieUrl ? (
                   <label className="btn-outline" style={{ cursor: 'pointer', marginBottom: '15px' }}>
-                    📸 Snap a Quick Selfie
-                    <input type="file" accept="image/*" capture="user" onChange={handleSelfieCapture} style={{ display: 'none' }} />
+                    📸 Tap to Add a Photo
+                    {/* 🔥 CAMERA FIX: Removed capture="user" to prevent Android from aggressively killing Chrome */}
+                    <input type="file" accept="image/*" onChange={handleSelfieCapture} style={{ display: 'none' }} />
                   </label>
                 ) : (
                   <div style={{ width: '100px', height: '100px', margin: '0 auto 20px', borderRadius: '50%', backgroundImage: `url(${selfieUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', border: '3px solid #E5D08F' }} />
@@ -337,12 +337,17 @@ function MenuContent() {
               </div>
 
               {blessing && (
-                <button onClick={shareToWhatsApp} className="btn-champagne" style={{ background: '#25D366', color: '#fff', marginBottom: '30px' }}>
+                <button onClick={shareToWhatsApp} className="btn-champagne" style={{ background: '#25D366', color: '#fff', marginBottom: '15px' }}>
                   Share Blessing to WhatsApp 💚
                 </button>
               )}
 
-              <button onClick={resetFlow} style={{ background: 'none', border: 'none', color: '#E5D08F', textDecoration: 'underline', padding: '15px', cursor: 'pointer' }}>
+              {/* 🔥 HOME & RESET BUTTONS */}
+              <button onClick={goHome} className="btn-champagne" style={{ background: 'transparent', color: '#E5D08F', border: '1px solid #E5D08F', marginBottom: '15px' }}>
+                Return to Homepage 🏠
+              </button>
+
+              <button onClick={resetFlow} style={{ background: 'none', border: 'none', color: '#aaa', textDecoration: 'underline', padding: '15px', cursor: 'pointer' }}>
                 Order for someone else? (Start Over)
               </button>
 

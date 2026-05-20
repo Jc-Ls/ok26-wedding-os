@@ -1,18 +1,19 @@
+import { neon } from '@neondatabase/serverless';
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
     const { count } = await request.json();
-    const codes = [];
+    const sql = neon(process.env.DATABASE_URL!);
+    
+    let generated = 0;
     for (let i = 0; i < count; i++) {
       const code = `MK26-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
-      codes.push({ code });
+      await sql`INSERT INTO "VipPass" (id, code, "isUsed", "createdAt") VALUES (gen_random_uuid(), ${code}, false, NOW()) ON CONFLICT (code) DO NOTHING`;
+      generated++;
     }
-    await prisma.vipPass.createMany({ data: codes, skipDuplicates: true });
-    return NextResponse.json({ success: true, count });
-  } catch (err) {
+    return NextResponse.json({ success: true, count: generated });
+  } catch (err: any) {
     return NextResponse.json({ error: "Failed to generate" }, { status: 500 });
   }
 }
