@@ -8,10 +8,17 @@ export default function ReservePage() {
   const [errorMsg, setErrorMsg] = useState('');
   const [ticketData, setTicketData] = useState({ code: '', name: '' });
 
-  const submitReservation = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitReservation = async (e: React.FormEvent | React.MouseEvent) => {
+    e.preventDefault(); // 🔥 This completely stops the browser from refreshing!
+    
+    if (!form.name || !form.phone || !form.vipCode) {
+      setErrorMsg("Please fill in all required fields.");
+      return;
+    }
+
     setStatus('submitting');
     setErrorMsg('');
+    
     try {
       const res = await fetch('/api/reserve', {
         method: 'POST',
@@ -19,7 +26,7 @@ export default function ReservePage() {
         body: JSON.stringify(form)
       });
       const data = await res.json();
-      
+
       if (res.ok && data.success) {
         setTicketData({ code: data.ticketId, name: data.name });
         setStatus('success');
@@ -54,11 +61,11 @@ export default function ReservePage() {
           <span style={{ fontSize: '3rem', display: 'block', marginBottom: '10px' }}>🎟️</span>
           <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#10b981', fontSize: '2rem', margin: '0 0 10px 0' }}>Reservation Confirmed</h2>
           <p style={{ color: '#FDFBF7', fontSize: '0.9rem', marginBottom: '30px' }}>Please take a screenshot of your digital pass below. It will be required for entry.</p>
-          
+
           <div className="ticket-card">
             <p style={{ color: '#E5D08F', fontSize: '0.75rem', letterSpacing: '4px', textTransform: 'uppercase', margin: '0 0 10px 0' }}>VIP Access Pass</p>
             <h3 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#FDFBF7', fontSize: '1.8rem', margin: '0 0 20px 0', fontWeight: '400' }}>{ticketData.name}</h3>
-            
+
             <div style={{ backgroundColor: 'rgba(229, 208, 143, 0.1)', padding: '15px', borderRadius: '8px', border: '1px solid rgba(229, 208, 143, 0.3)' }}>
               <p style={{ color: '#aaa', fontSize: '0.65rem', letterSpacing: '2px', textTransform: 'uppercase', margin: '0 0 5px 0' }}>Secure Code</p>
               <h1 style={{ fontFamily: 'monospace', color: '#E5D08F', fontSize: '2.5rem', letterSpacing: '4px', margin: 0 }}>{ticketData.code}</h1>
@@ -69,7 +76,7 @@ export default function ReservePage() {
           <p style={{ color: '#FDFBF7', fontSize: '0.8rem', marginBottom: '20px' }}>
             {form.email ? "A copy of this pass has also been sent to your email." : "Save this code to present at the entrance."}
           </p>
-          
+
           <Link href="/" style={{ color: '#E5D08F', textDecoration: 'none', fontSize: '0.9rem', borderBottom: '1px solid #E5D08F', paddingBottom: '2px' }}>
             Return to Homepage
           </Link>
@@ -87,15 +94,16 @@ export default function ReservePage() {
             </div>
           )}
 
-          <form onSubmit={submitReservation}>
-            <input type="text" placeholder="Full Name *" className="input-emerald" value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} required />
-            <input type="tel" placeholder="Phone Number *" className="input-emerald" value={form.phone} onChange={(e) => setForm({...form, phone: e.target.value})} required />
+          <form>
+            <input type="text" placeholder="Full Name *" className="input-emerald" value={form.name} onChange={(e) => setForm({...form, name: e.target.value})} />
+            <input type="tel" placeholder="Phone Number *" className="input-emerald" value={form.phone} onChange={(e) => setForm({...form, phone: e.target.value})} />
             <input type="email" placeholder="Email Address (Optional)" className="input-emerald" value={form.email} onChange={(e) => setForm({...form, email: e.target.value})} />
-            
-            <p style={{ fontSize: '0.75rem', color: '#E5D08F', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '8px', textAlign: 'center', marginTop: '10px' }}>Invitation Code *</p>
-            <input type="text" placeholder="MK26-XXXXX" className="input-emerald vip-input" value={form.vipCode} onChange={(e) => setForm({...form, vipCode: e.target.value.toUpperCase()})} required />
 
-            <button type="submit" disabled={status === 'submitting'} className="btn-champagne" style={{ marginTop: '10px' }}>
+            <p style={{ fontSize: '0.75rem', color: '#E5D08F', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '8px', textAlign: 'center', marginTop: '10px' }}>Invitation Code *</p>
+            <input type="text" placeholder="MK26-XXXXX" className="input-emerald vip-input" value={form.vipCode} onChange={(e) => setForm({...form, vipCode: e.target.value.toUpperCase()})} />
+
+            {/* 🔥 FIX: Changed to button type="button" so the browser CANNOT refresh */}
+            <button type="button" onClick={submitReservation} disabled={status === 'submitting'} className="btn-champagne" style={{ marginTop: '10px' }}>
               {status === 'submitting' ? 'Verifying Pass...' : 'Secure VIP Pass'}
             </button>
           </form>
