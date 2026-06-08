@@ -228,7 +228,7 @@ export default function ScanQRPage() {
                 color: '#E5D08F',
                 fontSize: '0.85rem',
                 textTransform: 'uppercase',
-                letter-spacing: '2px',
+                letterSpacing: '2px',
                 marginBottom: '10px',
               }}
             >
