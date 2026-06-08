@@ -578,7 +578,7 @@ export default function HomePage() {
             </div>
           </article>
         </div>
-        <Link href="/menu" className="btn-secondary">
+        <Link href="/menu-gate" className="btn-secondary">
           Browse Full Menu
         </Link>
       </section>
