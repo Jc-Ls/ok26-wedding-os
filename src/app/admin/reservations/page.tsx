@@ -20,6 +20,23 @@ export default function Reservations() {
   return (
     <div style={{ padding: '40px 20px', fontFamily: '"Montserrat", sans-serif', backgroundColor: '#050505', color: '#FDFBF7', minHeight: '100vh' }}>
       <h1 style={{ color: '#D4AF37', fontFamily: '"Cormorant Garamond", serif', fontSize: '2.5rem', textAlign: 'center' }}>Guest Check-in</h1>
+      <div style={{ textAlign: 'center', marginTop: 12 }}>
+        <button onClick={() => {
+          if (!guests || guests.length === 0) return;
+          const headers = Object.keys(guests[0]);
+          const rows = guests.map(g => headers.map(h => `"${String(g[h] ?? '')}"`).join(','));
+          const csv = [headers.join(','), ...rows].join('\n');
+          const blob = new Blob([csv], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'guest-list.csv';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+        }} style={{ background: 'linear-gradient(145deg,#E5D08F,#C7A951)', border: 'none', padding: '10px 16px', borderRadius: 8, fontWeight: 700, cursor: 'pointer' }}>Export CSV</button>
+      </div>
       {loading ? <p style={{ textAlign: 'center', color: '#aaa', marginTop: '50px' }}>Loading the Royal Guestlist...</p> : (
         <div style={{ maxWidth: '600px', margin: '30px auto', backgroundColor: '#111', padding: '20px', borderRadius: '12px', border: '1px solid #333' }}>
           {guests.length === 0 ? <p style={{ color: '#aaa', textAlign: 'center' }}>No reservations found.</p> : guests.map((g, i) => (
