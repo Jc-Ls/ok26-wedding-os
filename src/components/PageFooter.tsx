@@ -1,0 +1,128 @@
+'use client';
+import { useMemo } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+interface PageFooterProps {
+  previousHref?: string;
+  previousLabel?: string;
+  nextHref?: string;
+  nextLabel?: string;
+}
+
+const pageSequence = [
+  { href: '/', label: 'Home' },
+  { href: '/meet-the-couple', label: 'Meet the Couple' },
+  { href: '/meet-the-olowojares', label: 'Meet the Olowojares' },
+  { href: '/special-guests', label: 'Special Guests' },
+  { href: '/honorees', label: 'Honorees' },
+  { href: '/traditions', label: 'Traditions' },
+  { href: '/organisers', label: 'Organisers' },
+  { href: '/itinerary', label: 'Itinerary' },
+  { href: '/reservations', label: 'Reservations' },
+  { href: '/reserve', label: 'Reserve' },
+  { href: '/menu', label: 'Menu' },
+  { href: '/menu-gate', label: 'Menu Gate' },
+  { href: '/livestream', label: 'Livestream' },
+  { href: '/live', label: 'Live' },
+  { href: '/scan', label: 'Scan' },
+  { href: '/vault', label: 'Vault' },
+  { href: '/kitchen', label: 'Kitchen' },
+];
+
+export default function PageFooter({
+  previousHref,
+  previousLabel = 'Previous Page',
+  nextHref,
+  nextLabel = 'Next Page',
+}: PageFooterProps) {
+  const pathname = usePathname();
+
+  const { resolvedPreviousHref, resolvedPreviousLabel, resolvedNextHref, resolvedNextLabel } = useMemo(() => {
+    const activeIndex = pageSequence.findIndex((page) => page.href === pathname);
+    const previousPage = pageSequence[activeIndex - 1];
+    const nextPage = pageSequence[activeIndex + 1];
+
+    return {
+      resolvedPreviousHref: previousHref ?? previousPage?.href,
+      resolvedPreviousLabel: previousHref ? previousLabel : previousPage?.label ?? previousLabel,
+      resolvedNextHref: nextHref ?? nextPage?.href,
+      resolvedNextLabel: nextHref ? nextLabel : nextPage?.label ?? nextLabel,
+    };
+  }, [pathname, previousHref, previousLabel, nextHref, nextLabel]);
+
+  if (!pathname || pathname.startsWith('/admin') || pathname.startsWith('/api')) {
+    return null;
+  }
+
+  if (!resolvedPreviousHref && !resolvedNextHref) {
+    return null;
+  }
+
+  return (
+    <footer className="page-footer">
+      <div className="footer-content">
+        <div className="footer-section">
+          <div className="footer-grid">
+            <div>
+              <p className="footer-title">Quick Links</p>
+              <ul>
+                <li>
+                  <Link href="/">Home</Link>
+                </li>
+                <li>
+                  <Link href="/meet-the-couple">Meet the Couple</Link>
+                </li>
+                <li>
+                  <Link href="/honorees">Honorees</Link>
+                </li>
+                <li>
+                  <Link href="/itinerary">Itinerary</Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <p className="footer-title">Need Help?</p>
+              <p>Event Coordinator</p>
+              <p>Groom Representative</p>
+              <p>Bride Representative</p>
+            </div>
+            <div>
+              <p className="footer-title">Contact</p>
+              <p>+234 800 000 0000</p>
+              <p>support@olowojarewedding.com</p>
+            </div>
+          </div>
+          <p className="footer-credit">
+            Designed & Developed by Jare&apos;s Choice Labs (JCLs) • Crafting Digital Experiences That Matter
+          </p>
+        </div>
+
+        <div className="page-navigation">
+          <div className="nav-button previous">
+            {resolvedPreviousHref ? (
+              <Link href={resolvedPreviousHref} className="btn-nav">
+                ← {resolvedPreviousLabel}
+              </Link>
+            ) : (
+              <button className="btn-nav disabled" disabled>
+                ← {resolvedPreviousLabel}
+              </button>
+            )}
+          </div>
+          <div className="nav-button next">
+            {resolvedNextHref ? (
+              <Link href={resolvedNextHref} className="btn-nav">
+                {resolvedNextLabel} →
+              </Link>
+            ) : (
+              <button className="btn-nav disabled" disabled>
+                {resolvedNextLabel} →
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}

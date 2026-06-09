@@ -1,0 +1,43 @@
+﻿import { NextRequest, NextResponse } from "next/server";
+
+export function middleware(request: NextRequest) {
+  const { pathname, searchParams } = request.nextUrl;
+
+  // Only enforce table gating on /menu route
+  if (pathname === "/menu") {
+    // Check if table parameter exists in URL
+    const tableParam = searchParams.get("table");
+    
+    if (!tableParam) {
+      // Check if table is in cookies
+      const tableCookie = request.cookies.get("table_number")?.value;
+      
+      if (!tableCookie) {
+        // No table info, redirect to scan page
+        const scanUrl = new URL("/scan", request.url);
+        return NextResponse.redirect(scanUrl);
+      }
+    }
+
+    // Table parameter or cookie exists, set secure cookie for session persistence
+    const response = NextResponse.next();
+    const table = tableParam || request.cookies.get("table_number")?.value;
+    
+    if (table) {
+      response.cookies.set("table_number", table, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 86400, // 24 hours
+      });
+    }
+    
+    return response;
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: ["/menu"],
+};

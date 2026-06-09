@@ -19,7 +19,6 @@ const livestreamHighlights = [
 
 export default function LivestreamPage() {
   const { scrollY } = useScroll();
-  const heroDepth = useTransform(scrollY, [0, 500], [0, 32]);
   const heroGlow = useTransform(scrollY, [0, 500], [0.08, 0.22]);
   const panelFloat = useTransform(scrollY, [0, 500], [24, -12]);
 
