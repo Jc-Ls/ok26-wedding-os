@@ -162,6 +162,24 @@ input:focus { border: 1px solid var(--gold-bright); }
 .menu-item-img { width: 100%; height: 100%; object-fit: cover; }
 .radio-custom { width: 22px; height: 22px; margin-right: 12px; accent-color: var(--gold-base); flex-shrink: 0; }
 
+/* --- LIST GRID UTILITY: make lists display as CSS grid globally --- */
+ul, ol {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  padding-left: 0;
+  margin: 0;
+  list-style: none;
+}
+
+li { display: block; }
+
+.list-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
 /* --- THE "WOW" ANIMATIONS --- */
 .name-shimmer { background: linear-gradient(to right, var(--gold-bright) 20%, #ffffff 50%, var(--gold-bright) 80%); background-size: 200% auto; color: transparent; -webkit-background-clip: text; background-clip: text; animation: shimmer 4s linear infinite; }
 @keyframes shimmer { to { background-position: 200% center; } }

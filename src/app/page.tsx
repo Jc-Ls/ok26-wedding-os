@@ -91,7 +91,7 @@ export default function HomePage() {
               <Link href="/itinerary">Itinerary</Link>
             </div>
           </details>
-          <Link href="/livestream">Livestream</Link>
+          <Link href="/live">Livestream</Link>
           <Link href="/reservations">RSVP</Link>
         </div>
       </nav>
@@ -109,7 +109,7 @@ export default function HomePage() {
             <Link href="/meet-the-couple" className="btn-secondary">
               Start the Journey
             </Link>
-            <Link href="/livestream" className="btn-primary">
+            <Link href="/live" className="btn-primary">
               Livestream
             </Link>
             <Link href="/reservations" className="btn-secondary">

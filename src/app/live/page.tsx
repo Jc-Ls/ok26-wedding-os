@@ -15,7 +15,7 @@ export default function LivePage() {
             Live Stream
           </h1>
           <p className="text-purple-300 text-lg">
-            OK&apos;26 Royal OS - Broadcast from the Reception
+            M'K&apos;26 Royal - Broadcast from the Reception
           </p>
         </div>
 
@@ -36,7 +36,7 @@ export default function LivePage() {
               Event Details
             </h2>
             <p className="text-gray-300 leading-relaxed">
-              Join us for OK&apos;26 Royal OS - An unforgettable celebration featuring
+              Join us for M'K&apos;26 Royal OS - An unforgettable celebration featuring
               live entertainment, exceptional cuisine, and exclusive experiences
               designed for our cherished guests.
             </p>

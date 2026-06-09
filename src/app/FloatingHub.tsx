@@ -17,7 +17,7 @@ export default function FloatingHub() {
       </summary>
       <div className="hub-menu">
         <p className="hub-title">Guest command center</p>
-        <Link href="/livestream" className="hub-link">
+        <Link href="/live" className="hub-link">
           Livestream
         </Link>
         <Link href="/reservations" className="hub-link">

@@ -2,6 +2,7 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import SponsorBanner from './SponsorBanner';
 
 interface PageFooterProps {
   previousHref?: string;
@@ -22,11 +23,10 @@ const pageSequence = [
   { href: '/reservations', label: 'Reservations' },
   { href: '/menu', label: 'Menu' },
   { href: '/menu-gate', label: 'Menu Gate' },
-  { href: '/livestream', label: 'Livestream' },
   { href: '/live', label: 'Live' },
   { href: '/scan', label: 'Scan' },
   { href: '/vault', label: 'Vault' },
-  { href: '/kitchen', label: 'Kitchen' },
+  //{ href: '/kitchen', label: 'Kitchen' },
 ];
 
 export default function PageFooter({
@@ -85,6 +85,7 @@ export default function PageFooter({
           )}
         </div>
       </div>
+      <SponsorBanner />
       <div className="footer-bottom">
         <p className="footer-credit">
           Designed & Developed by Jare&apos;s Choice Labs (JCLs) • Crafting Digital Experiences That Matter
