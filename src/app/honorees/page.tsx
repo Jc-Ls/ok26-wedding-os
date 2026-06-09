@@ -1,6 +1,25 @@
 'use client';
 import Link from 'next/link';
+import TiltCard from '../components/TiltCard';
 
+
+const hosts = [
+  {
+    role: 'The Host',
+    name: 'Engr. Hammed Olowojare',
+    subtitle: 'CEO / MD Malad Global Concept FCT',
+  },
+  {
+    role: 'The Father of the Day',
+    name: 'Alhaji. Hakeem Olademeji Lawal',
+    subtitle: 'CEO / Founder Awilya Foundation',
+  },
+  {
+    role: 'Mother of the Day',
+    name: 'Alhaja. Binta A Logun',
+    subtitle: 'Proprietress Five-ways Int’l School Ilorin',
+  },
+];
 export default function HonoreesPage() {
   return (
     <main className="page-shell">
@@ -15,29 +34,30 @@ export default function HonoreesPage() {
           <Link href="#footer">Support</Link>
         </div>
       </nav>
-
+      
       <section className="section about-section" id="assistant">
         <div className="section-heading">
-          <span>About the Celebration</span>
-          <h2>Hosts, tradition, and distinguished guests</h2>
+          <span>Hosts & Parents</span>
+          <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2.3rem, 5vw, 3rem)', lineHeight: 1.1, marginBottom: '18px', color: '#fff' }}>
+            Honoured Guests Behind the Ceremony
+          </h2>
+          <p style={{ maxWidth: 760, lineHeight: 1.8, color: '#D9D2C1', fontSize: '1rem', marginBottom: '36px' }}>
+            After introducing the groom and bride, we honour the host and the parents of the day who play a central role in welcoming guests and guiding the celebration.
+          </p>
         </div>
-        <div className="about-grid">
-          <article className="about-card">
-            <p className="eyebrow">The Host</p>
-            <h3>Engr. Hammed Olowojare</h3>
-            <p>CEO/MD Malad Global Concept FCT</p>
-          </article>
-          <article className="about-card">
-            <p className="eyebrow">Father of the Day</p>
-            <h3>Alhaji Hakeem Olademeji Lawal</h3>
-            <p>CEO / Founder Awilya Foundation</p>
-          </article>
-          <article className="about-card">
-            <p className="eyebrow">Mother of the Day</p>
-            <h3>Alhaja Binta A. Logun</h3>
-            <p>Proprietress Five-Ways International School, Ilorin</p>
-          </article>
+
+        <div className="edge-grid compact">
+          {hosts.map((person) => (
+            <TiltCard key={person.name} className="compact-card">
+              <span style={{ display: 'inline-block', color: '#F9A8D4', textTransform: 'uppercase', letterSpacing: '3px', fontSize: '0.75rem', marginBottom: '14px' }}>
+                {person.role}
+              </span>
+              <h3 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.9rem', margin: '0 0 14px 0', color: '#fff' }}>{person.name}</h3>
+              <p style={{ color: '#D9D2C1', fontSize: '0.98rem', lineHeight: 1.75, margin: 0 }}>{person.subtitle}</p>
+            </TiltCard>
+          ))}
         </div>
+
         <div className="guest-list">
           <h3 style={{ marginBottom: '15px' }}>Special Invitees</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '12px' }}>

@@ -22,7 +22,7 @@ export default function MeetTheOlowojaresPage() {
     <main className="modern-page">
       <div className="modern-inner">
         <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.85rem', marginBottom: '16px' }}>
-          Meet The Olowojares
+          Meet The Family
         </p>
         <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(3rem, 6vw, 5rem)', lineHeight: 1, marginBottom: '24px' }}>A Family Celebration in Premium Style</h1>
         <p style={{ maxWidth: 760, lineHeight: 1.8, color: '#D9D2C1', fontSize: '1rem', marginBottom: '42px' }}>

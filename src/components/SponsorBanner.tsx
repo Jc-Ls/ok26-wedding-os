@@ -10,7 +10,7 @@ export default function SponsorBanner() {
           <h2>BABA-K TICKETHUB</h2>
           <p>Premium booking and celebration support powered across the entire wedding experience.</p>
         </div>
-        <Link href="/itinerary" className="btn-sponsor">
+        <Link href="https://baba-k.vercel.app/" className="btn-sponsor">
           Discover the BABA-K Experience
         </Link>
       </div>

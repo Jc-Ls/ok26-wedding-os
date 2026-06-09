@@ -25,6 +25,7 @@ const pageLinks = [
   { label: 'Traditions', href: '/traditions' },
   { label: 'Organisers', href: '/organisers' },
   { label: 'Reservations', href: '/reservations' },
+  { label: 'Itinerary', href: '/itinerary' },
 ];
 
 export default function HomePage() {
@@ -79,6 +80,7 @@ export default function HomePage() {
               <Link href="/special-guests">Special Guests</Link>
               <Link href="/traditions">Traditions</Link>
               <Link href="/organisers">Organisers</Link>
+              <Link href="/itinerary">Itinerary</Link>
             </div>
           </details>
           <Link href="/livestream">Livestream</Link>

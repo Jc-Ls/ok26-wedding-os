@@ -20,7 +20,7 @@ const pageSequence = [
   { href: '/organisers', label: 'Organisers' },
   { href: '/itinerary', label: 'Itinerary' },
   { href: '/reservations', label: 'Reservations' },
-  { href: '/reserve', label: 'Reserve' },
+  //{ href: '/reserve', label: 'Reserve' },
   { href: '/menu', label: 'Menu' },
   { href: '/menu-gate', label: 'Menu Gate' },
   { href: '/livestream', label: 'Livestream' },
