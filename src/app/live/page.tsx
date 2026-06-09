@@ -1,7 +1,7 @@
 ﻿import LiveStream from '@/components/LiveStream';
 
 export const metadata = {
-  title: 'Live Stream - OK\'26 Royal OS',
+  title: 'Live Stream - M K\'26 Royal OS',
   description: 'Watch the live stream of OK\'26 Royal OS wedding celebration',
 };
 
