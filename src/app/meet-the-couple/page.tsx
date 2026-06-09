@@ -12,7 +12,7 @@ const couple = [
   },
   {
     role: 'Bride',
-    name: 'Kaothar ',
+    name: 'Kaothar Abdulfatai',
     headline: 'A creative curator of beauty, grace, and unforgettable celebration.',
     biography:
       'Kaothar’s elegant vision guides every detail of this luxury celebration, blending tradition with modern warmth. Her style and heart create an inspiring atmosphere for family and guests alike.',
