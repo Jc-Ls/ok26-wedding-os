@@ -21,7 +21,7 @@ const heroSlides = [
 const coupleProfiles = [
   {
     role: 'The Groom',
-    name: 'Engr. Hammed Olowojare',
+    name: 'Muhammed Olowojare',
     biography:
       'A visionary leader shaping tomorrow with elegance, purpose, and warmth. Engr. Hammed brings family, faith, and timeless celebration together.',
     career: 'CEO / MD, Malad Global Concept FCT',
@@ -529,25 +529,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section dress-section">
-        <div className="section-heading">
-          <span>Dress Code</span>
-          <h2>Elegant style guidance for every guest</h2>
-        </div>
-        <div className="dress-grid">
-          {dressColors.map((item) => (
-            <div key={item.label} className="dress-card">
-              <div className="dress-swatch" style={{ backgroundColor: item.tone }} />
-              <h3>{item.label}</h3>
-            </div>
-          ))}
-        </div>
-        <p className="dress-copy">
-          Embrace soft luxury, traditional elegance, and a polished celebration palette across the three-day wedding experience.
-        </p>
-      </section>
+      
 
-      <section className="section" id="food-preview">
+     <section className="section" id="food-preview">
         <div className="section-heading">
           <span>Food Ordering</span>
           <h2>Premium menu experience with fast mobile ordering</h2>
@@ -558,7 +542,6 @@ export default function HomePage() {
             <div className="food-body">
               <h3>Royal Jollof Rice</h3>
               <p>Signature celebration plate with spicy beef and festive sides.</p>
-              <span className="price">₦12,000</span>
             </div>
           </article>
           <article className="food-card">
@@ -566,7 +549,6 @@ export default function HomePage() {
             <div className="food-body">
               <h3>Amala & Ewedu</h3>
               <p>Traditional luxury pairing served with carefully selected meats.</p>
-              <span className="price">₦10,500</span>
             </div>
           </article>
           <article className="food-card">
@@ -574,38 +556,14 @@ export default function HomePage() {
             <div className="food-body">
               <h3>Chilled Zobo</h3>
               <p>Refreshing floral drink crafted for the wedding celebration.</p>
-              <span className="price">₦2,500</span>
             </div>
           </article>
         </div>
-        <Link href="/menu-gate" className="btn-secondary">
-          Browse Full Menu
-        </Link>
-      </section>
-
-      <section className="section gift-section" id="gift">
-        <div className="section-heading">
-          <span>Bless the Couple</span>
-          <h2>Premium gifting experience with secure payment support</h2>
+        <div style={{ marginTop: '20px', padding: '15px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', textAlign: 'center', border: '1px solid rgba(229,208,143,0.2)' }}>
+          <p style={{ margin: 0, color: '#E5D08F' }}>To place an order, please scan the <strong>M'k26 Menu Barcode</strong> located on your reception table.</p>
         </div>
-        <div className="gift-grid">
-          <div className="gift-card">
-            <h3>₦15,000</h3>
-            <p>Support the wedding décor and guest hospitality.</p>
-          </div>
-          <div className="gift-card featured">
-            <h3>₦30,000</h3>
-            <p>Help create a memorable celebration for everyone.</p>
-          </div>
-          <div className="gift-card">
-            <h3>₦50,000+</h3>
-            <p>Contribute toward premium reception experiences.</p>
-          </div>
-        </div>
-        <p className="gift-note">
-          Payment verification and gift receipts are handled by the backend services. Support includes OPay-ready payment integration and transaction reference tracking.
-        </p>
       </section>
+     
 
       <section className="section about-section" id="assistant">
         <div className="section-heading">
@@ -629,19 +587,19 @@ export default function HomePage() {
             <p>Proprietress Five-Ways International School, Ilorin</p>
           </article>
         </div>
-        <div className="guest-list">
-          <h3>Special Invitees</h3>
-          <p>
-            Mall. Abdulrahman Abdulrazaq (CON) — The Executive Governor of Kwara State,
-            Mall. Mustapha M. Ishowo — Executive Secretary, Kwara State APC,
-            Engr. Femi Sanni Araba — CEO / Founder, Flow FM Station 90.7FM Araba Radio,
-            Prof. Abdulkadri Laaro — Dean, Faculty of Education Kwasu,
-            Mr. Alabi Amuda Zeriki — Retd. Perm. Sec., LGSC,
-            Mr. Habeeb Bolaji — NULGE Chairman Ilorin South,
-            Mr. Lanre Gambari — Dangote Group of Company,
-            Alhaji Olaitan Jimoh — Former NNPC Manager,
-            Alhaji Abdul Kareem Lambe — Former Commissioner 1, LGSC.
-          </p>
+       <div className="guest-list">
+          <h3 style={{ marginBottom: '15px' }}>Special Invitees</h3>
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '12px' }}>
+            <li><strong>Mall. Abdulrahman Abdulrazak (CON)</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>The Executive Governor of Kwara State</span></li>
+            <li><strong>Mall. Mustapha M Ishowo</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>Executive Secretary Kwara State APC</span></li>
+            <li><strong>Engr. Femi Sanni Araba</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>CEO / Founder, Flow F.M station 90.7fm Araba Radio</span></li>
+            <li><strong>Prof. Abdulkadri Laaro</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>Dean Faculty of Education Kwasu</span></li>
+            <li><strong>Mr. Alabi Amuda Zeriki</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>Rtd. Perm/sec LGSC</span></li>
+            <li><strong>Mr Habeeb Bolaji</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>NULGE Chairman ILR.South</span></li>
+            <li><strong>Mr Lanre Gambari</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>Dangote Group of Company</span></li>
+            <li><strong>Alhaji Olaitan Jimoh</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>Frm. NNPC Manager</span></li>
+            <li><strong>Alhaji Abdul Kareem Lambe</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>Frm. Commissioner 1 LGSC</span></li>
+          </ul>
         </div>
       </section>
 
