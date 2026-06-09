@@ -1,9 +1,10 @@
 'use client';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import confetti from 'canvas-confetti';
 
 type MenuItem = { id: string; name: string; category: string; imageUrl: string; isAvailable: boolean; };
+type OrderResponse = { id?: string; status?: string } | null;
 
 const fallbackMenu: MenuItem[] = [
   { id: '1', name: 'Royal Jollof Rice & Spicy Beef', category: 'MEAL', imageUrl: 'https://images.unsplash.com/photo-1662481028751-bb3d5eb9231f?q=80&w=200&auto=format&fit=crop', isAvailable: true },
@@ -33,25 +34,38 @@ function MenuContent() {
     'https://res.cloudinary.com/din74ljlu/image/upload/v1779080144/SAVE_20260518_242650_wgqxex.jpg'
   ];
 
+  const restoreOrder = useCallback(async () => {
+    const savedOrderId = localStorage.getItem('mk26_active_order');
+    if (!savedOrderId) return false;
+
+    setActiveOrderId(savedOrderId);
+    try {
+      const res = await fetch(`/api/orders/${savedOrderId}`);
+      const data = (await res.json()) as OrderResponse;
+      if (data?.status === 'Completed') {
+        setStep(6);
+        return true;
+      }
+      setStep(5);
+      setTrackingStatus(data?.status || 'Pending');
+    } catch {
+      setStep(5);
+    }
+    return true;
+  }, []);
+
   // 🔥 MEMORY RESTORE (Now checks if order was already completed!)
   useEffect(() => {
-    const savedOrderId = localStorage.getItem('mk26_active_order');
-    if (savedOrderId) {
-      setActiveOrderId(savedOrderId);
-      // Quickly ask the DB if this order was already completed
-      fetch(`/api/orders/${savedOrderId}`).then(res => res.json()).then(data => {
-        if (data && data.status === 'Completed') {
-          setStep(6); // Jump straight back to Blessing Vault!
-        } else {
-          setStep(5);
-          setTrackingStatus(data?.status || 'Pending');
-        }
-      }).catch(() => setStep(5));
-    } else if (step === 0) {
-      const timer = setTimeout(() => setStep(1), 3500); 
-      return () => clearTimeout(timer);
+    if (localStorage.getItem('mk26_active_order')) {
+      queueMicrotask(() => {
+        void restoreOrder();
+      });
+      return;
     }
-  }, []);
+
+    const timer = setTimeout(() => setStep(1), 3500);
+    return () => clearTimeout(timer);
+  }, [restoreOrder]);
 
   // LIVE DATABASE POLLING
   useEffect(() => {
@@ -59,7 +73,7 @@ function MenuContent() {
       try {
         const res = await fetch('/api/activities');
         if (res.ok) setActivities(await res.json());
-      } catch(e) {}
+      } catch {}
     };
     
     fetchActivities();
@@ -79,7 +93,7 @@ function MenuContent() {
               setTrackingStatus(data.status);
             }
           }
-        } catch (error) {}
+        } catch {}
       }, 3000);
     }
 
@@ -89,13 +103,24 @@ function MenuContent() {
     };
   }, [activeOrderId, step, trackingStatus]);
 
-  useEffect(() => {
-    fetch('/api/menu').then(res => res.json()).then(data => {
+  const fetchMenu = useCallback(async () => {
+    try {
+      const res = await fetch('/api/menu');
+      const data = await res.json();
       if (Array.isArray(data) && data.length > 0) setMenuItems(data.filter((item: MenuItem) => item.isAvailable));
       else setMenuItems(fallbackMenu);
       setLoadingMenu(false);
-    }).catch(() => { setMenuItems(fallbackMenu); setLoadingMenu(false); });
+    } catch {
+      setMenuItems(fallbackMenu);
+      setLoadingMenu(false);
+    }
   }, []);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      void fetchMenu();
+    });
+  }, [fetchMenu]);
 
   const handleFoodSelection = (mealName: string) => {
     setForm({ ...form, mealName });
@@ -115,7 +140,7 @@ function MenuContent() {
         setTrackingStatus('Pending');
         setStep(5);
       }
-    } catch (err) { alert("Failed to connect to Kitchen. Please try again."); }
+    } catch { alert("Failed to connect to Kitchen. Please try again."); }
   };
 
   const cancelOrder = async () => {
@@ -153,7 +178,7 @@ function MenuContent() {
           const link = document.createElement('a'); link.download = 'MK26_Gala.png'; link.href = URL.createObjectURL(blob); link.click();
         }
       });
-    } catch (error) { alert("Failed to generate your shareable card."); }
+    } catch { alert("Failed to generate your shareable card."); }
   };
 
   const resetFlow = () => {
@@ -175,7 +200,7 @@ function MenuContent() {
   if (step === 0) {
     return (
       <div style={{ backgroundColor: '#06140F', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <h1 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '5rem', letterSpacing: '6px', animation: 'pulseFade 3s ease-in-out forwards' }}>M'K26</h1>
+        <h1 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '5rem', letterSpacing: '6px', animation: 'pulseFade 3s ease-in-out forwards' }}>M&apos;K26</h1>
         <style>{`@keyframes pulseFade { 0% { opacity: 0; transform: scale(0.9); filter: blur(5px); } 30% { opacity: 1; transform: scale(1); filter: blur(0px); } 80% { opacity: 1; transform: scale(1.05); filter: blur(0px); } 100% { opacity: 0; transform: scale(1.1); filter: blur(5px); } }`}</style>
       </div>
     );
@@ -214,7 +239,7 @@ function MenuContent() {
       <div style={{ padding: '20px' }}>
         {step > 0 && step < 6 && (
           <div style={{ textAlign: 'center', marginBottom: '20px', paddingTop: '10px' }}>
-            <p style={{ color: '#E5D08F', letterSpacing: '4px', fontSize: '0.75rem', textTransform: 'uppercase', margin: '0 0 5px 0' }}>The M'K26 Gala</p>
+            <p style={{ color: '#E5D08F', letterSpacing: '4px', fontSize: '0.75rem', textTransform: 'uppercase', margin: '0 0 5px 0' }}>The M&apos;K26 Gala</p>
             <h1 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#FDFBF7', fontSize: '2.2rem', margin: 0 }}>Table {tableNumber}</h1>
           </div>
         )}
@@ -253,7 +278,7 @@ function MenuContent() {
                 const isRecommended = drink.name.toLowerCase().includes('zobo');
                 return (
                   <div key={drink.id} className="premium-card" onClick={() => { setForm({...form, drinkName: drink.name}); setStep(4); }}>
-                    {isRecommended && <div className="glow-badge">✨ Chef's Pairing</div>}
+                    {isRecommended && <div className="glow-badge">✨ Chef&apos;s Pairing</div>}
                     <div className="card-img" style={{ backgroundImage: `url(${drink.imageUrl || 'https://via.placeholder.com/100'})` }} />
                     <div style={{ marginLeft: '18px' }}>
                       <h4 style={{ margin: '0 0 5px 0', color: '#FDFBF7', fontSize: '1.1rem', fontWeight: '500' }}>{drink.name}</h4>
@@ -358,9 +383,9 @@ function MenuContent() {
                     <p style={{ color: '#E5D08F', fontFamily: '"Montserrat", sans-serif', fontSize: '1rem', letterSpacing: '4px', textTransform: 'uppercase', marginBottom: '20px' }}>VIP Blessing</p>
                     {selfieUrl && <div style={{ width: '120px', height: '120px', margin: '0 auto 20px', borderRadius: '50%', backgroundImage: `url(${selfieUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', border: '4px solid #E5D08F' }} />}
                     <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#FDFBF7', fontSize: '2.5rem', margin: '0 0 20px 0' }}>{form.guestName || "VIP Guest"}</h2>
-                    <p style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '1.8rem', fontStyle: 'italic', lineHeight: '1.5', padding: '0 20px' }}>"{blessing}"</p>
+                    <p style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '1.8rem', fontStyle: 'italic', lineHeight: '1.5', padding: '0 20px' }}>&quot;{blessing}&quot;</p>
                     <div style={{ borderTop: '2px solid rgba(229, 208, 143, 0.4)', marginTop: '30px', paddingTop: '20px' }}>
-                      <p style={{ color: '#aaa', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '3px', margin: 0 }}>The M'K26 Gala</p>
+                      <p style={{ color: '#aaa', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '3px', margin: 0 }}>The M&apos;K26 Gala</p>
                     </div>
                   </div>
                 </div>

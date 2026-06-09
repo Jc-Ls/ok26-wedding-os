@@ -1,13 +1,17 @@
 import { neon } from '@neondatabase/serverless';
 import { NextResponse } from 'next/server';
 
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : 'Unknown error';
+}
+
 export async function GET() {
   try {
     const sql = neon(process.env.DATABASE_URL!);
     const orders = await sql`SELECT * FROM "Order" ORDER BY "createdAt" DESC`;
     return NextResponse.json(orders);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }
 
@@ -42,8 +46,9 @@ export async function POST(req: Request) {
       RETURNING *;
     `;
     return NextResponse.json(order[0]);
-  } catch (err: any) {
-    console.error("ORDER POST ERROR:", err.message);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    const message = getErrorMessage(err);
+    console.error("ORDER POST ERROR:", message);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

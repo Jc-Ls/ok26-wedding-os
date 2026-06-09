@@ -6,7 +6,7 @@ export default function SecurityGate() {
   const [status, setStatus] = useState<{ message: string; type: 'success' | 'error' | 'neutral' } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleVerify = async (e: any) => {
+  const handleVerify = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     setStatus(null);

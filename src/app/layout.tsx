@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import FloatingHub from "./FloatingHub";
+import JourneyRail from "./components/JourneyRail";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,6 +32,8 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-[#060e18] text-white">
         {children}
+        <JourneyRail />
+        <FloatingHub />
       </body>
     </html>
   );

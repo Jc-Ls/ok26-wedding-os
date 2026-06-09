@@ -14,7 +14,7 @@ export async function GET() {
       success: true, 
       message: "Database patched successfully! The Wow Factors are now securely in the database." 
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
   }
 }

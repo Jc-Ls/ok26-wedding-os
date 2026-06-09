@@ -1,13 +1,24 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+
+type Order = {
+  id: string;
+  tableNumber: string;
+  guestName?: string | null;
+  mealName?: string | null;
+  drinkName?: string | null;
+  withSalad: boolean;
+  status: 'Pending' | 'Preparing' | 'Ready' | 'On the Way' | 'Completed' | string;
+  deliveredBy?: string | null;
+};
 
 export default function KitchenDashboard() {
-  const [orders, setOrders] = useState<any[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   const [waiterName, setWaiterName] = useState('');
   const [pin, setPin] = useState('');
   const [isSecurelyLoggedIn, setIsSecurelyLoggedIn] = useState(false);
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       const res = await fetch('/api/kitchen');
       if (res.ok) {
@@ -15,15 +26,17 @@ export default function KitchenDashboard() {
         setOrders(Array.isArray(data) ? data : []);
       }
     } catch(err) { console.error("Data fetch error", err); }
-  };
+  }, []);
 
   useEffect(() => {
     if (isSecurelyLoggedIn) {
-      fetchOrders();
+      queueMicrotask(() => {
+        void fetchOrders();
+      });
       const interval = setInterval(fetchOrders, 3000);
       return () => clearInterval(interval);
     }
-  }, [isSecurelyLoggedIn]);
+  }, [fetchOrders, isSecurelyLoggedIn]);
 
   const updateStatus = async (id: string, status: string) => {
     await fetch('/api/kitchen', {

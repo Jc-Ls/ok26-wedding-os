@@ -15,7 +15,7 @@ export default function VIPGenerator() {
         body: JSON.stringify({ count })
       });
       setStatus(`Successfully generated ${count} new codes!`);
-    } catch(e) { setStatus('Error generating codes.'); }
+    } catch { setStatus('Error generating codes.'); }
   };
 
   return (

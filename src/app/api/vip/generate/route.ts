@@ -13,7 +13,7 @@ export async function POST(request: Request) {
       generated++;
     }
     return NextResponse.json({ success: true, count: generated });
-  } catch (err: any) {
+  } catch {
     return NextResponse.json({ error: "Failed to generate" }, { status: 500 });
   }
 }

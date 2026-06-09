@@ -5,7 +5,7 @@ export async function GET() {
     const sql = neon(process.env.DATABASE_URL!);
     const orders = await sql`SELECT * FROM "Order" WHERE status != 'Completed' ORDER BY "createdAt" ASC`;
     return NextResponse.json(orders);
-  } catch (e) { return NextResponse.json([]); }
+  } catch { return NextResponse.json([]); }
 }
 export async function PATCH(req: Request) {
   try {
@@ -13,5 +13,5 @@ export async function PATCH(req: Request) {
     const { id, status, waiterName } = await req.json();
     const updated = await sql`UPDATE "Order" SET status = ${status}, "deliveredBy" = ${waiterName || null} WHERE id = ${id} RETURNING *`;
     return NextResponse.json(updated[0]);
-  } catch (e) { return NextResponse.json({ error: "Failed" }, { status: 500 }); }
+  } catch { return NextResponse.json({ error: "Failed" }, { status: 500 }); }
 }

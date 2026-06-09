@@ -2,8 +2,15 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+type Guest = {
+  [key: string]: string | number | boolean | null | undefined;
+  fullName?: string;
+  name?: string;
+  reservationId?: string;
+};
+
 export default function Reservations() {
-  const [guests, setGuests] = useState<any[]>([]);
+  const [guests, setGuests] = useState<Guest[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -11,7 +18,7 @@ export default function Reservations() {
       try {
         const res = await fetch('/api/reservations');
         if (res.ok) setGuests(await res.json());
-      } catch(e) {}
+      } catch {}
       setLoading(false);
     };
     fetchGuests();

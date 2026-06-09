@@ -8,7 +8,7 @@ export async function GET() {
     const sql = neon(process.env.DATABASE_URL!);
     const guests = await sql`SELECT * FROM "Guest" ORDER BY "createdAt" DESC`;
     return NextResponse.json(guests);
-  } catch (e) { return NextResponse.json([]); }
+  } catch { return NextResponse.json([]); }
 }
 
 // POST: For Guests submitting the RSVP form
@@ -66,8 +66,8 @@ export async function POST(req: Request) {
     await transporter.sendMail(mailOptions);
 
     return NextResponse.json({ success: true, vipCode });
-  } catch (err: any) {
-    console.error("RSVP Error:", err.message);
+  } catch (err: unknown) {
+    console.error("RSVP Error:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "Failed to process reservation" }, { status: 500 });
   }
 }

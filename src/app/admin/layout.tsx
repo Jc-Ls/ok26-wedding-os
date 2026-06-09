@@ -1,14 +1,12 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
 export default function AdminSecurityLayout({ children }: { children: React.ReactNode }) {
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('mk26_staff_auth') === '5273';
+  });
   const [pin, setPin] = useState('');
-
-  // Checks if staff is already logged in on this device
-  useEffect(() => {
-    if (localStorage.getItem('mk26_staff_auth') === '5273') setIsUnlocked(true);
-  }, []);
 
   const handleUnlock = () => {
     if (pin === '5273') {

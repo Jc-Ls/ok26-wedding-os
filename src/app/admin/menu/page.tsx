@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 
 type MenuItem = { id: string; name: string; category: string; imageUrl: string; isAvailable: boolean; };
@@ -9,12 +9,16 @@ export default function MenuManager() {
   const [form, setForm] = useState({ name: '', category: 'MEAL', imageUrl: '' });
   const [loading, setLoading] = useState(false);
 
-  const fetchItems = async () => {
+  const fetchItems = useCallback(async () => {
     const res = await fetch('/api/menu');
     if (res.ok) setItems(await res.json());
-  };
+  }, []);
 
-  useEffect(() => { fetchItems(); }, []);
+  useEffect(() => {
+    queueMicrotask(() => {
+      void fetchItems();
+    });
+  }, [fetchItems]);
 
   const addItem = async (e: React.FormEvent) => {
     e.preventDefault();

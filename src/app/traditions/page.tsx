@@ -12,7 +12,7 @@ export default function TraditionsHub() {
 
       {/* Header */}
       <header style={{ padding: '30px 24px', borderBottom: '1px solid rgba(212,175,55,0.2)', position: 'sticky', top: 0, backgroundColor: 'rgba(10,10,10,0.9)', backdropFilter: 'blur(10px)', zIndex: 100 }}>
-        <Link href="/" style={{ color: '#D4AF37', textDecoration: 'none', fontSize: '0.9rem', letterSpacing: '1px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '5px' }}>
+        <Link href="/special-guests" style={{ color: '#D4AF37', textDecoration: 'none', fontSize: '0.9rem', letterSpacing: '1px', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '5px' }}>
           <span>←</span> Back to Itinerary
         </Link>
       </header>
@@ -34,13 +34,13 @@ export default function TraditionsHub() {
             </video>
           </div>
           <p style={{ color: '#bbb', fontSize: '0.95rem', lineHeight: '1.8' }}>
-            A deeply rooted Ilorin tradition honoring the groom's heritage and family ties. This event serves as the spiritual and communal gateway into the wedding festivities, marked by familial prayers and the gathering of the community.
+            A deeply rooted Ilorin tradition honoring the groom&apos;s heritage and family ties. This event serves as the spiritual and communal gateway into the wedding festivities, marked by familial prayers and the gathering of the community.
           </p>
         </article>
 
         {/* Tradition Block: Walimatul-Quran */}
         <article style={{ marginBottom: '60px' }}>
-          <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.2rem', color: '#fff', marginBottom: '20px' }}>Walimatul-qur'an & Nikkah</h2>
+          <h2 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '2.2rem', color: '#fff', marginBottom: '20px' }}>Walimatul-qur&apos;an & Nikkah</h2>
           <div className="video-wrapper">
             <video controls poster="/images/nikkah-placeholder.jpg">
               <source src="/videos/nikkah-explainer.mp4" type="video/mp4" />
@@ -48,9 +48,18 @@ export default function TraditionsHub() {
             </video>
           </div>
           <p style={{ color: '#bbb', fontSize: '0.95rem', lineHeight: '1.8' }}>
-            The spiritual core of our union. The Walimatul-qur'an celebrates the recitation of the Holy Text, followed immediately by the Nikkah, where the vows are solemnized under Islamic law at the Sarumi Mosque.
+            The spiritual core of our union. The Walimatul-qur&apos;an celebrates the recitation of the Holy Text, followed immediately by the Nikkah, where the vows are solemnized under Islamic law at the Sarumi Mosque.
           </p>
         </article>
+
+        <div style={{ marginTop: '48px', display: 'flex', flexWrap: 'wrap', gap: '14px', justifyContent: 'center' }}>
+          <Link href="/special-guests" className="btn-secondary">
+            Back: Special Guests
+          </Link>
+          <Link href="/organisers" className="btn-primary">
+            Next: Organisers
+          </Link>
+        </div>
       </main>
     </div>
   );

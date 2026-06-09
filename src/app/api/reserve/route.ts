@@ -78,8 +78,8 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, ticketId: vipCode, name });
 
-  } catch (err: any) {
-    console.error("Reserve API Error:", err.message);
+  } catch (err: unknown) {
+    console.error("Reserve API Error:", err instanceof Error ? err.message : err);
     return NextResponse.json({ error: "Server connection failed. Try again." }, { status: 500 });
   }
 }
