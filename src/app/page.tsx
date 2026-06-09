@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import PageFooter from '@/components/PageFooter';
 
 const heroSlides = [
   {
@@ -15,52 +16,6 @@ const heroSlides = [
   {
     src: 'https://res.cloudinary.com/din74ljlu/image/upload/v1779080144/SAVE_20260518_242650_wgqxex.jpg',
     caption: 'A premium wedding experience',
-  },
-];
-
-const coupleProfiles = [
-  {
-    role: 'The Groom',
-    name: 'Muhammed Olowojare',
-    biography:
-      'A visionary leader shaping tomorrow with elegance, purpose, and warmth. Engr. Hammed brings family, faith, and timeless celebration together.',
-    career: 'CEO / MD, Malad Global Concept FCT',
-    achievements: ['Business leader', 'Community builder', 'Family first'],
-    gallery: [
-      'https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=400&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop',
-    ],
-  },
-  {
-    role: 'The Bride',
-    name: 'Kaothar Olowojare',
-    biography:
-      'A graceful partner with a radiant spirit. Her journey blends tradition, creativity, and a heart for unforgettable celebrations.',
-    career: 'Creative Advisor & Event Curator',
-    achievements: ['Inspired design', 'Cultural storyteller', 'Luxury curator'],
-    gallery: [
-      'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop',
-      'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=400&auto=format&fit=crop',
-    ],
-  },
-];
-
-const timelineItems = [
-  {
-    label: 'First Meeting',
-    description: 'A meaningful meeting that charted the course of a beautiful story.',
-  },
-  {
-    label: 'Courtship',
-    description: 'A season of laughter, care, and shared dreams.',
-  },
-  {
-    label: 'Engagement',
-    description: 'A joyful promise sealed with family blessings.',
-  },
-  {
-    label: 'Wedding Journey',
-    description: 'Three days of celebration, culture, and celebration.',
   },
 ];
 
@@ -117,27 +72,6 @@ const scheduleItems = [
   },
 ];
 
-const dressColors = [
-  { label: 'Gold & Cream', tone: '#E5C07B' },
-  { label: 'Midnight Navy', tone: '#09121F' },
-  { label: 'Blush Pink', tone: '#F9A8D4' },
-  { label: 'Ivory Lace', tone: '#F8F1E7' },
-];
-
-const sponsorInfo = {
-  name: 'BABA-K TICKETHUB',
-  description:
-    'A premium sponsor celebration for guests joining the royal wedding experience.',
-  cta: 'Explore Sponsorship',
-};
-
-const assistants = [
-  { label: 'AI Wedding Assistant', href: '#assistant' },
-  { label: 'Watch Live', href: '#live' },
-  { label: 'Get Directions', href: '#schedule' },
-  { label: 'Contact Support', href: '#footer' },
-];
-
 const LIVE_STREAM_URL =
   process.env.NEXT_PUBLIC_LIVESTREAM_URL ||
   'https://www.youtube.com/watch?v=live';
@@ -155,8 +89,6 @@ function formatCountdown(milliseconds: number) {
 export default function HomePage() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [splashComplete, setSplashComplete] = useState(false);
-  const [showHub, setShowHub] = useState(false);
-  const [showAssistantModal, setShowAssistantModal] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [musicOn, setMusicOn] = useState(false);
 
@@ -273,46 +205,6 @@ export default function HomePage() {
     );
   }
 
-  function ChatAssistant({ onClose }: { onClose: () => void }) {
-    const [messages, setMessages] = useState<{ from: 'user' | 'assistant'; text: string }[]>([]);
-    const [input, setInput] = useState('');
-
-    const send = () => {
-      if (!input.trim()) return;
-      const userMsg = { from: 'user' as const, text: input.trim() };
-      setMessages((m) => [...m, userMsg]);
-      setInput('');
-      // lightweight stubbed assistant reply
-      setTimeout(() => {
-        setMessages((m) => [...m, { from: 'assistant', text: `Thanks — I can help with schedule, directions, RSVP, menu, and gifts. For example: '${userMsg.text}'` }]);
-      }, 600);
-    };
-
-    return (
-      <div className="tracker-overlay" role="dialog" aria-modal="true" style={{ zIndex: 200 }}>
-        <div className="tracker-card" style={{ width: '100%', maxWidth: 520 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ margin: 0 }}>AI Wedding Assistant</h3>
-            <button onClick={onClose} style={{ border: 'none', background: 'transparent', color: '#E5D08F', fontWeight: 700 }}>Close</button>
-          </div>
-          <div style={{ marginTop: 16, maxHeight: 320, overflow: 'auto' }}>
-            {messages.map((m, i) => (
-              <div key={i} style={{ marginBottom: 10, textAlign: m.from === 'user' ? 'right' : 'left' }}>
-                <div style={{ display: 'inline-block', background: m.from === 'user' ? 'rgba(229,208,143,0.9)' : 'rgba(255,255,255,0.06)', color: m.from === 'user' ? '#000' : '#e6e6e6', padding: '8px 12px', borderRadius: 10 }}>
-                  {m.text}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 12, display: 'flex', gap: 8 }}>
-            <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask about the schedule, RSVP, or gifts" style={{ flex: 1, padding: 10, borderRadius: 8, border: '1px solid rgba(229,208,143,0.15)', background: 'rgba(0,0,0,0.4)', color: '#fff' }} />
-            <button onClick={send} className="btn-primary" type="button">Send</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const directionsUrl = (query: string) =>
     `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
 
@@ -367,9 +259,9 @@ export default function HomePage() {
           THE OLOWOJARE'S
         </Link>
         <div className="nav-actions">
-          <Link href="#schedule">Schedule</Link>
-          <Link href="#couple">Couple</Link>
-          <Link href="#rsvp">RSVP</Link>
+          <Link href="/itinerary">Schedule</Link>
+          <Link href="/couple">Couple</Link>
+          <Link href="/honorees">Honorees</Link>
           <Link href="#footer">Support</Link>
         </div>
       </nav>
@@ -383,9 +275,9 @@ export default function HomePage() {
           <Link href="/reserve" className="btn-primary">
             RSVP Now
           </Link>
-          <a href="#schedule" className="btn-secondary">
+          <Link href="/itinerary" className="btn-secondary">
             View Schedule
-          </a>
+          </Link>
           {eventPhase === 'live' ? (
             <a href={LIVE_STREAM_URL} target="_blank" rel="noreferrer" className="btn-secondary">
               Watch Live
@@ -426,254 +318,12 @@ export default function HomePage() {
         )}
       </section>
 
-      <section className="section" id="schedule">
-        <div className="section-heading">
-          <span>Event Schedule</span>
-          <h2>Follow the full celebration journey</h2>
-        </div>
-
-        <div className="schedule-grid">
-          {scheduleItems.map((item) => (
-            <article key={item.title} className="schedule-card">
-              <div className="schedule-top">
-                <span className="badge">{item.day}</span>
-                <span className="meta">{item.date}</span>
-              </div>
-              <h3>{item.title}</h3>
-              <p className="schedule-time">{item.time}</p>
-              <p className="schedule-location">{item.venue}</p>
-              {item.description ? <p className="schedule-description">{item.description}</p> : null}
-              <div className="schedule-actions">
-                <a href={directionsUrl(item.query)} target="_blank" rel="noreferrer" className="btn-link">
-                  Open in Google Maps
-                </a>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="section" id="couple">
-        <div className="section-heading">
-          <span>Meet the Couple</span>
-          <h2>Stories, portraits, and the journey to the altar</h2>
-        </div>
-
-        <div className="profile-grid">
-          {coupleProfiles.map((person) => (
-            <article key={person.role} className="profile-card">
-              <p className="eyebrow">{person.role}</p>
-              <h3>{person.name}</h3>
-              <p>{person.biography}</p>
-              <div className="profile-meta">{person.career}</div>
-              <ul className="feature-list">
-                {person.achievements.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-              <div className="gallery-grid">
-                {person.gallery.map((src) => (
-                  <div key={src} className="gallery-item" style={{ backgroundImage: `url(${src})` }} />
-                ))}
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <div className="timeline-panel">
-          <p className="eyebrow">Our Love Story</p>
-          <div className="timeline-list">
-            {timelineItems.map((item) => (
-              <div key={item.label} className="timeline-item">
-                <span className="timeline-marker" />
-                <div>
-                  <h4>{item.label}</h4>
-                  <p>{item.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section rsvp-panel" id="rsvp">
-        <div className="section-heading">
-          <span>RSVP Experience</span>
-          <h2>Confirm your attendance with ease</h2>
-        </div>
-        <div className="rsvp-card">
-          <p className="rsvp-text">
-            Share your details, attendance, dietary notes, and special requests so we can welcome you in luxury.
-          </p>
-          <div className="rsvp-grid">
-            <div>
-              <p className="small-label">Step 1</p>
-              <h3>Personal Information</h3>
-            </div>
-            <div>
-              <p className="small-label">Step 2</p>
-              <h3>Attendance Details</h3>
-            </div>
-            <div>
-              <p className="small-label">Step 3</p>
-              <h3>Special Requests</h3>
-            </div>
-            <div>
-              <p className="small-label">Step 4</p>
-              <h3>Confirmation</h3>
-            </div>
-          </div>
-          <Link href="/reserve" className="btn-primary">
-            Confirm Attendance
-          </Link>
-        </div>
-      </section>
-
-      
-
-     <section className="section" id="food-preview">
-        <div className="section-heading">
-          <span>Food Ordering</span>
-          <h2>Premium menu experience with fast mobile ordering</h2>
-        </div>
-        <div className="food-grid">
-          <article className="food-card">
-            <div className="food-visual" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1662481028751-bb3d5eb9231f?q=80&w=600&auto=format&fit=crop)' }} />
-            <div className="food-body">
-              <h3>Royal Jollof Rice</h3>
-              <p>Signature celebration plate with spicy beef and festive sides.</p>
-            </div>
-          </article>
-          <article className="food-card">
-            <div className="food-visual" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?q=80&w=600&auto=format&fit=crop)' }} />
-            <div className="food-body">
-              <h3>Amala & Ewedu</h3>
-              <p>Traditional luxury pairing served with carefully selected meats.</p>
-            </div>
-          </article>
-          <article className="food-card">
-            <div className="food-visual" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?q=80&w=600&auto=format&fit=crop)' }} />
-            <div className="food-body">
-              <h3>Chilled Zobo</h3>
-              <p>Refreshing floral drink crafted for the wedding celebration.</p>
-            </div>
-          </article>
-        </div>
-        <div style={{ marginTop: '20px', padding: '15px', background: 'rgba(255,255,255,0.05)', borderRadius: '8px', textAlign: 'center', border: '1px solid rgba(229,208,143,0.2)' }}>
-          <p style={{ margin: 0, color: '#E5D08F' }}>To place an order, please scan the <strong>M'k26 Menu Barcode</strong> located on your reception table.</p>
-        </div>
-      </section>
-     
-
-      <section className="section about-section" id="assistant">
-        <div className="section-heading">
-          <span>About the Celebration</span>
-          <h2>Hosts, tradition, and distinguished guests</h2>
-        </div>
-        <div className="about-grid">
-          <article className="about-card">
-            <p className="eyebrow">The Host</p>
-            <h3>Engr. Hammed Olowojare</h3>
-            <p>CEO/MD Malad Global Concept FCT</p>
-          </article>
-          <article className="about-card">
-            <p className="eyebrow">Father of the Day</p>
-            <h3>Alhaji Hakeem Olademeji Lawal</h3>
-            <p>CEO / Founder Awilya Foundation</p>
-          </article>
-          <article className="about-card">
-            <p className="eyebrow">Mother of the Day</p>
-            <h3>Alhaja Binta A. Logun</h3>
-            <p>Proprietress Five-Ways International School, Ilorin</p>
-          </article>
-        </div>
-       <div className="guest-list">
-          <h3 style={{ marginBottom: '15px' }}>Special Invitees</h3>
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '12px' }}>
-            <li><strong>Mall. Abdulrahman Abdulrazak (CON)</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>The Executive Governor of Kwara State</span></li>
-            <li><strong>Mall. Mustapha M Ishowo</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>Executive Secretary Kwara State APC</span></li>
-            <li><strong>Engr. Femi Sanni Araba</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>CEO / Founder, Flow F.M station 90.7fm Araba Radio</span></li>
-            <li><strong>Prof. Abdulkadri Laaro</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>Dean Faculty of Education Kwasu</span></li>
-            <li><strong>Mr. Alabi Amuda Zeriki</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>Rtd. Perm/sec LGSC</span></li>
-            <li><strong>Mr Habeeb Bolaji</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>NULGE Chairman ILR.South</span></li>
-            <li><strong>Mr Lanre Gambari</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>Dangote Group of Company</span></li>
-            <li><strong>Alhaji Olaitan Jimoh</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>Frm. NNPC Manager</span></li>
-            <li><strong>Alhaji Abdul Kareem Lambe</strong><br/><span style={{ fontSize: '0.9em', opacity: 0.7 }}>Frm. Commissioner 1 LGSC</span></li>
-          </ul>
-        </div>
-      </section>
-
-      <section className="section sponsor-section">
-        <div className="sponsor-card">
-          <div>
-            <span className="eyebrow">Sponsor Promotion</span>
-            <h2>{sponsorInfo.name}</h2>
-            <p>{sponsorInfo.description}</p>
-          </div>
-          <Link href="#footer" className="btn-primary">
-            {sponsorInfo.cta}
-          </Link>
-        </div>
-      </section>
-
-      <footer className="site-footer" id="footer">
-        <div className="footer-grid">
-          <div>
-            <p className="footer-title">Quick Links</p>
-            <ul>
-              <li><Link href="#hero">Home</Link></li>
-              <li><Link href="#schedule">Schedule</Link></li>
-              <li><Link href="#rsvp">RSVP</Link></li>
-              <li><Link href="#food-preview">Food</Link></li>
-            </ul>
-          </div>
-          <div>
-            <p className="footer-title">Need Help?</p>
-            <p>Event Coordinator</p>
-            <p>Groom Representative</p>
-            <p>Bride Representative</p>
-          </div>
-          <div>
-            <p className="footer-title">Contact</p>
-            <p>+234 800 000 0000</p>
-            <p>support@olowojarewedding.com</p>
-          </div>
-        </div>
-        <p className="footer-credit">
-          Designed & Developed by Jare's Choice Labs (JCLs) • Crafting Digital Experiences That Matter
-        </p>
-      </footer>
-
-      <div className={`floating-hub ${showHub ? 'open' : ''}`}>
-        <button
-          type="button"
-          className="hub-toggle"
-          onClick={() => setShowHub((value) => !value)}
-          aria-expanded={showHub}
-          aria-label="Open quick actions"
-        >
-          {showHub ? 'Close' : 'Quick Actions'}
-        </button>
-        {showHub && (
-          <div className="hub-menu">
-            {assistants.map((item) => (
-              item.label === 'AI Wedding Assistant' ? (
-                <button key={item.label} type="button" onClick={() => setShowAssistantModal(true)} className="hub-link">
-                  {item.label}
-                </button>
-              ) : (
-                <a key={item.label} href={item.href} className="hub-link">
-                  {item.label}
-                </a>
-              )
-            ))}
-            <a href={LIVE_STREAM_URL} target="_blank" rel="noreferrer" className="hub-link">
-              Live Stream
-            </a>
-          </div>
-        )}
-      </div>
-      {showAssistantModal && <ChatAssistant onClose={() => setShowAssistantModal(false)} />}
+      <PageFooter
+        previousHref={undefined}
+        previousLabel="Previous Page"
+        nextHref="/couple"
+        nextLabel="Meet the Couple"
+      />
     </main>
   );
 }
