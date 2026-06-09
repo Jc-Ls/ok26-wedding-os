@@ -178,8 +178,19 @@ input:focus { border: 1px solid var(--gold-bright); }
   filter: blur(10px);
 }
 
+.journey-grid {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  max-width: 900px;
+  margin: 0 auto;
+  justify-items: center;
+}
+
 .journey-card-wrap {
   perspective: 900px;
+  width: 100%;
+  max-width: 280px;
 }
 
 .journey-card {

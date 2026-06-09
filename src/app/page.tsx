@@ -119,23 +119,6 @@ export default function HomePage() {
 
       <section className="section" id="schedule" style={{ paddingTop: '0', paddingBottom: '80px' }}>
         <div className="journey-grid">
-          <motion.article
-            className="schedule-card kinetic-panel"
-            style={{ gridColumn: '1 / -1' }}
-            initial={{ opacity: 0, y: 26 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.25 }}
-            transition={{ duration: 0.55 }}
-          >
-            <div className="schedule-top">
-              <div>
-                <p className="badge">Schedule</p>
-                <h2 style={{ margin: '10px 0 0 0', color: '#fff', fontSize: 'clamp(2rem, 3vw, 2.5rem)' }}>Key moments of the Olowojare celebration</h2>
-              </div>
-            </div>
-            <p style={{ color: '#d1d5db', lineHeight: 1.8 }}>Follow the full guest journey: meet the couple, meet the Olowojares, view special guests, explore traditions, see the organisers, reserve your seat, then continue to the menu.</p>
-          </motion.article>
-
           {pageLinks.map((item, index) => (
             <motion.div
               key={item.href}

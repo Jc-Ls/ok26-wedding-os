@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import FloatingHub from "./FloatingHub";
 import JourneyRail from "./components/JourneyRail";
-import PageFooter from '@/components/PageFooter';
 import "./globals.css";
 
 const geistSans = Geist({
@@ -35,7 +34,6 @@ export default function RootLayout({
         {children}
         <JourneyRail />
         <FloatingHub />
-        <PageFooter />
       </body>
     </html>
   );
