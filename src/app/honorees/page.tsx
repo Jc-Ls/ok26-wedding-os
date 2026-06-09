@@ -57,7 +57,7 @@ export default function HonoreesPage() {
             </TiltCard>
           ))}
         </div>
-
+{/* 
         <div className="guest-list">
           <h3 style={{ marginBottom: '15px' }}>Special Invitees</h3>
           <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '12px' }}>
@@ -115,7 +115,7 @@ export default function HonoreesPage() {
               <span style={{ fontSize: '0.9em', opacity: 0.7 }}>Frm. Commissioner 1 LGSC</span>
             </li>
           </ul>
-        </div>
+        </div> */}
       </section>
     </main>
   );

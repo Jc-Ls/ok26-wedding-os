@@ -21,6 +21,7 @@ const heroSlides = [
 const pageLinks = [
   { label: 'Meet the Couple', href: '/meet-the-couple' },
   { label: 'The Family', href: '/meet-the-olowojares' },
+  { label: 'Host & Parents', href: '/honorees' },
   { label: 'Special Guests', href: '/special-guests' },
   { label: 'Traditions', href: '/traditions' },
   { label: 'Organisers', href: '/organisers' },
@@ -49,6 +50,13 @@ export default function HomePage() {
     const timer = setTimeout(() => setShowSplash(false), 7200);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle('splash-active', showSplash);
+    return () => {
+      document.body.classList.remove('splash-active');
+    };
+  }, [showSplash]);
 
   return (
     <main className="page-shell">
