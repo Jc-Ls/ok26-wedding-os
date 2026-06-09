@@ -1,8 +1,8 @@
 ﻿import LiveStream from '@/components/LiveStream';
 
 export const metadata = {
-  title: 'Live Stream - M K\'26 Royal OS',
-  description: 'Watch the live stream of OK\'26 Royal OS wedding celebration',
+  title: 'Live Stream - M K 26 Royal OS',
+  description: 'Watch the live stream of M K 26 Royal OS wedding celebration',
 };
 
 export default function LivePage() {
@@ -15,7 +15,7 @@ export default function LivePage() {
             Live Stream
           </h1>
           <p className="text-purple-300 text-lg">
-            M'K&apos;26 Royal - Broadcast from the Reception
+            M'K 26 Royal - Broadcast from the Reception
           </p>
         </div>
 
@@ -23,7 +23,7 @@ export default function LivePage() {
         <div className="rounded-lg overflow-hidden shadow-2xl mb-8 border border-purple-800/50">
           <LiveStream
             videoId="dQw4w9WgXcQ"
-            title="OK'26 Royal OS Live Stream"
+            title="M K'26 Royal OS Live Stream"
           />
         </div>
 
@@ -36,7 +36,7 @@ export default function LivePage() {
               Event Details
             </h2>
             <p className="text-gray-300 leading-relaxed">
-              Join us for M'K&apos;26 Royal OS - An unforgettable celebration featuring
+              Join us for M K 26 Royal- An unforgettable celebration featuring
               live entertainment, exceptional cuisine, and exclusive experiences
               designed for our cherished guests.
             </p>
