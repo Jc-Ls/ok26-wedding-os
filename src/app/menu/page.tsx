@@ -199,7 +199,7 @@ function MenuContent() {
 
   if (step === 0) {
     return (
-      <div style={{ backgroundColor: '#06140F', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="page-shell menu-page menu-intro">
         <h1 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '5rem', letterSpacing: '6px', animation: 'pulseFade 3s ease-in-out forwards' }}>M&apos;K26</h1>
         <style>{`@keyframes pulseFade { 0% { opacity: 0; transform: scale(0.9); filter: blur(5px); } 30% { opacity: 1; transform: scale(1); filter: blur(0px); } 80% { opacity: 1; transform: scale(1.05); filter: blur(0px); } 100% { opacity: 0; transform: scale(1.1); filter: blur(5px); } }`}</style>
       </div>
@@ -207,7 +207,7 @@ function MenuContent() {
   }
 
   return (
-    <div style={{ backgroundColor: '#06140F', backgroundImage: 'linear-gradient(to bottom, rgba(6,20,15,0.4), rgba(6,20,15,0.95)), url("https://res.cloudinary.com/din74ljlu/image/upload/v1779080657/SAVE_20260518_242659_ftuf3e.jpg")', backgroundSize: 'cover', backgroundPosition: 'center', backgroundAttachment: 'fixed', minHeight: '100vh', fontFamily: '"Montserrat", sans-serif', color: '#FDFBF7', overflowX: 'hidden' }}>
+    <div className="page-shell menu-page">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap');
         .ticker-wrap { width: 100%; overflow: hidden; background: rgba(10, 35, 24, 0.85); border-bottom: 1px solid rgba(229, 208, 143, 0.4); padding: 10px 0; position: sticky; top: 0; z-index: 100; backdrop-filter: blur(12px); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
@@ -401,5 +401,5 @@ function MenuContent() {
 }
 
 export default function GuestMenuPage() {
-  return <Suspense fallback={<div style={{ backgroundColor: '#06140F', minHeight: '100vh' }}>Loading...</div>}><MenuContent /></Suspense>;
+  return <Suspense fallback={<div className="page-shell menu-page">Loading...</div>}><MenuContent /></Suspense>;
 }

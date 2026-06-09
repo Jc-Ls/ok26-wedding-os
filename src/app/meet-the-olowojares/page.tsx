@@ -10,7 +10,7 @@ const familyCards = [
     highlights: ['Legacy of leadership', 'Community stewardship', 'Generations of elegance'],
   },
   {
-    title: 'Khoathar Family',
+    title: 'Sarumi Family',
     description:
       'A family shaped by creativity, grace, and a commitment to refined celebration. Their support and hospitality make this wedding truly exceptional.',
     highlights: ['Artful hospitality', 'Cultural heritage', 'Thoughtful collaboration'],
@@ -19,14 +19,14 @@ const familyCards = [
 
 export default function MeetTheOlowojaresPage() {
   return (
-    <main className="modern-page" style={{ background: 'linear-gradient(180deg, rgba(6,14,24,0.98), rgba(4,10,20,1))' }}>
+    <main className="modern-page">
       <div className="modern-inner">
         <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.85rem', marginBottom: '16px' }}>
           Meet The Olowojares
         </p>
         <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(3rem, 6vw, 5rem)', lineHeight: 1, marginBottom: '24px' }}>A Family Celebration in Premium Style</h1>
         <p style={{ maxWidth: 760, lineHeight: 1.8, color: '#D9D2C1', fontSize: '1rem', marginBottom: '42px' }}>
-          Introducing the family support behind Muhammed and Khoathar: two households united by meaningful tradition, elevated hospitality, and a refined sense of occasion.
+          Introducing the family support behind Muhammed and Kaothar: two households united by meaningful tradition, elevated hospitality, and a refined sense of occasion.
         </p>
 
         <div className="edge-grid">

@@ -55,21 +55,24 @@ export default function KitchenDashboard() {
 
   if (!isSecurelyLoggedIn) {
     return (
-      <div style={{ backgroundColor: '#050505', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Montserrat", sans-serif' }}>
-        <div style={{ backgroundColor: '#111', padding: '40px', borderRadius: '16px', border: '1px solid #ef4444', textAlign: 'center', width: '90%', maxWidth: '400px', boxShadow: '0 0 20px rgba(239, 68, 68, 0.2)' }}>
-          <span style={{ fontSize: '3rem', display: 'block', marginBottom: '10px' }}>🔒</span>
-          <h2 style={{ color: '#ef4444', margin: '0 0 20px 0' }}>Kitchen Secure Login</h2>
-          <input type="text" placeholder="Enter Waiter/Chef Name" value={waiterName} onChange={(e) => setWaiterName(e.target.value)} style={{ width: '100%', padding: '15px', backgroundColor: '#000', border: '1px solid #333', color: '#fff', borderRadius: '8px', marginBottom: '15px', outline: 'none', textAlign: 'center' }} />
-          <input type="password" placeholder="Master PIN (5273)" value={pin} onChange={(e) => setPin(e.target.value)} style={{ width: '100%', padding: '15px', backgroundColor: '#000', border: '1px solid #333', color: '#fff', borderRadius: '8px', marginBottom: '25px', outline: 'none', textAlign: 'center', letterSpacing: '4px' }} />
-          <button onClick={handleLogin} style={{ width: '100%', padding: '15px', backgroundColor: '#ef4444', color: '#fff', fontWeight: 'bold', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>Unlock Dashboard</button>
+      <main className="page-shell kitchen-page">
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Montserrat", sans-serif', minHeight: '100vh' }}>
+          <div style={{ backgroundColor: '#111', padding: '40px', borderRadius: '16px', border: '1px solid #ef4444', textAlign: 'center', width: '90%', maxWidth: '400px', boxShadow: '0 0 20px rgba(239, 68, 68, 0.2)' }}>
+            <span style={{ fontSize: '3rem', display: 'block', marginBottom: '10px' }}>🔒</span>
+            <h2 style={{ color: '#ef4444', margin: '0 0 20px 0' }}>Kitchen Secure Login</h2>
+            <input type="text" placeholder="Enter Waiter/Chef Name" value={waiterName} onChange={(e) => setWaiterName(e.target.value)} style={{ width: '100%', padding: '15px', backgroundColor: '#000', border: '1px solid #333', color: '#fff', borderRadius: '8px', marginBottom: '15px', outline: 'none', textAlign: 'center' }} />
+            <input type="password" placeholder="Master PIN (5273)" value={pin} onChange={(e) => setPin(e.target.value)} style={{ width: '100%', padding: '15px', backgroundColor: '#000', border: '1px solid #333', color: '#fff', borderRadius: '8px', marginBottom: '25px', outline: 'none', textAlign: 'center', letterSpacing: '4px' }} />
+            <button onClick={handleLogin} style={{ width: '100%', padding: '15px', backgroundColor: '#ef4444', color: '#fff', fontWeight: 'bold', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>Unlock Dashboard</button>
+          </div>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div style={{ padding: '20px', fontFamily: '"Montserrat", sans-serif', backgroundColor: '#050505', color: '#FDFBF7', minHeight: '100vh' }}>
-      <header style={{ borderBottom: '1px solid rgba(212, 175, 55, 0.3)', paddingBottom: '20px', marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <main className="page-shell kitchen-page">
+      <div style={{ padding: '20px', fontFamily: '"Montserrat", sans-serif', color: '#FDFBF7', minHeight: '100vh' }}>
+        <header style={{ borderBottom: '1px solid rgba(212, 175, 55, 0.3)', paddingBottom: '20px', marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h1 style={{ color: '#D4AF37', margin: 0, fontFamily: '"Cormorant Garamond", serif' }}>Kitchen Engine</h1>
           <p style={{ color: '#aaa', fontSize: '0.9rem', margin: '5px 0 0 0' }}>Logged in as: <strong style={{ color: '#fff' }}>{waiterName}</strong></p>
@@ -96,5 +99,6 @@ export default function KitchenDashboard() {
         ))}
       </div>
     </div>
+    </main>
   );
 }

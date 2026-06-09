@@ -12,10 +12,10 @@ const couple = [
   },
   {
     role: 'Bride',
-    name: 'Khoathar',
+    name: 'Kaothar ',
     headline: 'A creative curator of beauty, grace, and unforgettable celebration.',
     biography:
-      'Khoathar’s elegant vision guides every detail of this luxury celebration, blending tradition with modern warmth. Her style and heart create an inspiring atmosphere for family and guests alike.',
+      'Kaothar’s elegant vision guides every detail of this luxury celebration, blending tradition with modern warmth. Her style and heart create an inspiring atmosphere for family and guests alike.',
   },
 ];
 
@@ -39,7 +39,7 @@ const hosts = [
 
 export default function MeetTheCouplePage() {
   return (
-    <main className="modern-page" style={{ background: 'radial-gradient(circle at top, rgba(212,175,55,0.12), transparent 35%), #060e18' }}>
+    <main className="modern-page">
       <div className="modern-inner">
         <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.85rem', marginBottom: '16px' }}>
           The Couple

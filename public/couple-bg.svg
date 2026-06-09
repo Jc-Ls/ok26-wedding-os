@@ -1,0 +1,28 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0" y1="0" x2="1200" y2="800" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#050814" />
+      <stop offset="45%" stop-color="#0A1A35" />
+      <stop offset="100%" stop-color="#0A142F" />
+    </linearGradient>
+    <linearGradient id="glowGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#E5C07B" stop-opacity="0.75" />
+      <stop offset="100%" stop-color="#F9A8D4" stop-opacity="0.15" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#bgGradient)" />
+  <circle cx="900" cy="180" r="160" fill="url(#glowGradient)" />
+  <circle cx="220" cy="260" r="120" fill="url(#glowGradient)" />
+  <path d="M320 600C380 520 462 460 540 470C622 481 680 558 716 628C756 708 836 750 914 718" stroke="#E5C07B" stroke-width="12" stroke-linecap="round" opacity="0.18" />
+  <path d="M290 620C372 540 458 486 540 500C620 513 686 556 712 620" stroke="#F9A8D4" stroke-width="10" stroke-linecap="round" opacity="0.12" />
+  <ellipse cx="320" cy="450" rx="72" ry="112" fill="rgba(255,255,255,0.06)" />
+  <ellipse cx="795" cy="335" rx="82" ry="122" fill="rgba(255,255,255,0.05)" />
+  <path d="M346 538C352 520 368 507 384 500C394 495 405 494 416 497C440 504 449 526 450 547C451 588 416 632 368 650C321 668 280 648 276 612C273 580 304 558 346 538Z" fill="#fff" opacity="0.06" />
+  <path d="M772 292C730 312 704 364 718 418C727 453 753 481 796 484C841 487 873 458 891 419C904 388 886 346 851 329C820 314 790 298 772 292Z" fill="#fff" opacity="0.05" />
+  <path d="M495 216C484 172 460 142 418 138C370 132 320 166 308 224C296 282 310 339 344 380C378 421 432 446 490 436C548 426 589 386 605 333C621 280 589 247 535 232C512 225 505 219 495 216Z" fill="rgba(255,255,255,0.06)" />
+  <path d="M655 229C646 177 596 144 545 150C496 156 454 195 444 255C434 315 460 377 512 405C565 436 625 432 663 385C697 345 685 279 655 229Z" fill="rgba(255,255,255,0.08)" />
+  <path d="M403 258C326 296 324 402 427 445C530 488 669 453 702 389C736 319 689 227 619 202C583 188 531 194 503 224" stroke="#E5C07B" stroke-width="14" stroke-linecap="round" opacity="0.14" />
+  <path d="M400 260C365 340 358 378 378 420C398 462 438 493 481 502C534 514 589 490 615 434C641 378 613 312 568 286C540 269 505 263 468 267" stroke="#F9A8D4" stroke-width="10" stroke-linecap="round" opacity="0.12" />
+  <path d="M570 285C620 240 700 236 760 270C820 304 820 380 786 420C732 481 620 502 570 465C520 428 515 320 570 285Z" fill="url(#glowGradient)" opacity="0.08" />
+  <path d="M410 480C420 460 442 448 466 438C510 420 564 418 602 441C650 471 672 529 658 580C644 632 592 668 548 680C516 689 484 678 460 656C438 637 428 610 410 580" stroke="#E5C07B" stroke-width="10" stroke-linecap="round" opacity="0.12" />
+</svg>

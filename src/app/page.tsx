@@ -89,7 +89,7 @@ export default function HomePage() {
       <section className="hero hero-kinetic" id="hero">
         <motion.div className="hero-copy-layer" style={{ y: heroDepth, scale: heroScale }}>
           <p className="welcome-text">An elevated wedding portal for invited guests</p>
-          <h1 className="couple">Meet the Olowojares</h1>
+          <h1 className="couple">MK'26</h1>
           <p className="hero-copy">
             Enter a premium celebration experience designed for the Olowojares. Explore the couple,
             family lineage, organisers, reservations, and livestream from within the app.
@@ -112,7 +112,6 @@ export default function HomePage() {
           <div className="kinetic-ring ring-a" />
           <div className="kinetic-ring ring-b" />
           <div className="kinetic-core">
-            <span>OK26</span>
           </div>
         </motion.div>
       </section>
@@ -140,11 +139,13 @@ export default function HomePage() {
       {showSplash && (
         <div className="splash-screen">
           <div className="splash-panel">
-            <p className="splash-eyebrow">Meet the Olowojares</p>
-            <h1 className="splash-title">Muhammed &amp; Khoathar</h1>
+            <p className="splash-eyebrow">The Olowojare's</p>
+            <h1 className="splash-title">Muhammed &amp; Kaothar</h1>
             <p className="splash-copy">
-              A premium entrance into the wedding gala. Welcome to an elegant celebration of legacy,
-              harmony, and unforgettable detail.
+              With great joy and anticipation, we welcome you to our wedding website. 
+              As we step into this new chapter of our lives, 
+              we are reminded of how lucky we are to be surrounded by the love of our favorite people. 
+              May this space be a glimpse into our love story and the festivities to come
             </p>
             <div className="splash-actions">
               <Link href="/meet-the-couple" className="btn-primary">

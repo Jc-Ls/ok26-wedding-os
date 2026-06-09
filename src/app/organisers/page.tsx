@@ -4,28 +4,42 @@ import TiltCard from '../components/TiltCard';
 
 const organisers = [
   {
-    name: 'Amina Lawal',
+    name: 'Yusuf kayode Yusuf ',
     title: 'Chief Event Director',
     summary:
       'Oversees the entire gala with a focus on premium guest experience, timeline precision, and exquisite presentation.',
   },
   {
-    name: 'James Oyebanji',
+    name: 'Idriz Salman',
     title: 'Creative Hospitality Lead',
     summary:
       'Curates luxury service, décor, and ambience to ensure every moment feels exceptionally polished.',
   },
   {
-    name: 'Fatima Bello',
+    name: 'Okandeji Kehinde ',
     title: 'Guest Relations Director',
+    summary:
+      'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
+  },
+  {
+    name: 'Olowojare abubakar ',
+    title: 'Guest Relations Director',
+    summary:
+      'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
+  },
+  {
+    name: 'Sulu-gambari ABdulrasaq',
+    title: 'FrontEnd Dev',
     summary:
       'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
   },
 ];
 
+
+
 export default function OrganisersPage() {
   return (
-    <main className="modern-page" style={{ background: 'radial-gradient(circle at top, rgba(249,168,212,0.12), transparent 30%), #05070f' }}>
+    <main className="modern-page">
       <div className="modern-inner">
         <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.85rem', marginBottom: '16px' }}>
           The Organisers
@@ -36,13 +50,49 @@ export default function OrganisersPage() {
         </p>
 
         <div className="edge-grid compact">
-          {organisers.map((organiser) => (
-            <TiltCard key={organiser.name} className="compact-card">
-              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', marginBottom: '12px', color: '#fff' }}>{organiser.name}</h2>
-              <p style={{ color: '#E5D8BA', fontWeight: 700, marginBottom: '18px' }}>{organiser.title}</p>
-              <p style={{ color: '#CBC1AF', lineHeight: 1.85 }}>{organiser.summary}</p>
-            </TiltCard>
-          ))}
+          {organisers.map((organiser) => {
+            const slug = organiser.name
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/(^-|-$)/g, '');
+            const imgSrc = `/organisers/${slug}.jpg`;
+            const initials = organiser.name
+              .split(' ')
+              .filter(Boolean)
+              .map((p) => p[0])
+              .slice(0, 2)
+              .join('')
+              .toUpperCase();
+
+            return (
+              <TiltCard key={organiser.name} className="compact-card">
+                <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', marginBottom: 8 }}>
+                  <div style={{ flex: '0 0 auto' }}>
+                    <img
+                      src={imgSrc}
+                      alt={organiser.name}
+                      className="organiser-avatar"
+                      onError={(e) => {
+                        const el = e.currentTarget as HTMLImageElement;
+                        el.style.display = 'none';
+                        const sibling = el.nextElementSibling as HTMLElement | null;
+                        if (sibling) sibling.style.display = 'flex';
+                      }}
+                    />
+                    <div className="organiser-avatar-fallback" aria-hidden style={{ display: 'none' }}>
+                      {initials}
+                    </div>
+                  </div>
+
+                  <div style={{ flex: 1 }}>
+                    <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', margin: 0, color: '#fff' }}>{organiser.name}</h2>
+                    <p style={{ color: '#E5D8BA', fontWeight: 700, margin: '8px 0 18px' }}>{organiser.title}</p>
+                    <p style={{ color: '#CBC1AF', lineHeight: 1.85 }}>{organiser.summary}</p>
+                  </div>
+                </div>
+              </TiltCard>
+            );
+          })}
         </div>
 
         <div style={{ marginTop: '48px', display: 'flex', flexWrap: 'wrap', gap: '14px' }}>

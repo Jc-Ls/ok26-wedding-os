@@ -41,7 +41,7 @@ export default function ReservationsPage() {
   };
 
   return (
-    <main style={{ minHeight: '100vh', padding: '60px 20px', background: 'linear-gradient(180deg, #050709, #010205)', color: '#F5EFE0' }}>
+    <main className="page-shell reservation-page">
       <div style={{ maxWidth: 520, margin: '0 auto' }}>
         <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.85rem', marginBottom: '16px' }}>Reservations</p>
         <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2.8rem, 6vw, 4rem)', marginBottom: '18px' }}>Secure Your Invitation</h1>
@@ -66,8 +66,8 @@ export default function ReservationsPage() {
               <Link href="/menu" className="btn-primary" style={{ width: 'auto', padding: '14px 24px' }}>
                 Next: Menu
               </Link>
-              <Link href="/organisers" className="btn-secondary">
-                Back: Organisers
+              <Link href="/" className="btn-secondary">
+                Back: Home
               </Link>
             </div>
           </div>
@@ -121,11 +121,13 @@ export default function ReservationsPage() {
           </form>
         )}
 
-        <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'center' }}>
-          <Link href="/organisers" className="btn-secondary">
-            Back: Organisers
-          </Link>
-        </div>
+        {status !== 'success' && (
+          <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'center' }}>
+            <Link href="/organisers" className="btn-secondary">
+              Back: Organisers
+            </Link>
+          </div>
+        )}
       </div>
     </main>
   );

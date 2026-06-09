@@ -3,7 +3,8 @@ import Link from 'next/link';
 
 export default function TraditionsHub() {
   return (
-    <div style={{ backgroundColor: '#0A0A0A', minHeight: '100vh', color: '#fff', fontFamily: '"Montserrat", sans-serif', paddingBottom: '80px' }}>
+    <main className="page-shell">
+      <div style={{ minHeight: '100vh', color: '#fff', fontFamily: '"Montserrat", sans-serif', paddingBottom: '80px' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Montserrat:wght@300;400;600&display=swap');
         .video-wrapper { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px; background-color: #000; }
@@ -18,7 +19,7 @@ export default function TraditionsHub() {
       </header>
 
       {/* Content */}
-      <main style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 24px' }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '40px 24px' }}>
         <h1 style={{ fontFamily: '"Cormorant Garamond", serif', fontSize: '3rem', color: '#D4AF37', textAlign: 'center', marginBottom: '10px' }}>Our Heritage</h1>
         <p style={{ textAlign: 'center', color: '#aaa', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '60px' }}>
           Immerse yourself in the rich Islamic and indigenous traditions of Ilorin as we celebrate the union of two great families.
@@ -60,7 +61,8 @@ export default function TraditionsHub() {
             Next: Organisers
           </Link>
         </div>
-      </main>
+      </div>
     </div>
+    </main>
   );
 }

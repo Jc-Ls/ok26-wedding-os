@@ -16,7 +16,7 @@ const guests = [
 
 export default function SpecialGuestsPage() {
   return (
-    <main className="modern-page" style={{ background: 'linear-gradient(180deg, rgba(4,10,20,0.98), rgba(6,14,24,1))' }}>
+    <main className="modern-page">
       <div className="modern-inner">
         <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.85rem', marginBottom: '16px' }}>
           The Special Invitees

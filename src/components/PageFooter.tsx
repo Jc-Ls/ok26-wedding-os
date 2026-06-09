@@ -39,7 +39,8 @@ export default function PageFooter({
   const pathname = usePathname();
 
   const { resolvedPreviousHref, resolvedPreviousLabel, resolvedNextHref, resolvedNextLabel } = useMemo(() => {
-    const activeIndex = pageSequence.findIndex((page) => page.href === pathname);
+    const normalizedPath = pathname?.replace(/\/+$/, '') || '/';
+    const activeIndex = pageSequence.findIndex((page) => page.href === normalizedPath);
     const previousPage = pageSequence[activeIndex - 1];
     const nextPage = pageSequence[activeIndex + 1];
 
@@ -60,68 +61,35 @@ export default function PageFooter({
   }
 
   return (
-    <footer className="page-footer">
-      <div className="footer-content">
-        <div className="footer-section">
-          <div className="footer-grid">
-            <div>
-              <p className="footer-title">Quick Links</p>
-              <ul>
-                <li>
-                  <Link href="/">Home</Link>
-                </li>
-                <li>
-                  <Link href="/meet-the-couple">Meet the Couple</Link>
-                </li>
-                <li>
-                  <Link href="/honorees">Honorees</Link>
-                </li>
-                <li>
-                  <Link href="/itinerary">Itinerary</Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <p className="footer-title">Need Help?</p>
-              <p>Event Coordinator</p>
-              <p>Groom Representative</p>
-              <p>Bride Representative</p>
-            </div>
-            <div>
-              <p className="footer-title">Contact</p>
-              <p>+234 800 000 0000</p>
-              <p>support@olowojarewedding.com</p>
-            </div>
-          </div>
-          <p className="footer-credit">
-            Designed & Developed by Jare&apos;s Choice Labs (JCLs) • Crafting Digital Experiences That Matter
-          </p>
+    <footer id="footer" className="page-footer">
+      <div className="page-navigation">
+        <div className="nav-button previous">
+          {resolvedPreviousHref ? (
+            <Link href={resolvedPreviousHref} className="btn-nav">
+              ← {resolvedPreviousLabel}
+            </Link>
+          ) : (
+            <button className="btn-nav disabled" disabled>
+              ← {resolvedPreviousLabel}
+            </button>
+          )}
         </div>
-
-        <div className="page-navigation">
-          <div className="nav-button previous">
-            {resolvedPreviousHref ? (
-              <Link href={resolvedPreviousHref} className="btn-nav">
-                ← {resolvedPreviousLabel}
-              </Link>
-            ) : (
-              <button className="btn-nav disabled" disabled>
-                ← {resolvedPreviousLabel}
-              </button>
-            )}
-          </div>
-          <div className="nav-button next">
-            {resolvedNextHref ? (
-              <Link href={resolvedNextHref} className="btn-nav">
-                {resolvedNextLabel} →
-              </Link>
-            ) : (
-              <button className="btn-nav disabled" disabled>
-                {resolvedNextLabel} →
-              </button>
-            )}
-          </div>
+        <div className="nav-button next">
+          {resolvedNextHref ? (
+            <Link href={resolvedNextHref} className="btn-nav">
+              {resolvedNextLabel} →
+            </Link>
+          ) : (
+            <button className="btn-nav disabled" disabled>
+              {resolvedNextLabel} →
+            </button>
+          )}
         </div>
+      </div>
+      <div className="footer-bottom">
+        <p className="footer-credit">
+          Designed & Developed by Jare&apos;s Choice Labs (JCLs) • Crafting Digital Experiences That Matter
+        </p>
       </div>
     </footer>
   );
