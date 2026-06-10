@@ -12,6 +12,7 @@ const guests = [
   { name: 'Mr. Lanre Gambari', title: 'Dangote Group of Company' },
   { name: 'Alhaji Olaitan Jimoh', title: 'Former NNPC Manager' },
   { name: 'Alhaji Abdul Kareem Lambe', title: 'Former Commissioner 1, LGSC' },
+   { name: 'Hon. Abdulgfar Ahmed (THECUTEABIOLA)', title: 'S.A to kwara state Governor' },
 ];
 
 export default function SpecialGuestsPage() {

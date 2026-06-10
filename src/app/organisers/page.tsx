@@ -4,32 +4,59 @@ import TiltCard from '../components/TiltCard';
 
 const organisers = [
   {
-    name: 'Yusuf kayode Yusuf ',
+    name: 'Yusuf Kayode Yusuf',
     title: 'Chief Event Director',
+    contact: '',
     summary:
       'Oversees the entire gala with a focus on premium guest experience, timeline precision, and exquisite presentation.',
   },
   {
     name: 'Idriz Salman',
     title: 'Creative Hospitality Lead',
+    contact: '',
     summary:
       'Curates luxury service, décor, and ambience to ensure every moment feels exceptionally polished.',
   },
   {
-    name: 'Okandeji Kehinde ',
+    name: 'Okandeji Kehinde',
     title: 'Guest Relations Director',
+    contact: '',
     summary:
       'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
   },
   {
-    name: 'Olowojare abubakar ',
+    name: 'Olowojare Abubakar',
     title: 'Guest Relations Director',
+    contact: '',
     summary:
       'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
   },
   {
-    name: 'Sulu-gambari ABdulrasaq',
+    name: 'Abdulrasaq Sulu-Gambari',
+    image: '/organisers/Abdulrasaq_Sulugambari.png',
+     contact: '07012774756',
     title: 'FrontEnd Dev',
+    summary:
+      'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
+  },
+  {
+    name: 'Abdulwasiu',
+    title: 'FrontEnd Dev',
+    contact: '07039575635',
+    summary:
+      'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
+  },
+  {
+    name: 'Abidemi',
+    title: 'FrontEnd Dev',
+    contact: '09038792949',
+    summary:
+      'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
+  },
+  {
+    name: 'Faruq',
+    title: 'FrontEnd Dev',
+    contact: '09114326578',
     summary:
       'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
   },
@@ -55,7 +82,7 @@ export default function OrganisersPage() {
               .toLowerCase()
               .replace(/[^a-z0-9]+/g, '-')
               .replace(/(^-|-$)/g, '');
-            const imgSrc = `/organisers/${slug}.jpg`;
+            const imgSrc = organiser.image ?? `/organisers/${slug}.jpg`;
             const initials = organiser.name
               .split(' ')
               .filter(Boolean)
@@ -65,7 +92,7 @@ export default function OrganisersPage() {
               .toUpperCase();
 
             return (
-              <TiltCard key={organiser.name} className="compact-card">
+              <TiltCard key={slug} className="compact-card">
                 <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start', marginBottom: 8 }}>
                   <div style={{ flex: '0 0 auto' }}>
                     <img
