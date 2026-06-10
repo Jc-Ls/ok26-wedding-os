@@ -2,6 +2,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import SplashScreen from '@/components/SplashScreen';
 
 const heroSlides = [
   {
@@ -44,11 +45,6 @@ export default function HomePage() {
       5200,
     );
     return () => clearInterval(heroTimer);
-  }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowSplash(false), 7200);
-    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -147,26 +143,12 @@ export default function HomePage() {
       </section>
 
       {showSplash && (
-        <div className="splash-screen">
-          <div className="splash-panel">
-            <p className="splash-eyebrow">The Olowojare's</p>
-            <h1 className="splash-title">Muhammed &amp; Kaothar</h1>
-            <p className="splash-copy">
-              With great joy and anticipation, we welcome you to our wedding website. 
-              As we step into this new chapter of our lives, 
-              we are reminded of how lucky we are to be surrounded by the love of our favorite people. 
-              May this space be a glimpse into our love story and the festivities to come
-            </p>
-            <div className="splash-actions">
-              <Link href="/meet-the-couple" className="btn-primary">
-                Start the Journey
-              </Link>
-              <button type="button" className="btn-secondary" onClick={() => setShowSplash(false)}>
-                Explore Home
-              </button>
-            </div>
-          </div>
-        </div>
+        <SplashScreen
+          coupleName1="Muhammed"
+          coupleName2="Kaothar"
+          weddingDate="June 21, 2026"
+          onDismiss={() => setShowSplash(false)}
+        />
       )}
     </main>
   );

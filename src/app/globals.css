@@ -307,20 +307,22 @@ li { display: block; }
   display: grid;
   gap: 24px;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
-  justify-items: center;
+  justify-items: stretch;
+  align-items: stretch;
 }
 
 .journey-card-wrap {
   perspective: 900px;
   width: 100%;
-  max-width: 280px;
 }
 
 .journey-card {
-  display: grid;
-  gap: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
   padding: 26px 24px;
   border-radius: 14px;
   background: rgba(255,255,255,0.04);
@@ -340,6 +342,8 @@ li { display: block; }
 .journey-card span {
   color: var(--gold-bright);
   font-variant-numeric: tabular-nums;
+  min-width: 50px;
+  text-align: left;
 }
 
 .journey-rail {
@@ -808,19 +812,6 @@ li { display: block; }
 .menu-page { min-height: 100vh; color: #FDFBF7; font-family: 'Montserrat', sans-serif; overflow-x: hidden; background: transparent; }
 .menu-intro { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: transparent; }
 .kitchen-page { min-height: 100vh; background: transparent; }
-.splash-screen { position: fixed; inset: 0; z-index: 120; display: flex; align-items: center; justify-content: center; background: rgba(4, 10, 20, 0.96); backdrop-filter: blur(12px); }
-.splash-panel { max-width: 520px; width: 100%; padding: 40px 28px; border: 1px solid rgba(212, 175, 55, 0.2); border-radius: 14px; background: rgba(10, 20, 35, 0.95); box-shadow: 0 30px 80px rgba(0,0,0,0.45); text-align: center; }
-.splash-eyebrow { letter-spacing: 3px; text-transform: uppercase; color: var(--gold-bright); font-size: 0.8rem; margin-bottom: 16px; }
-.splash-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.7rem, 5vw, 4.5rem); line-height: 1.05; margin-bottom: 18px; color: #fff; }
-.splash-copy { color: #d1d5db; line-height: 1.8; margin-bottom: 28px; }
-.splash-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
-.btn-primary, .btn-secondary { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; padding: 14px 28px; font-weight: 700; letter-spacing: 1px; transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease; text-decoration: none; }
-.btn-primary { background: linear-gradient(135deg, var(--gold-bright), #f8e8b1); color: #081010; }
-.btn-secondary { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.12); }
-.btn-secondary.disabled { opacity: 0.45; cursor: not-allowed; }
-.btn-primary:hover, .btn-secondary:hover { transform: translateY(-1px); }
-.btn-secondary.active { background: linear-gradient(135deg, rgba(249,168,212,0.2), rgba(229,208,143,0.15)); }
-
 #carousel-container { position: fixed; inset: 0; z-index: -2; }
 .slide { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; transition: opacity 1.8s ease-in-out; }
 .slide.active { opacity: 0.65; }
@@ -861,7 +852,7 @@ nav { width: 100%; position: sticky; top: 0; z-index: 20; padding: 18px clamp(20
 .section-heading span { display: inline-block; text-transform: uppercase; letter-spacing: 3px; color: var(--gold-bright); font-size: 0.8rem; margin-bottom: 14px; }
 .section-heading h2 { font-size: clamp(2rem, 4vw, 3.2rem); line-height: 1.05; margin: 0; }
 
-.schedule-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.schedule-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); justify-items: stretch; align-items: stretch; }
 .schedule-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(229,208,143,0.16); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 16px; }
 .schedule-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
 .badge { display: inline-flex; padding: 8px 14px; border-radius: 999px; background: rgba(249,168,212,0.14); color: var(--pink-accent); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
@@ -874,14 +865,14 @@ nav { width: 100%; position: sticky; top: 0; z-index: 20; padding: 18px clamp(20
 .btn-link { display: inline-flex; color: var(--gold-bright); text-decoration: none; font-weight: 700; border-bottom: 1px solid transparent; transition: border-color 0.2s ease; }
 .btn-link:hover { border-color: var(--gold-bright); }
 
-.profile-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.profile-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); justify-items: stretch; align-items: stretch; }
 .profile-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(229,208,143,0.16); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 18px; }
 .eyebrow { text-transform: uppercase; letter-spacing: 2px; font-size: 0.78rem; color: var(--gold-bright); margin-bottom: 6px; }
 .profile-card h3 { margin: 0; font-size: 1.5rem; }
 .profile-meta { color: #d1d5db; font-size: 0.95rem; font-weight: 600; }
 .feature-list { display: grid; gap: 10px; list-style: none; padding: 0; margin: 0; color: #e9e2d5; }
 .feature-list li::before { content: '•'; margin-right: 10px; color: var(--gold-bright); }
-.gallery-grid { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.gallery-grid { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); justify-items: stretch; align-items: stretch; }
 .gallery-item { min-height: 140px; border-radius: 18px; background-size: cover; background-position: center; }
 
 .timeline-panel { background: rgba(255,255,255,0.04); border: 1px solid rgba(229,208,143,0.16); border-radius: 14px; padding: 28px; margin-top: 36px; }
@@ -897,7 +888,7 @@ nav { width: 100%; position: sticky; top: 0; z-index: 20; padding: 18px clamp(20
 .small-label { text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; color: var(--gold-bright); margin-bottom: 8px; }
 .rsvp-grid h3 { margin: 0; font-size: 1.05rem; }
 
-.food-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.food-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); justify-items: stretch; align-items: stretch; }
 .food-card { border-radius: 14px; overflow: hidden; background: rgba(255,255,255,0.06); box-shadow: 0 25px 60px rgba(0,0,0,0.22); display: flex; flex-direction: column; }
 .food-visual { min-height: 220px; background-size: cover; background-position: center; }
 .food-body { padding: 24px; display: grid; gap: 12px; }
@@ -905,14 +896,14 @@ nav { width: 100%; position: sticky; top: 0; z-index: 20; padding: 18px clamp(20
 .food-body p { margin: 0; color: #d1d5db; line-height: 1.7; }
 .price { display: inline-flex; margin-top: 10px; color: var(--gold-bright); font-weight: 700; }
 
-.gift-grid { display: grid; gap: 22px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 24px; }
+.gift-grid { display: grid; gap: 22px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); justify-items: stretch; align-items: stretch; margin-bottom: 24px; }
 .gift-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(229,208,143,0.14); border-radius: 14px; padding: 28px; text-align: center; }
 .gift-card.featured { background: linear-gradient(135deg, rgba(229,208,143,0.2), rgba(255,255,255,0.08)); border-color: rgba(229,208,143,0.3); }
 .gift-card h3 { margin: 0 0 10px; font-size: 2rem; }
 .gift-card p { margin: 0; color: #d1d5db; }
 .gift-note { max-width: 760px; margin: 0 auto; color: #d1d5db; line-height: 1.8; }
 
-.about-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 28px; }
+.about-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); justify-items: stretch; align-items: stretch; margin-bottom: 28px; }
 .about-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(229,208,143,0.14); border-radius: 14px; padding: 26px; }
 .about-card h3 { margin: 10px 0 8px; }
 .about-card p { margin: 0; color: #d1d5db; }
