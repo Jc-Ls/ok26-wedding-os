@@ -6,6 +6,11 @@ export const metadata = {
 };
 
 export default function LivePage() {
+  // ⚠️ REPLACE THIS VIDEO ID WITH YOUR ACTUAL YOUTUBE LIVE VIDEO ID
+  // Get it from YouTube Studio after creating your live event
+  // Instructions: Go to youtube.com/studio → Create → Go live → Copy Video ID from URL
+  const youtubeVideoId = process.env.NEXT_PUBLIC_YOUTUBE_LIVE_ID || "dQw4w9WgXcQ";
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-purple-900 via-black to-black p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
@@ -22,7 +27,7 @@ export default function LivePage() {
         {/* Video Container */}
         <div className="rounded-lg overflow-hidden shadow-2xl mb-8 border border-purple-800/50">
           <LiveStream
-            videoId="dQw4w9WgXcQ"
+            videoId={youtubeVideoId}
             title="M K'26 Royal OS Live Stream"
           />
         </div>

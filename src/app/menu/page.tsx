@@ -249,15 +249,17 @@ function MenuContent() {
           {step === 1 && (
             <div>
               <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '1.8rem', margin: '0 0 20px 0', textAlign: 'center' }}>The Royal Main Course</h2>
-              {loadingMenu ? <p style={{ textAlign: 'center', color: '#E5D08F' }}>Curating Menu...</p> : meals.map(meal => (
-                <div key={meal.id} className="premium-card" onClick={() => handleFoodSelection(meal.name)}>
-                  <div className="card-img" style={{ backgroundImage: `url(${meal.imageUrl || 'https://via.placeholder.com/100'})` }} />
-                  <div style={{ marginLeft: '18px' }}>
-                    <h4 style={{ margin: '0 0 5px 0', color: '#FDFBF7', fontSize: '1.1rem', fontWeight: '500' }}>{meal.name}</h4>
-                    <p style={{ margin: 0, color: '#E5D08F', fontSize: '0.75rem', textTransform: 'uppercase' }}>Tap to Select</p>
-                  </div>
+              {loadingMenu ? <p style={{ textAlign: 'center', color: '#E5D08F' }}>Curating Menu...</p> : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '16px' }}>
+                  {meals.map(meal => (
+                    <div key={meal.id} className="premium-card" onClick={() => handleFoodSelection(meal.name)} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', cursor: 'pointer', padding: '12px', borderRadius: '12px', border: '1px solid rgba(229,208,143,0.2)', backgroundColor: 'rgba(255,255,255,0.03)', transition: '0.2s', margin: 0 }}>
+                      <div className="card-img" style={{ backgroundImage: `url(${meal.imageUrl || 'https://via.placeholder.com/100'})`, width: '100%', height: '100px', backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '8px', marginBottom: '10px' }} />
+                      <h4 style={{ margin: '0 0 5px 0', color: '#FDFBF7', fontSize: '0.95rem', fontWeight: '500' }}>{meal.name}</h4>
+                      <p style={{ margin: 0, color: '#E5D08F', fontSize: '0.7rem', textTransform: 'uppercase' }}>Tap to Select</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           )}
 
@@ -274,19 +276,19 @@ function MenuContent() {
           {step === 3 && (
             <div>
               <h2 style={{ fontFamily: '"Cormorant Garamond", serif', color: '#E5D08F', fontSize: '1.8rem', margin: '0 0 20px 0', textAlign: 'center' }}>Royal Beverages</h2>
-              {drinks.map(drink => {
-                const isRecommended = drink.name.toLowerCase().includes('zobo');
-                return (
-                  <div key={drink.id} className="premium-card" onClick={() => { setForm({...form, drinkName: drink.name}); setStep(4); }}>
-                    {isRecommended && <div className="glow-badge">✨ Chef&apos;s Pairing</div>}
-                    <div className="card-img" style={{ backgroundImage: `url(${drink.imageUrl || 'https://via.placeholder.com/100'})` }} />
-                    <div style={{ marginLeft: '18px' }}>
-                      <h4 style={{ margin: '0 0 5px 0', color: '#FDFBF7', fontSize: '1.1rem', fontWeight: '500' }}>{drink.name}</h4>
-                      <p style={{ margin: 0, color: '#E5D08F', fontSize: '0.75rem', textTransform: 'uppercase' }}>Tap to Select</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '16px' }}>
+                {drinks.map(drink => {
+                  const isRecommended = drink.name.toLowerCase().includes('zobo');
+                  return (
+                    <div key={drink.id} className="premium-card" onClick={() => { setForm({...form, drinkName: drink.name}); setStep(4); }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', cursor: 'pointer', padding: '12px', borderRadius: '12px', border: '1px solid rgba(229,208,143,0.2)', backgroundColor: 'rgba(255,255,255,0.03)', transition: '0.2s', position: 'relative', margin: 0 }}>
+                      {isRecommended && <div className="glow-badge" style={{ position: 'absolute', top: '8px', right: '8px', fontSize: '0.7rem' }}>✨ Chef&apos;s Pairing</div>}
+                      <div className="card-img" style={{ backgroundImage: `url(${drink.imageUrl || 'https://via.placeholder.com/100'})`, width: '100%', height: '100px', backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '8px', marginBottom: '10px' }} />
+                      <h4 style={{ margin: '0 0 5px 0', color: '#FDFBF7', fontSize: '0.95rem', fontWeight: '500' }}>{drink.name}</h4>
+                      <p style={{ margin: 0, color: '#E5D08F', fontSize: '0.7rem', textTransform: 'uppercase' }}>Tap to Select</p>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
               <button onClick={() => setStep(1)} style={{ background: 'none', border: 'none', color: '#aaa', width: '100%', padding: '15px', marginTop: '10px', textDecoration: 'underline' }}>← Restart Selection</button>
             </div>
           )}

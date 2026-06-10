@@ -13,7 +13,7 @@ interface PageFooterProps {
 
 const pageSequence = [
   { href: '/', label: 'Home' },
-  { href: '/meet-the-couple', label: 'Meet the Couple' },
+  { href: '/couple', label: 'Meet the Couple' },
   { href: '/meet-the-olowojares', label: 'Meet the Family' },
   { href: '/honorees', label: 'Honorees' },
   { href: '/special-guests', label: 'Special Guests' },

@@ -49,7 +49,7 @@ export default function ReservationsPage() {
           Reserve your place at the Olowojares gala with a premium booking experience. Enter your details and VIP access code to confirm attendance.
         </p>
         <p style={{ color: '#D9D2C1', lineHeight: 1.8, marginBottom: '40px' }}>
-          Once your reservation is confirmed, continue to the menu page to place your order. The menu order will be sent directly to the kitchen for preparation.
+          Your reservation is confirmed! At the reception, scan your table's QR code to unlock the menu and place your order. All orders will be sent directly to the kitchen.
         </p>
 
         {status === 'success' ? (
@@ -63,9 +63,7 @@ export default function ReservationsPage() {
             </div>
 
             <div style={{ marginTop: '32px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <Link href="/menu" className="btn-primary" style={{ width: 'auto', padding: '14px 24px' }}>
-                Next: Menu
-              </Link>
+              <p style={{ color: '#E5C07B', fontSize: '0.9rem', lineHeight: 1.6, margin: '0 0 16px 0' }}>📱 <strong>To access the menu:</strong> Scan the QR code at your table in the reception hall. This will unlock your personalized menu and ordering options.</p>
               <Link href="/" className="btn-secondary">
                 Back: Home
               </Link>

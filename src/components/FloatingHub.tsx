@@ -74,7 +74,7 @@ export default function FloatingHub() {
 
   const quickActions = [
     { label: 'AI Wedding Assistant', href: null },
-    { label: 'Watch Live', href: '#live' },
+    { label: 'Watch Live', href: '/live' },
     { label: 'Get Directions', href: '#schedule' },
     { label: 'Contact Support', href: '#footer' },
   ];
