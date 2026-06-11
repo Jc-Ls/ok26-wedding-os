@@ -11,7 +11,7 @@ const organisers = [
       'Oversees the entire gala with a focus on premium guest experience, timeline precision, and exquisite presentation.',
   },
   {
-    name: 'Idriz Salman',
+    name: 'Idris Salman',
     title: 'Creative Hospitality Lead',
     contact: '',
     summary:
