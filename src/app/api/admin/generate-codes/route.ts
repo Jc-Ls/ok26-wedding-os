@@ -1,10 +1,32 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { getRateLimitKey, checkRateLimit } from '@/lib/rate-limit';
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    // Extract client IP from request headers
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
+    
+    // Check rate limit: max 100 code generations per minute per IP
+    const limitKey = getRateLimitKey(ip, 'generate-codes');
+    const rateLimit = checkRateLimit(limitKey, 'generate-codes');
+
+    if (!rateLimit.allowed) {
+      const resetSeconds = Math.ceil((rateLimit.resetAt - Date.now()) / 1000);
+      return NextResponse.json(
+        { 
+          error: 'Too many code generation requests. Please try again later.',
+          retryAfter: resetSeconds 
+        },
+        { 
+          status: 429,
+          headers: { 'Retry-After': resetSeconds.toString() }
+        }
+      );
+    }
+
     const newCodes = [];
     // We use characters that are easy to read (removed O, 0, I, L to avoid confusion)
     const characters = 'ABCDEFGHJKMNPQRSTUVWXYZ123456789'; 
@@ -31,7 +53,8 @@ export async function GET() {
       success: true,
       message: "300 VIP codes generated and locked into the vault!",
       total: plainTextList.length,
-      codes: plainTextList
+      codes: plainTextList,
+      rateLimitRemaining: rateLimit.remaining
     });
     
   } catch (error) {

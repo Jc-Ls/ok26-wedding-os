@@ -7,6 +7,7 @@ export default function ReservationsPage() {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [ticketData, setTicketData] = useState({ code: '', name: '' });
+  const [showMenuGateModal, setShowMenuGateModal] = useState(false);
 
   const submitReservation = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -62,8 +63,11 @@ export default function ReservationsPage() {
               <p style={{ fontFamily: 'monospace', fontSize: '2rem', color: '#F5EFE0', margin: 0 }}>{ticketData.code}</p>
             </div>
 
-            <div style={{ marginTop: '32px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ marginTop: '32px', display: 'flex', gap: '12px', flexWrap: 'wrap', flexDirection: 'column' }}>
               <p style={{ color: '#E5C07B', fontSize: '0.9rem', lineHeight: 1.6, margin: '0 0 16px 0' }}>📱 <strong>To access the menu:</strong> Scan the QR code at your table in the reception hall. This will unlock your personalized menu and ordering options.</p>
+              <button onClick={() => setShowMenuGateModal(true)} className="btn-secondary" style={{ cursor: 'pointer', width: '100%' }}>
+                Access Menu (via QR)
+              </button>
               <Link href="/" className="btn-secondary">
                 Back: Home
               </Link>
@@ -119,6 +123,23 @@ export default function ReservationsPage() {
           </form>
         )}
       </div>
+
+      {showMenuGateModal && (
+        <div className="tracker-overlay" role="dialog" aria-modal="true" style={{ zIndex: 200 }} onClick={() => setShowMenuGateModal(false)}>
+          <div style={{ position: 'relative', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(229,208,143,0.18)', borderRadius: '24px', padding: '30px', maxWidth: '500px', boxShadow: '0 30px 70px rgba(0,0,0,0.25)' }} onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setShowMenuGateModal(false)} style={{ position: 'absolute', top: '20px', right: '20px', border: 'none', background: 'transparent', color: '#E5D08F', fontWeight: 700, fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.85rem', marginBottom: '16px' }}>Menu Access</p>
+              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2.2rem', color: '#fff', marginBottom: '16px' }}>Scan to Order</h2>
+              <span style={{ fontSize: '3rem', display: 'block', margin: '24px 0' }}>📱</span>
+              <p style={{ color: '#D9D2C1', lineHeight: 1.7, margin: '20px 0', fontSize: '0.95rem' }}>To access the menu and place your order, you must scan the unique QR code at your table in the reception hall. This will unlock your personalized ordering experience.</p>
+              <button onClick={() => setShowMenuGateModal(false)} className="btn-primary" style={{ width: '100%', padding: '14px', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', marginTop: '24px' }}>
+                Got It, Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

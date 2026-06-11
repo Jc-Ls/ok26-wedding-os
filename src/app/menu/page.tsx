@@ -2,6 +2,7 @@
 import { useState, useEffect, Suspense, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import confetti from 'canvas-confetti';
+import { notifyGuestStatusChange, triggerHaptic, HapticPatterns, requestNotificationPermission } from '@/lib/notifications';
 
 type MenuItem = { id: string; name: string; category: string; imageUrl: string; isAvailable: boolean; };
 type OrderResponse = { id?: string; status?: string } | null;
@@ -24,6 +25,8 @@ function MenuContent() {
   
   const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
   const [trackingStatus, setTrackingStatus] = useState('Pending');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [prevStatus, setPrevStatus] = useState('Pending');
   const [blessing, setBlessing] = useState('');
   const [selfieUrl, setSelfieUrl] = useState('');
   const [activities, setActivities] = useState<string[]>([]);
@@ -48,6 +51,7 @@ function MenuContent() {
       }
       setStep(5);
       setTrackingStatus(data?.status || 'Pending');
+      setPrevStatus(data?.status || 'Pending');
     } catch {
       setStep(5);
     }
@@ -66,6 +70,15 @@ function MenuContent() {
     const timer = setTimeout(() => setStep(1), 3500);
     return () => clearTimeout(timer);
   }, [restoreOrder]);
+
+  // Request notification permission on mount
+  useEffect(() => {
+    const setupNotifications = async () => {
+      const enabled = await requestNotificationPermission();
+      setNotificationsEnabled(enabled);
+    };
+    setupNotifications();
+  }, []);
 
   // LIVE DATABASE POLLING
   useEffect(() => {
@@ -87,8 +100,12 @@ function MenuContent() {
           if (res.ok) {
             const data = await res.json();
             if (data && data.status) {
-              if (data.status === 'On the Way' && trackingStatus !== 'On the Way') {
-                if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+              // Send notification for any status change
+              if (data.status !== prevStatus) {
+                void notifyGuestStatusChange(data.status, activeOrderId);
+                triggerHaptic(HapticPatterns.statusUpdate);
+                console.log(`[GUEST STATUS UPDATE] From ${prevStatus} to ${data.status}`);
+                setPrevStatus(data.status);
               }
               setTrackingStatus(data.status);
             }
@@ -101,7 +118,7 @@ function MenuContent() {
       clearInterval(activityInterval);
       if (orderInterval) clearInterval(orderInterval);
     };
-  }, [activeOrderId, step, trackingStatus]);
+  }, [activeOrderId, step, trackingStatus, prevStatus]);
 
   const fetchMenu = useCallback(async () => {
     try {
@@ -138,6 +155,7 @@ function MenuContent() {
         localStorage.setItem('mk26_active_order', data.id);
         setActiveOrderId(data.id);
         setTrackingStatus('Pending');
+        setPrevStatus('Pending');
         setStep(5);
       }
     } catch { alert("Failed to connect to Kitchen. Please try again."); }
