@@ -35,15 +35,6 @@ export default function SpecialGuestsPage() {
             </TiltCard>
           ))}
         </div>
-
-        <div style={{ marginTop: '48px', display: 'flex', flexWrap: 'wrap', gap: '14px' }}>
-          <Link href="/meet-the-olowojares" className="btn-secondary">
-            Back: Meet the Olowojares
-          </Link>
-          <Link href="/traditions" className="btn-primary">
-            Next: Traditions
-          </Link>
-        </div>
       </div>
     </main>
   );

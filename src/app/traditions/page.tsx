@@ -53,14 +53,6 @@ export default function TraditionsHub() {
           </p>
         </article>
 
-        <div style={{ marginTop: '48px', display: 'flex', flexWrap: 'wrap', gap: '14px', justifyContent: 'center' }}>
-          <Link href="/special-guests" className="btn-secondary">
-            Back: Special Guests
-          </Link>
-          <Link href="/organisers" className="btn-primary">
-            Next: Organisers
-          </Link>
-        </div>
       </div>
     </div>
     </main>

@@ -118,14 +118,6 @@ export default function ReservationsPage() {
             </button>
           </form>
         )}
-
-        {status !== 'success' && (
-          <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'center' }}>
-            <Link href="/organisers" className="btn-secondary">
-              Back: Organisers
-            </Link>
-          </div>
-        )}
       </div>
     </main>
   );

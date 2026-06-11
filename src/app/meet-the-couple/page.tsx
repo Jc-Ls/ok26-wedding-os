@@ -44,16 +44,6 @@ export default function MeetTheCouplePage() {
             </TiltCard>
           ))}
         </div>
-
-
-        <div style={{ marginTop: '48px', display: 'flex', flexWrap: 'wrap', gap: '14px' }}>
-          <Link href="/" className="btn-secondary">
-            Back to Home
-          </Link>
-          <Link href="/meet-the-olowojares" className="btn-primary">
-            Next: Meet the Family
-          </Link>
-        </div>
       </div>
     </main>
   );

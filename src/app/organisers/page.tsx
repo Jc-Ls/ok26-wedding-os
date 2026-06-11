@@ -34,31 +34,31 @@ const organisers = [
   {
     name: 'Abdulrasaq Sulu-Gambari',
     image: '/organisers/Abdulrasaq_Sulugambari.png',
-     contact: '07012774756',
-    title: 'FrontEnd Dev',
+    contact: '07012774756',
+    title: 'Logistics & Operations Manager',
     summary:
-      'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
+      'Manages event timelines, vendor coordination, and seamless execution of every ceremonial component.',
   },
   {
     name: 'Abdulwasiu',
-    title: 'FrontEnd Dev',
+    title: 'Guest Experience Technology Lead',
     contact: '07039575635',
     summary:
-      'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
+      'Oversees digital check-in systems, live streaming coordination, and real-time guest engagement platforms.',
   },
   {
     name: 'Abidemi',
-    title: 'FrontEnd Dev',
+    title: 'Digital Concierge Manager',
     contact: '09038792949',
     summary:
-      'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
+      'Coordinates live order management, guest communications, and on-site digital support for seamless service.',
   },
   {
     name: 'Faruq',
-    title: 'FrontEnd Dev',
+    title: 'Event Analytics & Coordination',
     contact: '09114326578',
     summary:
-      'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
+      'Tracks guest metrics, manages reservations data, and ensures all systems sync for optimal event flow.',
   },
 ];
 
@@ -120,15 +120,6 @@ export default function OrganisersPage() {
               </TiltCard>
             );
           })}
-        </div>
-
-        <div style={{ marginTop: '48px', display: 'flex', flexWrap: 'wrap', gap: '14px' }}>
-          <Link href="/traditions" className="btn-secondary">
-            Back: Traditions
-          </Link>
-          <Link href="/reservations" className="btn-primary">
-            Next: Reservations
-          </Link>
         </div>
       </div>
     </main>
