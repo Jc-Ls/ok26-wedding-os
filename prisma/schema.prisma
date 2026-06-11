@@ -12,7 +12,10 @@ model Guest {
   id            String   @id @default(cuid())
   fullName      String
   phone         String
+  email         String?
   reservationId String   @unique
+  tableNumber   String?
+  ticketId      String?
   hasEntered    Boolean  @default(false)
   createdAt     DateTime @default(now())
 }

@@ -10,7 +10,7 @@ export default function SplashScreen({ coupleName1, coupleName2, weddingDate, on
   };
 
   useEffect(() => {
-    const autoDismiss = setTimeout(() => setIsLeaving(true), 3000);
+    const autoDismiss = setTimeout(() => setIsLeaving(true), 7000);
     return () => clearTimeout(autoDismiss);
   }, []);
 
@@ -44,13 +44,14 @@ export default function SplashScreen({ coupleName1, coupleName2, weddingDate, on
         </div>
 
         <div className="wedding-splash-copy">
-          <p className="wedding-splash-eyebrow">Forever Begins Today</p>
+          <p className="wedding-splash-eyebrow">Welcome to Our Royal Celebration</p>
           <h1 className="wedding-splash-heading">
             {coupleName1} &amp; {coupleName2}
           </h1>
           <p className="wedding-splash-subtitle">{weddingDate}</p>
+          <p className="wedding-splash-message">We are honored to celebrate with you. Your presence means everything to us, and we look forward to creating unforgettable memories together.</p>
           <button type="button" className="wedding-splash-button" onClick={handleDismiss}>
-            Enter
+            Enter the Celebration
           </button>
         </div>
 
