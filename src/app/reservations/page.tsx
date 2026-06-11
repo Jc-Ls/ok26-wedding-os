@@ -9,6 +9,7 @@ export default function ReservationsPage() {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [ticketData, setTicketData] = useState({ code: '', name: '' });
+  const [showMenuGateModal, setShowMenuGateModal] = useState(false);
 
   const submitReservation = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();

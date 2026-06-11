@@ -58,8 +58,11 @@ export async function sendNotification(payload: NotificationPayload) {
       tag: payload.tag || payload.type, // Group notifications with same tag
       requireInteraction: payload.requireInteraction ?? false,
       badge: icon,
-      vibrate: payload.hapticPattern,
     });
+
+    if (payload.hapticPattern) {
+      triggerHaptic(payload.hapticPattern);
+    }
 
     // Close notification after 5 seconds if not requiring interaction
     if (!payload.requireInteraction) {
