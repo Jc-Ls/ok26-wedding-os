@@ -17,14 +17,14 @@ const guests = [
 
 export default function SpecialGuestsPage() {
   return (
-    <main className="modern-page">
+    <main className="modern-page" style={{ backgroundImage: 'linear-gradient(135deg, rgba(10,20,47,0.85) 0%, rgba(20,35,70,0.9) 50%, rgba(10,20,47,0.85) 100%)', backgroundAttachment: 'fixed' }}>
       <div className="modern-inner">
         <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.85rem', marginBottom: '16px' }}>
           The Special Invitees
         </p>
-        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(3rem, 6vw, 5rem)', lineHeight: 1, marginBottom: '24px' }}>Guest Section</h1>
+        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(3rem, 6vw, 5rem)', lineHeight: 1, marginBottom: '24px' }}>Distinguished Guests & Dignitaries</h1>
         <p style={{ maxWidth: 760, marginBottom: '42px', color: '#D9D2C1', lineHeight: 1.8, fontSize: '1rem' }}>
-          These cards present the distinguished invitees with the guest name at the top and their formal title below.
+          We are honored to welcome exceptional leaders from government, business, education, and community service who have shaped the landscape of Kwara State and beyond. Their presence elevates this celebration to a truly distinguished occasion.
         </p>
 
         <div className="edge-grid compact">
@@ -34,15 +34,6 @@ export default function SpecialGuestsPage() {
               <p style={{ marginTop: '14px', color: '#D9D2C1', fontSize: '0.95rem', lineHeight: 1.8 }}>{guest.title}</p>
             </TiltCard>
           ))}
-        </div>
-
-        <div style={{ marginTop: '48px', display: 'flex', flexWrap: 'wrap', gap: '14px' }}>
-          <Link href="/meet-the-olowojares" className="btn-secondary">
-            Back: Meet the Olowojares
-          </Link>
-          <Link href="/traditions" className="btn-primary">
-            Next: Traditions
-          </Link>
         </div>
       </div>
     </main>

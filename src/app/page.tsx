@@ -20,7 +20,7 @@ const heroSlides = [
 ];
 
 const pageLinks = [
-  { label: 'Meet the Couple', href: '/meet-the-couple' },
+  { label: 'Meet the Couple', href: '/couple' },
   { label: 'The Family', href: '/meet-the-olowojares' },
   { label: 'Host & Parents', href: '/honorees' },
   { label: 'Special Guests', href: '/special-guests' },
@@ -33,6 +33,7 @@ const pageLinks = [
 export default function HomePage() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [showSplash, setShowSplash] = useState(true);
+  const [showMenuGateModal, setShowMenuGateModal] = useState(false);
   const { scrollY } = useScroll();
   const heroDepth = useTransform(scrollY, [0, 700], [0, 90]);
   const heroScale = useTransform(scrollY, [0, 700], [1, 1.08]);
@@ -79,7 +80,7 @@ export default function HomePage() {
             <summary>Explore</summary>
             <div className="nav-dropdown-panel">
               <Link href="/#schedule">Schedule</Link>
-              <Link href="/meet-the-couple">Couple</Link>
+              <Link href="/couple">Couple</Link>
               <Link href="/meet-the-olowojares">The Family</Link>
               <Link href="/special-guests">Special Guests</Link>
               <Link href="/traditions">Traditions</Link>
@@ -111,6 +112,9 @@ export default function HomePage() {
             <Link href="/reservations" className="btn-secondary">
               Reserve Seat
             </Link>
+            <button onClick={() => setShowMenuGateModal(true)} className="btn-secondary" style={{ cursor: 'pointer' }}>
+              Order Menu
+            </button>
           </div>
         </motion.div>
 
@@ -146,9 +150,27 @@ export default function HomePage() {
         <SplashScreen
           coupleName1="Muhammed"
           coupleName2="Kaothar"
-          weddingDate="June 21, 2026"
+          weddingDate="June 25, 2026"
           onDismiss={() => setShowSplash(false)}
         />
+      )}
+
+      {showMenuGateModal && (
+        <div className="tracker-overlay" role="dialog" aria-modal="true" style={{ zIndex: 200 }} onClick={() => setShowMenuGateModal(false)}>
+          <div className="tracker-card" style={{ width: '100%', maxWidth: 480 }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: 0, fontSize: '1.5rem', color: '#E5D08F' }}>🍽️ Order Your Meal</h3>
+              <button onClick={() => setShowMenuGateModal(false)} style={{ border: 'none', background: 'transparent', color: '#E5D08F', fontWeight: 700, fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+            </div>
+            <div style={{ background: 'rgba(212,175,55,0.1)', padding: '24px', borderRadius: '16px', border: '1px solid rgba(212,175,55,0.25)', marginBottom: '24px' }}>
+              <p style={{ color: '#E5D08F', fontSize: '0.9rem', fontWeight: '600', marginBottom: '12px', textTransform: 'uppercase' }}>📱 QR Code Required</p>
+              <p style={{ color: '#D9D2C1', lineHeight: 1.7, margin: 0, fontSize: '0.95rem' }}>To access the menu and place your order, you must scan the unique QR code at your table in the reception hall. This will unlock your personalized ordering experience.</p>
+            </div>
+            <button onClick={() => setShowMenuGateModal(false)} className="btn-primary" style={{ width: '100%', padding: '14px', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
+              Got It, Close
+            </button>
+          </div>
+        </div>
       )}
     </main>
   );

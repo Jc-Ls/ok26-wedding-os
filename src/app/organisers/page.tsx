@@ -11,7 +11,7 @@ const organisers = [
       'Oversees the entire gala with a focus on premium guest experience, timeline precision, and exquisite presentation.',
   },
   {
-    name: 'Idriz Salman',
+    name: 'Idris Salman',
     title: 'Creative Hospitality Lead',
     contact: '',
     summary:
@@ -34,31 +34,31 @@ const organisers = [
   {
     name: 'Abdulrasaq Sulu-Gambari',
     image: '/organisers/Abdulrasaq_Sulugambari.png',
-     contact: '07012774756',
-    title: 'FrontEnd Dev',
+    contact: '07012774756',
+    title: 'Logistics & Operations Manager',
     summary:
-      'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
+      'Manages event timelines, vendor coordination, and seamless execution of every ceremonial component.',
   },
   {
     name: 'Abdulwasiu',
-    title: 'FrontEnd Dev',
+    title: 'Guest Experience Technology Lead',
     contact: '07039575635',
     summary:
-      'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
+      'Oversees digital check-in systems, live streaming coordination, and real-time guest engagement platforms.',
   },
   {
     name: 'Abidemi',
-    title: 'FrontEnd Dev',
+    title: 'Digital Concierge Manager',
     contact: '09038792949',
     summary:
-      'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
+      'Coordinates live order management, guest communications, and on-site digital support for seamless service.',
   },
   {
     name: 'Faruq',
-    title: 'FrontEnd Dev',
+    title: 'Event Analytics & Coordination',
     contact: '09114326578',
     summary:
-      'Coordinates VIP support, reservations, and on-site guest care for a seamless wedding experience.',
+      'Tracks guest metrics, manages reservations data, and ensures all systems sync for optimal event flow.',
   },
 ];
 
@@ -66,7 +66,7 @@ const organisers = [
 
 export default function OrganisersPage() {
   return (
-    <main className="modern-page">
+    <main className="modern-page" style={{ backgroundImage: 'linear-gradient(135deg, rgba(10,20,47,0.85) 0%, rgba(20,35,70,0.9) 50%, rgba(10,20,47,0.85) 100%)', backgroundAttachment: 'fixed' }}>
       <div className="modern-inner">
         <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.85rem', marginBottom: '16px' }}>
           The Organisers
@@ -120,15 +120,6 @@ export default function OrganisersPage() {
               </TiltCard>
             );
           })}
-        </div>
-
-        <div style={{ marginTop: '48px', display: 'flex', flexWrap: 'wrap', gap: '14px' }}>
-          <Link href="/traditions" className="btn-secondary">
-            Back: Traditions
-          </Link>
-          <Link href="/reservations" className="btn-primary">
-            Next: Reservations
-          </Link>
         </div>
       </div>
     </main>

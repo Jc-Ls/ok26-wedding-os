@@ -121,6 +121,16 @@
   animation: fade-up 1.4s ease forwards;
 }
 
+.wedding-splash-message {
+  font-family: 'Montserrat', sans-serif;
+  color: rgba(229, 229, 223, 0.88);
+  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+  line-height: 1.8;
+  max-width: 720px;
+  margin: 0 auto;
+  animation: fade-up 1.3s ease forwards;
+}
+
 .wedding-splash-button {
   margin: 0 auto;
   min-width: 170px;

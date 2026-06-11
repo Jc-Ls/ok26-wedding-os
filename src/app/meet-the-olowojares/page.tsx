@@ -19,7 +19,7 @@ const familyCards = [
 
 export default function MeetTheOlowojaresPage() {
   return (
-    <main className="modern-page">
+    <main className="modern-page" style={{ backgroundImage: 'linear-gradient(135deg, rgba(10,20,47,0.85) 0%, rgba(20,35,70,0.9) 50%, rgba(10,20,47,0.85) 100%)', backgroundAttachment: 'fixed' }}>
       <div className="modern-inner">
         <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.85rem', marginBottom: '16px' }}>
           Meet The Family
@@ -44,15 +44,6 @@ export default function MeetTheOlowojaresPage() {
               </ul>
             </TiltCard>
           ))}
-        </div>
-
-        <div style={{ marginTop: '48px', display: 'flex', flexWrap: 'wrap', gap: '14px' }}>
-          <Link href="/meet-the-couple" className="btn-secondary">
-            Back: Meet the Couple
-          </Link>
-          <Link href="/special-guests" className="btn-primary">
-            Next: Special Guests
-          </Link>
         </div>
       </div>
     </main>

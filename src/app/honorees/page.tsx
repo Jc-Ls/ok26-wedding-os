@@ -22,7 +22,7 @@ const hosts = [
 ];
 export default function HonoreesPage() {
   return (
-    <main className="page-shell">
+    <main className="page-shell" style={{ backgroundImage: 'linear-gradient(135deg, rgba(10,20,47,0.85) 0%, rgba(20,35,70,0.9) 50%, rgba(10,20,47,0.85) 100%)', backgroundAttachment: 'fixed' }}>
       <nav aria-label="Primary navigation">
         <Link href="/" className="logo">
           THE OLOWOJARE&apos;S

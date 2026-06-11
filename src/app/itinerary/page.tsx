@@ -59,7 +59,7 @@ const directionsUrl = (query: string) =>
 
 export default function ItineraryPage() {
   return (
-    <main className="page-shell">
+    <main className="page-shell" style={{ backgroundImage: 'linear-gradient(135deg, rgba(10,20,47,0.85) 0%, rgba(20,35,70,0.9) 50%, rgba(10,20,47,0.85) 100%)', backgroundAttachment: 'fixed' }}>
       <nav aria-label="Primary navigation">
         <Link href="/" className="logo">
           THE OLOWOJARE&apos;S
@@ -99,18 +99,7 @@ export default function ItineraryPage() {
         </div>
       </section>
 
-      <section className="section sponsor-section">
-        <div className="sponsor-card">
-          <div>
-            <span className="eyebrow">Sponsor Promotion</span>
-            <h2>BABA-K TICKETHUB</h2>
-            <p>A premium sponsor celebration for guests joining the royal wedding experience.</p>
-          </div>
-          <Link href="#footer" className="btn-primary">
-            Explore Sponsorship
-          </Link>
-        </div>
-      </section>
+      
     </main>
   );
 }

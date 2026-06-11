@@ -1,8 +1,10 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function ReservationsPage() {
+  const router = useRouter();
   const [form, setForm] = useState({ name: '', phone: '', email: '', vipCode: '' });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
@@ -41,7 +43,7 @@ export default function ReservationsPage() {
   };
 
   return (
-    <main className="page-shell reservation-page">
+    <main className="page-shell reservation-page" style={{ backgroundImage: 'linear-gradient(135deg, rgba(10,20,47,0.85) 0%, rgba(20,35,70,0.9) 50%, rgba(10,20,47,0.85) 100%)', backgroundAttachment: 'fixed' }}>
       <div style={{ maxWidth: 520, margin: '0 auto' }}>
         <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.85rem', marginBottom: '16px' }}>Reservations</p>
         <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2.8rem, 6vw, 4rem)', marginBottom: '18px' }}>Secure Your Invitation</h1>
@@ -49,7 +51,7 @@ export default function ReservationsPage() {
           Reserve your place at the Olowojares gala with a premium booking experience. Enter your details and VIP access code to confirm attendance.
         </p>
         <p style={{ color: '#D9D2C1', lineHeight: 1.8, marginBottom: '40px' }}>
-          Once your reservation is confirmed, continue to the menu page to place your order. The menu order will be sent directly to the kitchen for preparation.
+          Your reservation is confirmed! At the reception, scan your table's QR code to unlock the menu and place your order. All orders will be sent directly to the kitchen.
         </p>
 
         {status === 'success' ? (
@@ -62,10 +64,11 @@ export default function ReservationsPage() {
               <p style={{ fontFamily: 'monospace', fontSize: '2rem', color: '#F5EFE0', margin: 0 }}>{ticketData.code}</p>
             </div>
 
-            <div style={{ marginTop: '32px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <Link href="/menu" className="btn-primary" style={{ width: 'auto', padding: '14px 24px' }}>
-                Next: Menu
-              </Link>
+            <div style={{ marginTop: '32px', display: 'flex', gap: '12px', flexWrap: 'wrap', flexDirection: 'column' }}>
+              <p style={{ color: '#E5C07B', fontSize: '0.9rem', lineHeight: 1.6, margin: '0 0 16px 0' }}>📱 <strong>To access the menu:</strong> Scan the QR code at your table in the reception hall. This will unlock your personalized menu and ordering options.</p>
+              <button onClick={() => router.push('/menu-gate')} className="btn-secondary" style={{ cursor: 'pointer', width: '100%' }}>
+                Access Menu (via QR)
+              </button>
               <Link href="/" className="btn-secondary">
                 Back: Home
               </Link>
@@ -120,15 +123,24 @@ export default function ReservationsPage() {
             </button>
           </form>
         )}
-
-        {status !== 'success' && (
-          <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'center' }}>
-            <Link href="/organisers" className="btn-secondary">
-              Back: Organisers
-            </Link>
-          </div>
-        )}
       </div>
+
+      {showMenuGateModal && (
+        <div className="tracker-overlay" role="dialog" aria-modal="true" style={{ zIndex: 200 }} onClick={() => setShowMenuGateModal(false)}>
+          <div style={{ position: 'relative', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(229,208,143,0.18)', borderRadius: '24px', padding: '30px', maxWidth: '500px', boxShadow: '0 30px 70px rgba(0,0,0,0.25)' }} onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setShowMenuGateModal(false)} style={{ position: 'absolute', top: '20px', right: '20px', border: 'none', background: 'transparent', color: '#E5D08F', fontWeight: 700, fontSize: '1.5rem', cursor: 'pointer' }}>×</button>
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.85rem', marginBottom: '16px' }}>Menu Access</p>
+              <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2.2rem', color: '#fff', marginBottom: '16px' }}>Scan to Order</h2>
+              <span style={{ fontSize: '3rem', display: 'block', margin: '24px 0' }}>📱</span>
+              <p style={{ color: '#D9D2C1', lineHeight: 1.7, margin: '20px 0', fontSize: '0.95rem' }}>To access the menu and place your order, you must scan the unique QR code at your table in the reception hall. This will unlock your personalized ordering experience.</p>
+              <button onClick={() => setShowMenuGateModal(false)} className="btn-primary" style={{ width: '100%', padding: '14px', border: 'none', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', marginTop: '24px' }}>
+                Got It, Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
