@@ -1,13 +1,14 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function ReservationsPage() {
+  const router = useRouter();
   const [form, setForm] = useState({ name: '', phone: '', email: '', vipCode: '' });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [ticketData, setTicketData] = useState({ code: '', name: '' });
-  const [showMenuGateModal, setShowMenuGateModal] = useState(false);
 
   const submitReservation = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -65,7 +66,7 @@ export default function ReservationsPage() {
 
             <div style={{ marginTop: '32px', display: 'flex', gap: '12px', flexWrap: 'wrap', flexDirection: 'column' }}>
               <p style={{ color: '#E5C07B', fontSize: '0.9rem', lineHeight: 1.6, margin: '0 0 16px 0' }}>📱 <strong>To access the menu:</strong> Scan the QR code at your table in the reception hall. This will unlock your personalized menu and ordering options.</p>
-              <button onClick={() => setShowMenuGateModal(true)} className="btn-secondary" style={{ cursor: 'pointer', width: '100%' }}>
+              <button onClick={() => router.push('/menu-gate')} className="btn-secondary" style={{ cursor: 'pointer', width: '100%' }}>
                 Access Menu (via QR)
               </button>
               <Link href="/" className="btn-secondary">
