@@ -99,18 +99,7 @@ export default function ItineraryPage() {
         </div>
       </section>
 
-      <section className="section sponsor-section">
-        <div className="sponsor-card">
-          <div>
-            <span className="eyebrow">Sponsor Promotion</span>
-            <h2>BABA-K TICKETHUB</h2>
-            <p>A premium sponsor celebration for guests joining the royal wedding experience.</p>
-          </div>
-          <Link href="#footer" className="btn-primary">
-            Explore Sponsorship
-          </Link>
-        </div>
-      </section>
+      
     </main>
   );
 }
