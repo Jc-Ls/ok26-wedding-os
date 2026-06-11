@@ -41,7 +41,7 @@ export default function ReservationsPage() {
   };
 
   return (
-    <main className="page-shell reservation-page">
+    <main className="page-shell reservation-page" style={{ backgroundImage: 'linear-gradient(135deg, rgba(10,20,47,0.85) 0%, rgba(20,35,70,0.9) 50%, rgba(10,20,47,0.85) 100%)', backgroundAttachment: 'fixed' }}>
       <div style={{ maxWidth: 520, margin: '0 auto' }}>
         <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.85rem', marginBottom: '16px' }}>Reservations</p>
         <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2.8rem, 6vw, 4rem)', marginBottom: '18px' }}>Secure Your Invitation</h1>

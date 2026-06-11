@@ -4,7 +4,7 @@ import Link from 'next/link';
 export default function TraditionsHub() {
   return (
     <main className="page-shell">
-      <div style={{ minHeight: '100vh', color: '#fff', fontFamily: '"Montserrat", sans-serif', paddingBottom: '80px' }}>
+      <div style={{ minHeight: '100vh', color: '#fff', fontFamily: '"Montserrat", sans-serif', paddingBottom: '80px', backgroundImage: 'linear-gradient(135deg, rgba(10,20,47,0.85) 0%, rgba(20,35,70,0.9) 50%, rgba(10,20,47,0.85) 100%)', backgroundAttachment: 'fixed' }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=Montserrat:wght@300;400;600&display=swap');
         .video-wrapper { width: 100%; border-radius: 12px; overflow: hidden; border: 1px solid rgba(212,175,55,0.3); margin-bottom: 20px; background-color: #000; }
