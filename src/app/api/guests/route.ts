@@ -8,17 +8,24 @@ export async function POST(request: Request) {
   try {
     const { pin } = await request.json();
     
+    if (!pin || typeof pin !== 'string') {
+      console.warn('[Concierge/POST] Invalid PIN format received');
+      return NextResponse.json({ success: false, message: 'Invalid PIN format.' }, { status: 400 });
+    }
+    
     // Find the guest by their unique OK26-XXXX pin
     const guest = await prisma.guest.findUnique({
       where: { reservationId: pin }
     });
 
     if (!guest) {
-      return NextResponse.json({ success: false, message: 'Pass not found in system.' });
+      console.warn(`[Concierge/POST] Guest not found for PIN: ${pin}`);
+      return NextResponse.json({ success: false, message: 'Pass not found in system.' }, { status: 404 });
     }
 
     if (guest.hasEntered) {
-      return NextResponse.json({ success: false, message: 'Pass ALREADY USED. Access Denied.' });
+      console.warn(`[Concierge/POST] Duplicate entry attempt for PIN: ${pin}`);
+      return NextResponse.json({ success: false, message: 'Pass ALREADY USED. Access Denied.' }, { status: 400 });
     }
 
     // Mark them as entered so they can't pass the phone to someone outside
@@ -27,9 +34,12 @@ export async function POST(request: Request) {
       data: { hasEntered: true }
     });
 
-    return NextResponse.json({ success: true, message: `Valid Pass: ${guest.fullName}` });
+    console.log(`[Concierge/POST] ✓ Access granted for: ${guest.fullName} (PIN: ${pin})`);
+    return NextResponse.json({ success: true, message: `Valid Pass: ${guest.fullName}` }, { status: 200 });
 
-  } catch {
-    return NextResponse.json({ success: false, message: 'Database Error' }, { status: 500 });
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : 'Unknown error';
+    console.error(`[Concierge/POST] Error:`, errorMsg);
+    return NextResponse.json({ success: false, message: 'Server error. Please try again.' }, { status: 500 });
   }
 }

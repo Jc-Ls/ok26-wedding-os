@@ -15,9 +15,29 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "The Olowojare's Wedding",
+  title: "M'K26 Royal Gala - The Olowojare's Wedding",
   description:
-    "A luxury celebration experience for the Olowojare wedding in Ilorin, featuring event details, RSVP flow, live event mode, and guest support.",
+    "Join us for M'K26 Royal Gala, a luxury celebration experience for the Olowojares wedding in Ilorin. Featuring event details, RSVP, live stream, and exclusive guest experiences.",
+  openGraph: {
+    title: "M'K26 Royal Gala - A Luxury Wedding Celebration",
+    description: "Experience the Olowojares' premium wedding celebration with exclusive features, RSVP, and live streaming.",
+    images: [
+      {
+        url: "https://res.cloudinary.com/din74ljlu/image/upload/v1779078967/SAVE_20260518_242717_kylnnd.jpg",
+        width: 1200,
+        height: 630,
+        alt: "M'K26 Royal Gala Wedding Celebration",
+      },
+    ],
+    type: "website",
+    siteName: "M'K26 Royal Gala",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "M'K26 Royal Gala - The Olowojare's Wedding",
+    description: "A luxury celebration experience in Ilorin",
+    images: ["https://res.cloudinary.com/din74ljlu/image/upload/v1779078967/SAVE_20260518_242717_kylnnd.jpg"],
+  },
 };
 
 export default function RootLayout({

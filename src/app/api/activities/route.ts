@@ -18,5 +18,8 @@ export async function GET() {
       return `${name} just placed a royal order 🔔`;
     });
     return NextResponse.json(activities);
-  } catch { return NextResponse.json([]); }
+  } catch (error) {
+    console.error('[Activities/GET] Error fetching recent activities:', error instanceof Error ? error.message : error);
+    return NextResponse.json([], { status: 200 });
+  }
 }

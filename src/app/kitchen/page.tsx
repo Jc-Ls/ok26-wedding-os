@@ -17,15 +17,23 @@ export default function KitchenDashboard() {
   const [waiterName, setWaiterName] = useState('');
   const [pin, setPin] = useState('');
   const [isSecurelyLoggedIn, setIsSecurelyLoggedIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchOrders = useCallback(async () => {
     try {
+      setIsLoading(true);
       const res = await fetch('/api/kitchen');
       if (res.ok) {
         const data = await res.json();
         setOrders(Array.isArray(data) ? data : []);
+      } else {
+        console.error(`[Kitchen Dashboard] API error: ${res.status}`);
       }
-    } catch(err) { console.error("Data fetch error", err); }
+    } catch(err) { 
+      console.error("[Kitchen Dashboard] Fetch error:", err);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -80,24 +88,32 @@ export default function KitchenDashboard() {
         <button onClick={() => { setIsSecurelyLoggedIn(false); setPin(''); }} style={{ padding: '10px 15px', backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', borderRadius: '6px' }}>Logout</button>
       </header>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
-        {orders.length === 0 ? <p style={{ color: '#aaa' }}>No active orders in the queue.</p> : orders.map((o) => (
-          <div key={o.id} style={{ backgroundColor: '#111', border: o.status === 'Pending' ? '1px solid #ef4444' : o.status === 'Ready' ? '1px solid #D4AF37' : '1px solid #333', padding: '20px', borderRadius: '12px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-              <h2 style={{ margin: 0, color: '#D4AF37' }}>Table {o.tableNumber}</h2>
-              <span style={{ backgroundColor: 'rgba(255,255,255,0.1)', padding: '5px 10px', borderRadius: '4px', fontSize: '0.8rem' }}>{o.status}</span>
-            </div>
-            <p style={{ margin: '0 0 5px 0', fontSize: '1.1rem' }}><strong>{o.guestName}</strong></p>
-            <p style={{ margin: '0 0 5px 0', color: '#aaa' }}>🍽️ {o.mealName} {o.withSalad ? '(+ Salad)' : ''}</p>
-            <p style={{ margin: '0 0 15px 0', color: '#aaa' }}>🍹 {o.drinkName}</p>
+      {isLoading && (
+        <div style={{ textAlign: 'center', padding: '40px', color: '#aaa' }}>
+          <p style={{ fontSize: '1.1rem' }}>⏳ Loading live orders...</p>
+        </div>
+      )}
 
-            {o.status === 'Pending' && <button onClick={() => updateStatus(o.id, 'Preparing')} style={{ width: '100%', padding: '12px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Accept & Start Cooking</button>}
-            {o.status === 'Preparing' && <button onClick={() => updateStatus(o.id, 'Ready')} style={{ width: '100%', padding: '12px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Mark as Ready</button>}
-            {o.status === 'Ready' && <button onClick={() => updateStatus(o.id, 'On the Way')} style={{ width: '100%', padding: '12px', backgroundColor: '#D4AF37', color: '#000', fontWeight: 'bold', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Claim & Deliver</button>}
-            {o.status === 'On the Way' && <p style={{ textAlign: 'center', color: '#10b981', margin: '10px 0 0 0', fontSize: '0.9rem' }}>En route by {o.deliveredBy}</p>}
-          </div>
-        ))}
-      </div>
+      {!isLoading && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+          {orders.length === 0 ? <p style={{ color: '#aaa' }}>No active orders in the queue.</p> : orders.map((o) => (
+            <div key={o.id} style={{ backgroundColor: '#111', border: o.status === 'Pending' ? '1px solid #ef4444' : o.status === 'Ready' ? '1px solid #D4AF37' : '1px solid #333', padding: '20px', borderRadius: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
+                <h2 style={{ margin: 0, color: '#D4AF37' }}>Table {o.tableNumber}</h2>
+                <span style={{ backgroundColor: 'rgba(255,255,255,0.1)', padding: '5px 10px', borderRadius: '4px', fontSize: '0.8rem' }}>{o.status}</span>
+              </div>
+              <p style={{ margin: '0 0 5px 0', fontSize: '1.1rem' }}><strong>{o.guestName}</strong></p>
+              <p style={{ margin: '0 0 5px 0', color: '#aaa' }}>🍽️ {o.mealName} {o.withSalad ? '(+ Salad)' : ''}</p>
+              <p style={{ margin: '0 0 15px 0', color: '#aaa' }}>🍹 {o.drinkName}</p>
+
+              {o.status === 'Pending' && <button onClick={() => updateStatus(o.id, 'Preparing')} style={{ width: '100%', padding: '12px', backgroundColor: '#3b82f6', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Accept & Start Cooking</button>}
+              {o.status === 'Preparing' && <button onClick={() => updateStatus(o.id, 'Ready')} style={{ width: '100%', padding: '12px', backgroundColor: '#10b981', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Mark as Ready</button>}
+              {o.status === 'Ready' && <button onClick={() => updateStatus(o.id, 'On the Way')} style={{ width: '100%', padding: '12px', backgroundColor: '#D4AF37', color: '#000', fontWeight: 'bold', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>Claim & Deliver</button>}
+              {o.status === 'On the Way' && <p style={{ textAlign: 'center', color: '#10b981', margin: '10px 0 0 0', fontSize: '0.9rem' }}>En route by {o.deliveredBy}</p>}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
     </main>
   );
