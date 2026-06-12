@@ -150,7 +150,7 @@ export default function HomePage() {
         <SplashScreen
           coupleName1="Muhammed"
           coupleName2="Kaothar"
-          weddingDate="June 21, 2026"
+          weddingDate="June 25, 2026"
           onDismiss={() => setShowSplash(false)}
         />
       )}
