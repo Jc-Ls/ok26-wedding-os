@@ -13,7 +13,7 @@ interface PageFooterProps {
 
 const pageSequence = [
   { href: '/', label: 'Home' },
-  { href: '/couple', label: 'Meet the Couple' },
+  { href: '/meet-the-couple', label: 'Meet the Couple' },
   { href: '/meet-the-olowojares', label: 'Meet the Family' },
   { href: '/honorees', label: 'Honorees' },
   { href: '/special-guests', label: 'Special Guests' },
@@ -87,8 +87,70 @@ export default function PageFooter({
       </div>
       <SponsorBanner />
       <div className="footer-bottom">
+        <style>{`
+          .footer-credit {
+            font-size: 13px;
+            color: rgba(229, 208, 143, 0.75);
+            text-align: center;
+            letter-spacing: 0.02em;
+            margin: 0;
+          }
+
+          .footer-credit-link {
+            color: #E5C07B;
+            text-decoration: none;
+            font-weight: 600;
+            position: relative;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: inline-block;
+          }
+
+          .footer-credit-link::before {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #E5C07B, #F5D962);
+            transition: width 0.4s ease;
+          }
+
+          .footer-credit-link:hover::before {
+            width: 100%;
+          }
+
+          .footer-credit-link:hover {
+            color: #F5D962;
+            text-shadow: 0 0 12px rgba(229, 192, 123, 0.6);
+          }
+
+          @keyframes portfolioGlow {
+            0%, 100% {
+              text-shadow: 0 0 0px rgba(229, 192, 123, 0.4);
+            }
+            50% {
+              text-shadow: 0 0 8px rgba(229, 192, 123, 0.8);
+            }
+          }
+
+          .footer-credit-link.pulse {
+            animation: portfolioGlow 3s ease-in-out infinite;
+          }
+        `}</style>
         <p className="footer-credit">
-          Designed & Developed by Jare&apos;s Choice Labs (JCLs) • Crafting Digital Experiences That Matter
+          Designed & Developed by{' '}
+          <a 
+            href="https://jclabs-portfolio.vercel.app/" 
+            className="footer-credit-link pulse"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Visit JCLabs Portfolio"
+          >
+            Jare&apos;s Choice Labs (JCLs)
+          </a>
+          {' '}• Crafting Digital Experiences That Matter
         </p>
       </div>
     </footer>

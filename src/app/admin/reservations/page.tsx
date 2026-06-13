@@ -7,6 +7,7 @@ type Guest = {
   fullName?: string;
   name?: string;
   reservationId?: string;
+  guestCategory?: string;
 };
 
 export default function Reservations() {
@@ -47,9 +48,18 @@ export default function Reservations() {
       {loading ? <p style={{ textAlign: 'center', color: '#aaa', marginTop: '50px' }}>Loading the Royal Guestlist...</p> : (
         <div style={{ maxWidth: '600px', margin: '30px auto', backgroundColor: '#111', padding: '20px', borderRadius: '12px', border: '1px solid #333' }}>
           {guests.length === 0 ? <p style={{ color: '#aaa', textAlign: 'center' }}>No reservations found.</p> : guests.map((g, i) => (
-            <div key={i} style={{ padding: '15px', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between' }}>
-              <span>{g.fullName || g.name}</span>
-              <span style={{ color: '#D4AF37' }}>{g.reservationId}</span>
+            <div key={i} style={{ padding: '15px', borderBottom: '1px solid #333', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '15px' }}>
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px' }}>
+                  <span>{g.fullName || g.name}</span>
+                  <span style={{ color: '#D4AF37' }}>{g.reservationId}</span>
+                </div>
+                {g.guestCategory && (
+                  <span style={{ fontSize: '0.85rem', color: '#E5C07B', marginTop: '6px', display: 'block' }}>
+                    Category: {g.guestCategory}
+                  </span>
+                )}
+              </div>
             </div>
           ))}
         </div>

@@ -16,6 +16,7 @@ model Guest {
   reservationId String   @unique
   tableNumber   String?
   ticketId      String?
+  guestCategory String?
   hasEntered    Boolean  @default(false)
   createdAt     DateTime @default(now())
 }

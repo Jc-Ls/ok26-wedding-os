@@ -5,16 +5,16 @@ import { useRouter } from 'next/navigation';
 
 export default function ReservationsPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ name: '', phone: '', email: '', vipCode: '' });
+  const [form, setForm] = useState({ name: '', phone: '', email: '', vipCode: '', guestCategory: '' });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
-  const [ticketData, setTicketData] = useState({ code: '', name: '' });
+  const [ticketData, setTicketData] = useState({ code: '', name: '', guestCategory: '' });
   const [showMenuGateModal, setShowMenuGateModal] = useState(false);
 
   const submitReservation = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
 
-    if (!form.name || !form.phone || !form.vipCode) {
+    if (!form.name || !form.phone || !form.vipCode || !form.guestCategory) {
       setErrorMsg('Please fill in all required fields.');
       return;
     }
@@ -31,7 +31,7 @@ export default function ReservationsPage() {
       const data = await res.json();
 
       if (res.ok && data.success) {
-        setTicketData({ code: data.ticketId, name: data.name });
+        setTicketData({ code: data.ticketId, name: data.name, guestCategory: data.guestCategory });
         setStatus('success');
       } else {
         setErrorMsg(data.error || 'Failed to secure reservation. Please try again.');
@@ -59,6 +59,9 @@ export default function ReservationsPage() {
           <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(229,208,143,0.18)', borderRadius: '24px', padding: '30px', boxShadow: '0 30px 70px rgba(0,0,0,0.25)' }}>
             <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '2px', marginBottom: '16px' }}>Reservation Confirmed</p>
             <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2.1rem', marginBottom: '16px', color: '#fff' }}>{ticketData.name}</h2>
+            <p style={{ color: '#D9D2C1', fontSize: '0.95rem', marginBottom: '20px' }}>
+              Attending as: <span style={{ color: '#E5C07B', fontWeight: 600 }}>{ticketData.guestCategory}</span>
+            </p>
             <p style={{ color: '#CBC1AF', marginBottom: '24px', lineHeight: 1.7 }}>Please save the VIP access code below and present it when requested at the event entrance.</p>
             <div style={{ background: 'rgba(212,175,55,0.08)', padding: '24px', borderRadius: '18px', border: '1px solid rgba(212,175,55,0.25)' }}>
               <p style={{ color: '#D9D2C1', letterSpacing: '2px', fontSize: '0.75rem', marginBottom: '10px' }}>VIP PASS CODE</p>
@@ -112,6 +115,17 @@ export default function ReservationsPage() {
                 onChange={(e) => setForm({ ...form, vipCode: e.target.value.toUpperCase() })}
                 style={{ width: '100%', padding: '16px', background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(229,208,143,0.2)', borderRadius: '12px', color: '#fff', outline: 'none', letterSpacing: '1px' }}
               />
+              <select
+                value={form.guestCategory}
+                onChange={(e) => setForm({ ...form, guestCategory: e.target.value })}
+                style={{ width: '100%', padding: '16px', background: 'rgba(0,0,0,0.35)', border: '1px solid rgba(229,208,143,0.2)', borderRadius: '12px', color: '#fff', outline: 'none', fontSize: '1rem', cursor: 'pointer', appearance: 'none', backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(229,208,143,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 12px center', backgroundSize: '24px', paddingRight: '40px' }}
+              >
+                <option value="" disabled>
+                  Select Guest Category *
+                </option>
+                <option value="Bride's Guest">Bride's Guest</option>
+                <option value="Groom's Guest">Groom's Guest</option>
+              </select>
             </div>
             <button
               type="button"

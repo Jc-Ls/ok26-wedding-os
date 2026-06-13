@@ -9,7 +9,7 @@ export default function LivePage() {
   // ⚠️ REPLACE THIS VIDEO ID WITH YOUR ACTUAL YOUTUBE LIVE VIDEO ID
   // Get it from YouTube Studio after creating your live event
   // Instructions: Go to youtube.com/studio → Create → Go live → Copy Video ID from URL
-  const youtubeVideoId = process.env.NEXT_PUBLIC_YOUTUBE_LIVE_ID || "dQw4w9WgXcQ";
+  const youtubeVideoId = process.env.NEXT_PUBLIC_YOUTUBE_LIVE_ID || "VDsu2SbqeiM";
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-purple-900 via-black to-black p-4 md:p-8">

@@ -20,7 +20,7 @@ const heroSlides = [
 ];
 
 const pageLinks = [
-  { label: 'Meet the Couple', href: '/couple' },
+  { label: 'Meet the Couple', href: '/meet-the-couple' },
   { label: 'The Family', href: '/meet-the-olowojares' },
   { label: 'Host & Parents', href: '/honorees' },
   { label: 'Special Guests', href: '/special-guests' },
@@ -80,7 +80,7 @@ export default function HomePage() {
             <summary>Explore</summary>
             <div className="nav-dropdown-panel">
               <Link href="/#schedule">Schedule</Link>
-              <Link href="/couple">Couple</Link>
+              <Link href="/meet-the-couple">Couple</Link>
               <Link href="/meet-the-olowojares">The Family</Link>
               <Link href="/special-guests">Special Guests</Link>
               <Link href="/traditions">Traditions</Link>

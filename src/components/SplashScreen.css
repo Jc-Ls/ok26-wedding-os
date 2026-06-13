@@ -20,13 +20,15 @@
 .wedding-splash-panel {
   position: relative;
   width: min(1080px, calc(100vw - 36px));
-  min-height: 100vh;
+  min-height: auto;
+  max-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 32px;
   padding: 3.5rem 2.25rem;
+  margin: auto;
   background: rgba(7, 15, 34, 0.72);
   border: 1px solid rgba(212, 175, 55, 0.18);
   border-radius: 28px;
@@ -216,15 +218,36 @@
 }
 
 @media (max-width: 720px) {
+  .wedding-splash-shell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
   .wedding-splash-panel {
     padding: 2rem 1.25rem;
     border-radius: 20px;
+    gap: 20px;
   }
   .wedding-splash-stage {
-    width: min(300px, 70vw);
-    height: min(300px, 70vw);
+    width: min(280px, 60vw);
+    height: min(280px, 60vw);
   }
   .wedding-splash-heading {
     font-size: clamp(2.3rem, 7vw, 3.4rem);
+  }
+  .wedding-splash-copy {
+    gap: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wedding-splash-panel {
+    padding: 1.5rem 1rem;
+    gap: 16px;
+  }
+  .wedding-splash-stage {
+    width: min(240px, 55vw);
+    height: min(240px, 55vw);
   }
 }

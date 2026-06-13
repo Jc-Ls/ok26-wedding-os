@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, phone, email, vipCode } = body;
+    const { name, phone, email, vipCode, guestCategory } = body;
     
     // Validate all required fields
     const nameValidation = validateName(name);
@@ -39,6 +39,11 @@ export async function POST(req: NextRequest) {
     const vipValidation = validateVipCode(vipCode);
     if (!vipValidation.valid) {
       return NextResponse.json({ error: vipValidation.error }, { status: 400 });
+    }
+
+    // Validate guest category
+    if (!guestCategory || !["Bride's Guest", "Groom's Guest"].includes(guestCategory)) {
+      return NextResponse.json({ error: "Please select a valid guest category." }, { status: 400 });
     }
 
     // Email is optional but validate if provided
@@ -83,6 +88,7 @@ export async function POST(req: NextRequest) {
     await sql`ALTER TABLE "Guest" ADD COLUMN IF NOT EXISTS email TEXT`; 
     await sql`ALTER TABLE "Guest" ADD COLUMN IF NOT EXISTS "ticketId" TEXT`; 
     await sql`ALTER TABLE "Guest" ADD COLUMN IF NOT EXISTS "tableNumber" TEXT`; 
+    await sql`ALTER TABLE "Guest" ADD COLUMN IF NOT EXISTS "guestCategory" TEXT`; 
     await sql`ALTER TABLE "Guest" ADD COLUMN IF NOT EXISTS "reservationId" TEXT`; 
     await sql`ALTER TABLE "Guest" ADD COLUMN IF NOT EXISTS "createdAt" TIMESTAMP DEFAULT NOW()`; 
     
@@ -91,7 +97,7 @@ export async function POST(req: NextRequest) {
     const newReservationId = `RES-${Math.floor(Math.random() * 1000000)}`;
 
     // Safely insert with BOTH IDs included (using sanitized values)!
-    await sql`INSERT INTO "Guest" (id, "fullName", phone, email, "ticketId", "tableNumber", "reservationId") VALUES (${newId}, ${sanitizedName}, ${sanitizedPhone}, ${sanitizedEmail}, ${sanitizedCode}, 'Assigned at Door', ${newReservationId})`;
+    await sql`INSERT INTO "Guest" (id, "fullName", phone, email, "ticketId", "tableNumber", "guestCategory", "reservationId") VALUES (${newId}, ${sanitizedName}, ${sanitizedPhone}, ${sanitizedEmail}, ${sanitizedCode}, 'Assigned at Door', ${guestCategory}, ${newReservationId})`;
 
     // 4. Send Email Notification
     let emailSent = false;
@@ -130,7 +136,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, ticketId: sanitizedCode, name: sanitizedName, emailSent });
+    return NextResponse.json({ success: true, ticketId: sanitizedCode, name: sanitizedName, guestCategory: guestCategory, emailSent });
 
   } catch (err: unknown) {
     console.error("Reserve API Error:", err instanceof Error ? err.message : err);
