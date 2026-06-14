@@ -5,14 +5,14 @@ import TiltCard from '../components/TiltCard';
 const guests = [
   { name: 'Mall. Abdulrahman Abdulrazak (CON)', title: 'The Executive Governor of Kwara State' },
   { name: 'Mall. Mustapha M Ishowo', title: 'Executive Secretary, Kwara State APC' },
-  { name: 'Engr. Femi Sanni Araba', title: 'CEO / Founder, Flow FM Station 90.7FM Araba Radio' },
-  { name: 'Prof. Abdulkadri Laaro', title: 'Dean, Faculty of Education, Kwasu' },
+  { name: 'Engr. Femi Sanni Araba', title: 'CEO / Founder, Flow FM Station 92.7FM Araba Radio' },
+  { name: 'Prof. Ibrahim Laro ABUBAKAR', title: 'Dean, Faculty of Education, Kwasu' },
   { name: 'Mr. Alabi Amuda Zeriki', title: 'Retd. Perm. Sec., LGSC' },
   { name: 'Mr. Habeeb Bolaji', title: 'NULGE Chairman, Ilorin South' },
   { name: 'Mr. Lanre Gambari', title: 'Dangote Group of Company' },
   { name: 'Alhaji Olaitan Jimoh', title: 'Former NNPC Manager' },
   { name: 'Alhaji Abdul Kareem Lambe', title: 'Former Commissioner 1, LGSC' },
-   { name: 'Hon. Abdulgfar Ahmed (THECUTEABIOLA)', title: 'S.A to kwara state Governor' },
+   { name: 'Hon. Abdulgfar Ahmed (Thecuteabiola)', title: 'TCA AUTOS' },
 ];
 
 export default function SpecialGuestsPage() {
