@@ -47,12 +47,12 @@ export default function ReservationsPage() {
     <main className="page-shell reservation-page" style={{ backgroundImage: 'linear-gradient(135deg, rgba(10,20,47,0.85) 0%, rgba(20,35,70,0.9) 50%, rgba(10,20,47,0.85) 100%)', backgroundAttachment: 'fixed' }}>
       <div style={{ maxWidth: 520, margin: '0 auto' }}>
         <p style={{ color: '#E5C07B', textTransform: 'uppercase', letterSpacing: '4px', fontSize: '0.85rem', marginBottom: '16px' }}>Reservations</p>
-        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2.8rem, 6vw, 4rem)', marginBottom: '18px' }}>Secure Your Invitation</h1>
+        <h1 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(2.8rem, 6vw, 4rem)', marginBottom: '18px' }}>Secure Your VIP Reservation</h1>
         <p style={{ color: '#D9D2C1', lineHeight: 1.8, marginBottom: '24px' }}>
-          Reserve your place at the Olowojares gala with a premium booking experience. Enter your details and VIP access code to confirm attendance.
+          Enter your access code to confirm your attendance. Your designated Table Number will be delivered directly to your email (and SMS).
         </p>
         <p style={{ color: '#D9D2C1', lineHeight: 1.8, marginBottom: '40px' }}>
-          Your reservation is confirmed! At the reception, scan your table's QR code to unlock the menu and place your order. All orders will be sent directly to the kitchen.
+         A Seamless Reception: Once seated, simply scan your table&apos;s QR code to send your dining choices straight to the kitchen. Sit back, connect, and let the hospitality come to you without a single interruption.
         </p>
 
         {status === 'success' ? (
