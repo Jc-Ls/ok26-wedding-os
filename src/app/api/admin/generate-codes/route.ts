@@ -40,17 +40,20 @@ export async function POST(req: NextRequest) {
       for (let j = 0; j < 5; j++) {
         randomPart += characters.charAt(Math.floor(Math.random() * characters.length));
       }
-      newCodes.push({ code: `MK26-${randomPart}` });
+      newCodes.push(`MK26-${randomPart}`);
     }
 
-    // Securely inject them all into the Neon Database at once
-    await prisma.vipPass.createMany({
-      data: newCodes,
-      skipDuplicates: true, // Just in case a random code accidentally duplicates
-    });
+    // Securely inject them all into the Neon Database at once using raw SQL for better control
+    const queryStr = `
+      INSERT INTO "VipPass" (code, "isUsed", "createdAt")
+      VALUES ${newCodes.map((_, idx) => `($${idx + 1}, false, NOW())`).join(', ')}
+      ON CONFLICT (code) DO NOTHING;
+    `;
+    
+    await prisma.$executeRawUnsafe(queryStr, ...newCodes);
 
-    // Extract just the text to make it easy for you to copy
-    const plainTextList = newCodes.map(c => c.code);
+    // Extract the plaintext list
+    const plainTextList = newCodes;
 
     return NextResponse.json({
       success: true,
