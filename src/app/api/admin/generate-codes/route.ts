@@ -4,8 +4,11 @@ import { getRateLimitKey, checkRateLimit } from '@/lib/rate-limit';
 
 const prisma = new PrismaClient();
 
-export async function GET(req: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
+    const body = await req.json();
+    const count = Math.min(body.count || 300, 2000); // Max 2000 per request
+
     // Extract client IP from request headers
     const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';
     
@@ -31,13 +34,13 @@ export async function GET(req: NextRequest) {
     // We use characters that are easy to read (removed O, 0, I, L to avoid confusion)
     const characters = 'ABCDEFGHJKMNPQRSTUVWXYZ123456789'; 
 
-    // Generate 300 unique codes
-    for (let i = 0; i < 300; i++) {
+    // Generate unique codes
+    for (let i = 0; i < count; i++) {
       let randomPart = '';
       for (let j = 0; j < 5; j++) {
         randomPart += characters.charAt(Math.floor(Math.random() * characters.length));
       }
-      newCodes.push({ code: `OK26-${randomPart}` });
+      newCodes.push({ code: `MK26-${randomPart}` });
     }
 
     // Securely inject them all into the Neon Database at once
@@ -51,7 +54,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: "300 VIP codes generated and locked into the vault!",
+      message: `${count} VIP codes generated and locked into the vault!`,
       total: plainTextList.length,
       codes: plainTextList,
       rateLimitRemaining: rateLimit.remaining
@@ -59,6 +62,29 @@ export async function GET(req: NextRequest) {
     
   } catch (error) {
     console.error("Generator Error:", error);
+    return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
+  }
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    // Fetch all unused codes from database
+    const allCodes = await prisma.vipPass.findMany({
+      where: { isUsed: false },
+      select: { code: true },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const codeList = allCodes.map(c => c.code);
+
+    return NextResponse.json({
+      success: true,
+      total: codeList.length,
+      codes: codeList
+    });
+    
+  } catch (error) {
+    console.error("Fetch Error:", error);
     return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
   }
 }
