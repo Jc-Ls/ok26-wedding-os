@@ -67,3 +67,13 @@ model MenuItem {
   isAvailable Boolean  @default(true)
   createdAt   DateTime @default(now())
 }
+
+model CheckInLog {
+  id            String   @id @default(cuid())
+  guestId       String
+  fullName      String
+  reservationId String
+  guestCategory String?
+  tableNumber   String?
+  checkedInAt   DateTime @default(now())
+}

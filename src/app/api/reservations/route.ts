@@ -1,6 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 // GET: For the Admin Hub to see all reservations
 export async function GET() {
@@ -42,20 +42,14 @@ export async function POST(req: Request) {
     await sql`CREATE TABLE IF NOT EXISTS "Guest" (id UUID DEFAULT gen_random_uuid() PRIMARY KEY, "fullName" TEXT, email TEXT, "ticketId" TEXT, "tableNumber" TEXT, "createdAt" TIMESTAMP DEFAULT NOW())`;
     await sql`INSERT INTO "Guest" ("fullName", email, "ticketId", "tableNumber") VALUES (${name}, ${email}, ${vipCode}, ${tableNumber || 'TBD'})`;
 
-    // 4. Send the Email via Nodemailer
+    // 4. Send the Email via Resend
     let emailSent = false;
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    if (process.env.RESEND_API_KEY) {
       try {
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-          }
-        });
+        const resend = new Resend(process.env.RESEND_API_KEY);
 
-        const mailOptions = {
-          from: `"M'K26 Royal Gala" <${process.env.EMAIL_USER}>`,
+        const response = await resend.emails.send({
+          from: "M'k26 Royal Concierge <noreply@mk26.com>",
           to: email,
           subject: "Your VIP Access Pass - M'K26 Wedding",
           html: `
@@ -73,13 +67,18 @@ export async function POST(req: Request) {
               <p style="font-size: 0.9rem; color: #aaa;">Please screenshot this email for your records.</p>
             </div>
           `
-        };
+        });
 
-        await transporter.sendMail(mailOptions);
-        emailSent = true;
-        console.log(`[Reservations/POST] ✓ Email sent to ${email} with code ${vipCode}`);
+        if (response.error) {
+          console.error(`[Reservations/POST] Resend API error:`, response.error);
+          emailSent = false;
+        } else {
+          emailSent = true;
+          console.log(`[Reservations/POST] ✓ Email sent to ${email} with code ${vipCode}`);
+        }
       } catch (emailError) {
         console.error(`[Reservations/POST] Email sending failed for ${email}:`, emailError instanceof Error ? emailError.message : emailError);
+        emailSent = false;
       }
     }
 

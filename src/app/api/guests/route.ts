@@ -34,7 +34,18 @@ export async function POST(request: Request) {
       data: { hasEntered: true }
     });
 
-    console.log(`[Concierge/POST] ✓ Access granted for: ${guest.fullName} (PIN: ${pin})`);
+    // Log the check-in event with guest category
+    await prisma.checkInLog.create({
+      data: {
+        guestId: guest.id,
+        fullName: guest.fullName,
+        reservationId: guest.reservationId,
+        guestCategory: guest.guestCategory,
+        tableNumber: guest.tableNumber
+      }
+    });
+
+    console.log(`[Concierge/POST] ✓ Access granted for: ${guest.fullName} (PIN: ${pin}) | Category: ${guest.guestCategory || 'N/A'}`);
     return NextResponse.json({ success: true, message: `Valid Pass: ${guest.fullName}` }, { status: 200 });
 
   } catch (error) {

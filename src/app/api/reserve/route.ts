@@ -1,6 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 import { NextResponse, type NextRequest } from 'next/server';
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 import { validateName, validatePhone, validateEmail, validateVipCode } from '@/lib/validation';
 import { getRateLimitKey, checkRateLimit } from '@/lib/rate-limit';
 
@@ -99,17 +99,14 @@ export async function POST(req: NextRequest) {
     // Safely insert with BOTH IDs included (using sanitized values)!
     await sql`INSERT INTO "Guest" (id, "fullName", phone, email, "ticketId", "tableNumber", "guestCategory", "reservationId") VALUES (${newId}, ${sanitizedName}, ${sanitizedPhone}, ${sanitizedEmail}, ${sanitizedCode}, 'Assigned at Door', ${guestCategory}, ${newReservationId})`;
 
-    // 4. Send Email Notification
+    // 4. Send Email Notification via Resend
     let emailSent = false;
-    if (sanitizedEmail && process.env.EMAIL_USER && process.env.EMAIL_APP_PASSWORD) {
+    if (sanitizedEmail && process.env.RESEND_API_KEY) {
       try {
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_APP_PASSWORD }
-        });
+        const resend = new Resend(process.env.RESEND_API_KEY);
         
-        const mailOptions = {
-          from: `"M'K26 Royal Gala" <${process.env.EMAIL_USER}>`,
+        const response = await resend.emails.send({
+          from: "M'k26 Royal Concierge <noreply@mk26.com>",
           to: sanitizedEmail,
           subject: "Your VIP Access Pass - M'K26 Wedding",
           html: `
@@ -126,9 +123,14 @@ export async function POST(req: NextRequest) {
               <p style="font-size: 0.9rem; color: #aaa;">Please screenshot this email for your records.</p>
             </div>
           `
-        };
-        await transporter.sendMail(mailOptions);
-        emailSent = true;
+        });
+        
+        if (response.error) {
+          console.error("Resend API error, but reservation succeeded:", response.error);
+          emailSent = false;
+        } else {
+          emailSent = true;
+        }
       } catch (emailError) {
         console.error("Email sending failed, but reservation succeeded:", emailError);
         // Don't fail the reservation if email fails - just log it
